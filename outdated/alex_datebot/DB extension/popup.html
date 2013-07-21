@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Getting Started Extension's Popup</title>
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <style type="text/css">
+  
+      body {
+        min-width:750px;
+        min-height:550px; 
+      }
+
+      #robot {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 5px; 
+      }
+
+      .bluekeywords {
+        color: blue;
+      }
+
+      #the-progress-bar {
+        display: none;
+        margin: 10px;
+      }
+
+      /*
+      textarea {
+        margin-top:8px;
+        font-size:18px;
+        color:#545454;
+        -moz-border-radius: 2px;
+        -webkit-border-radius: 2px;
+        -border-radius: 2px;
+        display:none;
+        width:100%;
+        height:85%;
+        word-wrap:break-word;
+      
+      }
+
+
+      .save {
+        display:none;
+      }
+
+      h1 {
+        display: inline;
+      }
+
+      table {
+        margin:10px;
+        width: 98%;
+      }
+
+      .columntitle {
+        border: 1px black solid;
+        background-color: 74A6BD;
+      }
+
+      tr {
+      color:#000000;
+      background-color:#74A6BD;
+      }
+
+      td {
+        padding: 5px;
+        border: 1px solid black;
+      }
+
+      #headline {
+        background-color: #D4E7ED;
+      }
+      .context {
+        width: 50%;
+      }
+
+      #info {
+        padding: 20px;
+      }
+
+      #matches {
+        font-size: 10px;
+        text-align: center;
+      }
+      */
+    </style>
+
+    <!--
+      - JavaScript and HTML must be in separate files: see our Content Security
+      - Policy documentation[1] for details and explanation.
+      -
+      - [1]: http://developer.chrome.com/extensions/contentSecurityPolicy.html
+     -->
+  </head>
+  <body>
+  <div class="container">
+      <h2> DBot</h2>
+      
+      <img id="robot" src="Thomas-Hello.png" width="300px" alt="Datebot">
+      <center><button type="button" class="btn btn-primary btn-large" id="initate">Scan The Page</button></center>
+
+    <div id="picture"></div>
+    <div id="info"></div>
+    <div id="the-progress-bar" class="progress progress-striped active">
+      <div id="the-progress-bar-2" class="bar" style="width: 0%;"></div>
+    </div>
+    <table id="gtable" class="table table-hover table-bordered" style="display:none;">
+      <thead>
+          <!--<tr>
+              <th id="headline" colspan="7" style="font-size:24px; padding:20px; font-family:cursive;">
+                Information
+              </th>
+          </tr> -->
+          <tr>
+              <th class="columntitle">Similarities</th>
+              <th class="columntitle">Context</th>
+              <th class="columntitle">The Message</th>
+          </tr>   
+      </thead>
+      <tbody>
+          
+        
+        <!--jQuery will pull data into here via parsing JSON object and putting into a table-->
+        
+         
+      </tbody>
+    <div id="matches"><a href="http://www.okcupid.com/match?filter1=0,34&filter2=2,21,25&filter3=3,25&filter4=5,31536000&filter5=1,1&filter6=35,2&filter7=32,12&filter8=10,0,16002&locid=0&timekey=1&matchOrderBy=SPECIAL_BLEND&custom_search=0&fromWhoOnline=0&mygender=m&update_prefs=1&sort_type=0&sa=1&using_saved_search=" target="_blank">Generate matches</a></div>
+    </table>
+  </div>
+    <script src="jquery.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
+

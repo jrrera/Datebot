@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <head>
+    <title>DBot Datastore</title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <h2>Summary</h2>
+
+    <p class="lead">Messages Sent: <strong>{{ count }}</strong></p>
+    <p class="lead">Responses Received: <strong>{{ responses }}</strong></p>
+    <p class="lead">Response Rate: <strong>{{ response_rate }}%</strong></p>
+
+    <h2>Data Table</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>User</th>
+          <th>Girl</th>
+          <th>Keywords</th>
+          <th>Custom?</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for message in messages %}
+          <tr>
+            <td>{{ message.date }}</td>
+            <td>{{ message.user }}</td>
+            <td>{{ message.sent_to }}</td>
+            <td>
+              <ul>
+              {% if message.keywords %}
+
+                {% for keyword in message.keywords %}
+                  <li> {{ keyword }} <small> {{ message.keywords[keyword] }} </small></li>
+                {% endfor %}
+
+              {% else %}
+                <li>No keywords could be found.</li>
+              {% endif %}
+              </ul>
+            </td>
+            <td>{{ message.customized }}</td>
+            <td>{{ message.response }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+    <a href="{{ url|safe }}">{{ url_linktext }}</a>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
+{% endautoescape %}

@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "name": "Scraper Bot",
+  "version": "2",
+  "permissions": [
+    "tabs",
+    "background"
+  ],
+  "description": "Scrapes the OKC page to make your life easier",
+  "background": {"page":"background.html"},
+  "options_page": "options.html",
+  "browser_action": {
+    "name": "Scrape dat OKC Page",
+    "icons": {"16":"Thomas-Hello.png","48":"Thomas-Hello.png","128":"Thomas-Hello.png"},
+    "default_icon": "Thomas-Hello.png",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [ {
+    "js": [ "jquery.min.js", "content_script.js" ],
+    "matches": [ "http://*/*", "https://*/*"]
+  }]
+}

@@ -1,0 +1,21 @@
+{
+    "verbose": false, 
+    "logLevel": "debug",
+    "remoteScripts": [ "http://code.jquery.com/jquery-1.9.1.min.js" ],
+    "viewportSize": {
+        "width": 800,
+        "height": 600    
+    },
+    "pageSettings": {
+        "userAgent": "Mozilla/5.0 (Windows NT 6.1; rv:9.0) Gecko/20100101 Firefox/9.0",
+        "javascriptEnabled": true,
+        "ignoreSslErrors": true,
+        "XSSAuditingEnabled": false,
+        "maxDiskCacheSize": 1000,
+        "outputEncoding": "utf8",
+        "loadImages": false,
+        "loadPlugins": false,
+        "proxy": "174.34.168.242:1080",
+        "proxyType": "socks5"
+    }
+}
