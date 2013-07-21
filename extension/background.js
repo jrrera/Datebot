@@ -48,13 +48,13 @@ function extractMatchedKeywords(response, keywords) {
 }
 
 function extractContext(response, keywords) {
-  //console.log("This is what we're extracting context from: ", response);
+  console.log("This is what we're extracting context from: ", response);
   var contextArr = [];
   var findKeyword;
   for (var i = 0; i < keywords.length; i++) {
-    findKeyword = new RegExp('[^a-zA-Z]' + keywords[i] + '[^a-zA-Z]', 'g');
+    findKeyword = new RegExp('([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)', 'g');
     if (response.search(findKeyword) != -1) {
-      var contextGrabber = response.match(new RegExp('[^\s]{0,10}(\n|.){0,50}[^a-zA-Z]' + keywords[i] + '[^a-zA-Z](\n|.){0,50}[^\s]{0,10}', 'g'));
+      var contextGrabber = response.match(new RegExp('[^\s]{0,10}(\n|.){0,50}([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)(\n|.){0,50}[^\s]{0,10}', 'g'));
       //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
       console.log("contextGrabber for the keyword " + keywords[i] + ": ", contextGrabber);
       contextGrabber[0] = contextGrabber[0].replace(/(\r\n|\n|\r)/gm," / "); //Replaces line breaks with a space to prevent code from being broken
@@ -97,19 +97,22 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo,tab){
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   if(msg.content) {
-    //console.log("content has been received, bro: ", msg.content);
-
     okcText = msg.content[0];
-    //console.log("The NEW okcText: ", okcText);
-
     okcUserName = msg.content[1];
     okcPicture = msg.content[2];
     okcContext = msg.content[3]; //Contains backslashes to help denote line breaks. May need to remove temporarily since line breaks interrupt keyword matching, and were seeing undefined for context. 
+    console.log(okcContext);
   }
 
   if(msg.method == "getProfile") {
     if (testEnvironment === false) {
-      var profile = JSON.parse(localStorage["keywords"]); 
+      try {
+        var profile = JSON.parse(localStorage["keywords"]);   
+      } 
+      catch(e) {
+        console.log ("Warning! Error. Unable to parse localStorage['keywords']. Try saving your user settings again");
+      }
+      
     } else if (testEnvironment === true) {
       var profile = JSON.parse(localStorage["keywordsTestEnvironment"]);
     }     
