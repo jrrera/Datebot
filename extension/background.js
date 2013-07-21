@@ -9,12 +9,12 @@ var testEnvironment = false;
 function sendKeyword(info,tab) {
     console.log("Word " + info.selectionText + " was clicked.");
     chrome.tabs.create({ 
-        url: "chrome-extension://oigkpfjikkegfibmpimmjdonhomehmgl/options.html",
+        url: "chrome-extension://dmjakdbcahkjfnkchfbiolmkagnfhgkd/options.html",
         active: false
     }, function(){
         chrome.tabs.query({}, function (tab){ //This is necessary to make sure the page fully loads in the browser before the message is sent
           for(var i =0; i < tab.length; i++) {
-            if (tab[i].url === "chrome-extension://oigkpfjikkegfibmpimmjdonhomehmgl/options.html") {
+            if (tab[i].url === "chrome-extension://dmjakdbcahkjfnkchfbiolmkagnfhgkd/options.html") {
               console.log("Looks like the page has loaded. Sending the message!");
               chrome.runtime.sendMessage({newKeyword:info.selectionText},function(response){});
               break;

@@ -1,6 +1,6 @@
 var testEnvironment = false;
 
-localStorage["xp"] = 900; //Uncomment this if you need to reset the XP after testing
+localStorage["xp"] = 935; //Uncomment this if you need to reset the XP after testing
 
 var self = this;
 var checkedKeywords = [];
@@ -42,6 +42,7 @@ function checkSameProfile(){
       $('#gtable').fadeIn('slow');
       $('#thecheckbox').fadeIn('slow');
       $('#portover').fadeIn();
+      $('#rescan').fadeIn();
       if (localStorage['customcheckbox'] == user) { //If I had customized the message at all, the usernames will match here, and I correctly populate table
         $('#customcheckbox').prop('checked', true);
         $('.capturemessage').html(localStorage['custommessage']);
@@ -460,14 +461,26 @@ function reverseLineBreaks(text) {
 //
 
 checkSameProfile(); //First thing to be checked. If this girl was JUST scanned, can pull that data back up without needing a rescan
+var rescan = 0; //An incrementor that will prevent the rescan from adding additional event listeners
 
 $('#portover').click(function(){
   var raw = $('.capturemessage').html();
-  
-
   var messageToPort = processLineBreaks(raw);
-
   chrome.runtime.sendMessage({portover:messageToPort},function(response){});
+});
+
+$('#rescan').click(function(){ //This will clear the table, grab the data from the page again, and generate a new set of results. Most commonly used when you add a new keyword and want to update the view
+  localStorage["name"] = null;
+  $("tbody").empty();
+  $("#picture").empty();
+  $('#the-progress-bar').css('display', 'none');
+  chrome.runtime.sendMessage({method:"triggerScript"},function(response){});
+  if (rescan == 0) {
+    chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+      generateResultsView(msg, sender, sendResponse);
+    }); 
+  }
+  rescan++; //Increments rescan so if you click 'rescan' again during same session, won't add a duplicate generateResultsView event listener
 });
 
 
@@ -478,7 +491,12 @@ $("#initiate").click(function() {
   //First, we send a runtime message to the background script. Then, we add a listener for the result back the content and background scripts. 
   chrome.runtime.sendMessage({method:"triggerScript"},function(response){});
   chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    if (msg.finalresult == "ready") {
+    generateResultsView(msg, sender, sendResponse);
+  });  
+});
+
+function generateResultsView(msg, sender, sendResponse){
+  if (msg.finalresult == "ready") {
       console.log("Asynchronous call was successful!");
       
       if ($('#picture').html().length > 0) {
@@ -493,6 +511,7 @@ $("#initiate").click(function() {
             $('#robot').slideUp();
             $('#initiate').fadeOut();
             $('#portover').fadeIn();
+            $('#rescan').fadeIn();
             response = response.replace(/\n/gi,"\\n");
             console.log("response: ", response);
             console.log("babesArray: ", babesArray);
@@ -541,7 +560,6 @@ $("#initiate").click(function() {
         }); //Ends chrome sendmessage response code
       } //Ends the else statement for the image check
     } //End the if statement for msg.finalresult
-  });  
-});
+}
 
 
