@@ -1,6 +1,6 @@
 var testEnvironment = false;
 
-//localStorage["xp"] = 900; //Uncomment this if you need to reset the XP after testing
+localStorage["xp"] = 900; //Uncomment this if you need to reset the XP after testing
 
 var self = this;
 var checkedKeywords = [];
@@ -22,7 +22,7 @@ function checkSameProfile(){
     console.log('Found a username in local storage. It was', user);
   } else {
     console.log('No user found');
-    user = undefined;
+    user = null;
   }
   
   var pattern = new RegExp(user,'i'); //The username will be compared to URL, since username can be found in URL
@@ -456,8 +456,9 @@ function reverseLineBreaks(text) {
 }
 
 
-//Begin code
+//***********************************Begin code***********************************//
 //
+
 checkSameProfile(); //First thing to be checked. If this girl was JUST scanned, can pull that data back up without needing a rescan
 
 $('#portover').click(function(){

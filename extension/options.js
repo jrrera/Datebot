@@ -1,3 +1,16 @@
+//If you ever need to restore keyword data into localStorage, follow these steps:
+/*
+1) create a variable called jsonRestore that you paste in the object from CouchDB. Then search that whole string and replace all apostraphes with an escaped apostraphe so you can wrap it in apostraphes to define it as a string
+
+2)var jsonFix = jsonRestore.replace(/\\'/gi,"'"); //This will replace the escaped apostrpahes back into regular ones, so that JSON becomes valid again
+
+3) remove any \n line breaks in opener or keywords. These will also break the JSON
+
+4) localStorage["keywords"] = jsonFix;
+
+5) PHEW! ALl done.
+*/
+
 var testEnvironment = false; 
 var testStorage = "keywordsTestingArea";
 

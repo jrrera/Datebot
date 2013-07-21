@@ -97,19 +97,22 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo,tab){
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   if(msg.content) {
-    //console.log("content has been received, bro: ", msg.content);
-
     okcText = msg.content[0];
-    //console.log("The NEW okcText: ", okcText);
-
     okcUserName = msg.content[1];
     okcPicture = msg.content[2];
     okcContext = msg.content[3]; //Contains backslashes to help denote line breaks. May need to remove temporarily since line breaks interrupt keyword matching, and were seeing undefined for context. 
+    console.log(okcContext);
   }
 
   if(msg.method == "getProfile") {
     if (testEnvironment === false) {
-      var profile = JSON.parse(localStorage["keywords"]); 
+      try {
+        var profile = JSON.parse(localStorage["keywords"]);   
+      } 
+      catch(e) {
+        console.log ("Warning! Error. Unable to parse localStorage['keywords']. Try saving your user settings again");
+      }
+      
     } else if (testEnvironment === true) {
       var profile = JSON.parse(localStorage["keywordsTestEnvironment"]);
     }     
