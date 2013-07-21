@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "Scraper Bot",
-  "version": "2.3",
+  "name": "DBot",
+  "version": "2.4",
   "permissions": [
     "tabs",
     "background",
@@ -15,11 +15,11 @@
     "128":"Thomas-Hello.png"
   },
 
-  "description": "Scrapes the OKC page to make your life easier",
+  "description": "People write long profiles. Don't spend a long time reading them.",
   "background": {"page":"background.html"},
   "options_page": "options.html",
   "browser_action": {
-    "name": "Scrape dat OKC Page",
+    "name": "Let's read some profiles",
     "icons": {"16":"Thomas-Hello16.png","48":"Thomas-Hello.png","128":"Thomas-Hello.png"},
     "default_icon": "Thomas-Hello.png",
     "default_popup": "popup.html"
