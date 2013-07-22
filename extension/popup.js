@@ -1,6 +1,6 @@
-var testEnvironment = false;
+var testEnvironment = true;
 
-localStorage["xp"] = 935; //Uncomment this if you need to reset the XP after testing
+//localStorage["xp"] = 960; //Uncomment this if you need to reset the XP after testing
 
 var self = this;
 var checkedKeywords = [];

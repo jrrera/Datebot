@@ -24,6 +24,27 @@ function removeProfileFluff(text){
 }
 
 
+function processContext() {
+	var contextArr = [];
+	var name, essay, finalEssay;
+	for (var i = 0; i < 9; i++) {
+		var contextObj = {};
+		name = $('#essay_'+i+'> a').text();
+		essay = $('#essay_text_'+i).text();
+
+		finalEssay = essay.replace(/\n/gi," ");
+
+		contextObj.name = name;
+		contextObj.essay = finalEssay;
+
+		contextArr.push(contextObj);
+		console.log(contextObj);
+	}
+
+	return contextArr;
+}
+
+
 chrome.extension.onMessage.addListener(function (msg, sender, sendResponse) {
 	//Upon receiving a scrape command from the bg script, this will scrape the page, remove line breaks & unnecessary spaces, and send back as 'summary'
 	if (msg.action == "scrape") {
@@ -33,20 +54,24 @@ chrome.extension.onMessage.addListener(function (msg, sender, sendResponse) {
 		var okcUserName = $('#basic_info_sn').text();
 		var okcPicture = $('#thumb0 img').attr('src');
 
+		var okcContext = processContext();
+		//console.log("okcText when run through process Context function", experiment);
+
+
+		//console.log("okcText before processing fluff out", okcText);
 		okcText = removeProfileFluff(okcText);
 		
-		var okcContext = okcText.replace(/(\r\n|\n|\r)/gm," / ");
-		okcText = okcText.replace(/(\r\n|\n|\r)/gm," ");
+		//var okcContext = okcText.replace(/(\r\n|\n|\r)/gm," / ");
+		//okcContext = okcContext.replace(/\s+/gm, " ");
 		
+		okcText = okcText.replace(/(\r\n|\n|\r)/gm," ");
 		okcText = okcText.replace(/\s+/gm, " ");
-		okcContext = okcContext.replace(/\s+/gm, " ");
+		
 
 		var summary = [okcText, okcUserName, okcPicture, okcContext];
 		sendResponse("scraped");
 
 		console.log("Scraped: ", okcText, okcUserName, okcPicture);
-		console.log("Sent the response: scraped");
-		console.log("okcContext: ", okcContext);
 
 		chrome.runtime.sendMessage({content: summary}); //Passes the matched keywords as the final result. Will soon update to pass a JSON object
 

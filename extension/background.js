@@ -47,22 +47,47 @@ function extractMatchedKeywords(response, keywords) {
   return matchedKeywords;
 }
 
-function extractContext(response, keywords) {
+function findEssayTitle(keyword, essays){
+  console.log(keyword);
+  console.log(essays);
+  var final;
+  var keywordRe = new RegExp(keyword, 'i');
+
+  for (var i = 0; i < essays.length; i++) {
+    var essay = essays[i].essay;
+    console.log("Now looking through this essay: ", essay);
+    if (essay.search(keywordRe) != -1) {
+      console.log("Found a match for " + keyword + ": ", + essays[i].name);
+      final = '<strong>' + essays[i].name + '</strong><br />';
+      return final;
+    } 
+  }
+  return "<strong>Unknown</strong><br />";
+}
+
+
+function extractContext(response, keywords, essays) {
   console.log("This is what we're extracting context from: ", response);
   var contextArr = [];
   var findKeyword;
+  var essayTitle;
+  var final;
+
   for (var i = 0; i < keywords.length; i++) {
     findKeyword = new RegExp('([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)', 'g');
+
     if (response.search(findKeyword) != -1) {
-      var contextGrabber = response.match(new RegExp('[^\s]{0,10}(\n|.){0,50}([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)(\n|.){0,50}[^\s]{0,10}', 'g'));
-      //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
-      console.log("contextGrabber for the keyword " + keywords[i] + ": ", contextGrabber);
-      contextGrabber[0] = contextGrabber[0].replace(/(\r\n|\n|\r)/gm," / "); //Replaces line breaks with a space to prevent code from being broken
-      console.log("contextGrabber[0] after find and replace for the keyword " + keywords[i] + ": ", contextGrabber[0]);
-      contextArr.push(contextGrabber[0]);
+
+      essayTitle = findEssayTitle(keywords[i], essays);
+      var contextGrabber = response.match(new RegExp('\S{0,10}(\n|.){0,50}([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)(\n|.){0,50}\S{0,10}', 'g')); //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
+      
+      //console.log("contextGrabber for the keyword " + keywords[i] + ": ", contextGrabber);
+      //contextGrabber[0] = contextGrabber[0].replace(/(\r\n|\n|\r)/gm," / "); //Replaces line breaks with a space to prevent code from being broken
+      final = essayTitle + contextGrabber[0];
+      contextArr.push(final);
     }
-  console.log("Context Array from this page: ", contextArr);
   } 
+
   return contextArr;
 }
 
@@ -100,7 +125,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     okcText = msg.content[0];
     okcUserName = msg.content[1];
     okcPicture = msg.content[2];
-    okcContext = msg.content[3]; //Contains backslashes to help denote line breaks. May need to remove temporarily since line breaks interrupt keyword matching, and were seeing undefined for context. 
+    okcContext = msg.content[3]; //This is an array of objects (essay title and essay)
     console.log(okcContext);
   }
 
@@ -141,7 +166,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       okcResponse = okcText;  
 
       finalKeywords = extractMatchedKeywords(okcResponse,desiredKeywords);
-      finalContext = extractContext(okcResponse,desiredKeywords);
+      finalContext = extractContext(okcResponse,desiredKeywords, okcContext);
 
       for (var i = 0; i < finalKeywords.length; i++) {
         if (desiredKeywords.indexOf(finalKeywords[i]) != -1) {
