@@ -233,9 +233,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       console.log(babeObj);
       sendResponse("background.js successfully received babeObj!");
 
-      $.post("http://localhost:3000/newint", {"interaction": babeObj}, function(result){
-        console.log("Posted the interaction to the local nodeJS server. The server wrote back: ", result);
-      });
+      //Old nodeJS CouchDB code
+      // $.post("http://localhost:3000/newint", {"interaction": babeObj}, function(result){
+      //   console.log("Posted the interaction to the local nodeJS server. The server wrote back: ", result);
+      // }); 
 
       $.post("http://dbotapp.appspot.com/int", {"interaction": babeObj, "username": "jrrera"}, function(result){
         console.log("Posted the interaction to the App Engine server. The server wrote back: ", result);
@@ -248,18 +249,49 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     
     sendResponse("background.js successfully received keywordObj!");
 
-    $.post("http://localhost:3000/keywords", {"keywords": keywordObj}, function(result){
-      console.log("Posted the keywords to the server. The result: ", result);
-    });
+    //Old nodeJS CouchDB code
+    // $.post("http://localhost:3000/keywords", {"keywords": keywordObj}, function(result){
+    //   console.log("Posted the keywords to the server. The result: ", result);
+    // });
+
+    $.ajax({
+        type: 'POST',
+        url: 'http://dbotapp.appspot.com/keywords',
+        data: JSON.stringify({
+          "username":"jrrera",
+          "keywords": keywordObj,
+         }),
+        contentType: 'application/json',
+        success: function(data,textStatus, jqXHR) {
+            console.log('POST response: ');
+            console.log(data);
+        }
+    });  
   }
 
-  if (msg.requestAllData) {
-    $.post("http://localhost:3000/data", {"keywords": keywordObj}, function(result){
-      console.log("Result of requesting all the data from the database:", result);
-      sendResponse(result);
-    });
+  if (msg.request == "appengine_keywords") {
+    $.get("http://dbotapp.appspot.com/keywords", function(result){
+      // console.log("Results of AJAX call");
+      // console.log(JSON.parse(result));
+      
+      try {
+        var aeJson = JSON.parse(result);
+        sendResponse(aeJson);  
+      } catch (e) {
+        console.log('Warning! Could not parse App Engine\'s JSON! The error:', e);
+        sendResponse('Warning! Could not parse App Engine\'s JSON! The error:', e);
+      }
+    }); 
     return true;
   }
+
+  // if (msg.requestAllData) {
+  //   $.post("http://localhost:3000/data", {"keywords": keywordObj}, function(result){
+  //     console.log("Result of requesting all the data from the database:", result);
+  //     sendResponse(result);
+  //   });
+  //   return true;
+  // }
 
 
 

@@ -46,6 +46,12 @@ body {
 	padding: 5px;
 }
 
+#import {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	padding: 5px;
+}
+
 .add {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;

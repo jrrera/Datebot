@@ -101,6 +101,47 @@ function restore_options() {
   }
 }
 
+function import_keywords(keywords) {
+  //Receive the JSON from App Engine (passed in from background page, and process if testing mode is off)
+  if (testEnvironment === false) {
+    try {
+        var profileObj = JSON.parse(keywords);    
+        //Clear page of current keywords
+        $('#keywords').empty();
+
+        //Populate the page
+        add_prepopulated_rows(profileObj);
+        console.log(profileObj);
+
+        if (profileObj.opener.length > 0) {
+          $('#opener').text(profileObj.opener);
+        }
+
+        if (profileObj.closer.length > 0) {
+          $('#closer').text(profileObj.closer);
+        }
+
+        if (profileObj.first_transition.length > 0) {
+          $('#transition1').text(profileObj.first_transition);
+        }
+
+        if (profileObj.second_transition.length > 0) {
+          $('#transition2').text(profileObj.second_transition);
+        }     
+    }
+    catch (e) {
+        console.log(e);
+        console.log("Warning! Caught an error when trying to parse AppEngine keywords. Adding default rows instead. Take console log below and try and fix the corrupted data");
+        console.log(profileObj);
+        prebuiltKeywords("error");
+    }
+  } else {
+    alert("Keywords not imported because testing environment is on!");
+  }
+}
+
+
+
 function prebuiltKeywords(status) {
 
     if (status == "new") {
@@ -387,7 +428,14 @@ $(document).ready(function(){
       $('#status').html('<span style="color:red;">' + qualityCheck(keywords,messages) + '</span>');
     }
   }); // Save and export settings  
+  
 
+  $(document.body).on('click','#import',function(){
+    chrome.runtime.sendMessage({"request":"appengine_keywords"},function(response){
+      console.log("Here's the data you requested:", response);
+      import_keywords(response);
+    });
+  });
 
   $('#requestdata').click(function(){
     console.log("Request for data has initiated.");

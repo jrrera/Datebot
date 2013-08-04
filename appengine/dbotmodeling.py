@@ -33,6 +33,12 @@ class Message(ndb.Model):
     used_dbot = ndb.BooleanProperty(default=True) #This will be for experiment where I flip a coin and either use or don't use DBot. Defaults to true
     response = ndb.BooleanProperty(default=False) #This gets updated when I scan my inbox
 
+
+class Keywords(ndb.Model):
+    """Stores the JSON file containing all keywords"""
+    date = ndb.DateTimeProperty(auto_now_add=True)
+    keywords = ndb.JsonProperty()    
+
 def user_key(user="Anonymous"):
     """Constructs a Datastore key for a user entity who sent the message."""
     return ndb.Key('User', user)
@@ -177,11 +183,29 @@ class ReceiveMessages(webapp2.RequestHandler):
                     list_of_entities.append(entry)
         ndb.put_multi(list_of_entities)
 
+class ReceiveKeywords(webapp2.RequestHandler):
+    def post(self):
+        self.response.write('Received request for keywords!')
 
+        full_json = json.loads(self.request.body)
+        user = full_json['username'] #No support for anonymous here.
+        keyword_list = json.dumps(full_json['keywords']) #Converts keywords back into JSON for storage
+
+        keywords = Keywords(parent=user_key(user))
+        keywords.keywords = keyword_list
+        keywords.put()
+
+    def get(self):
+        username = "jrrera" #Will be updated upon having additional users
+        query = Keywords.query(ancestor=user_key(username)).order(-Message.date).get()
+        
+        keyword_json = query.keywords
+        self.response.write(keyword_json)
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/int', SubmitMessage),
-    ('/messages', ReceiveMessages)
+    ('/messages', ReceiveMessages),
+    ('/keywords', ReceiveKeywords)
 ], debug=True)
 
