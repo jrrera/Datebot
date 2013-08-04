@@ -238,6 +238,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       //   console.log("Posted the interaction to the local nodeJS server. The server wrote back: ", result);
       // }); 
 
+      //TESTING CODE
+      // $.post("http://localhost:14080/int", {"interaction": babeObj, "username": "jrrera"}, function(result){
+      //   console.log("Posted the interaction to the App Engine server. The server wrote back: ", result);
+      // });
+      //END TESTING CODE
+
       $.post("http://dbotapp.appspot.com/int", {"interaction": babeObj, "username": "jrrera"}, function(result){
         console.log("Posted the interaction to the App Engine server. The server wrote back: ", result);
       });

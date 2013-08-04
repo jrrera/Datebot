@@ -1,6 +1,6 @@
-var testEnvironment = true;
+var testEnvironment = false;
 
-//localStorage["xp"] = 960; //Uncomment this if you need to reset the XP after testing
+//localStorage["xp"] = 1040; //Uncomment this if you need to reset the XP after testing
 
 var self = this;
 var checkedKeywords = [];
@@ -46,6 +46,11 @@ function checkSameProfile(){
       if (localStorage['customcheckbox'] == user) { //If I had customized the message at all, the usernames will match here, and I correctly populate table
         $('#customcheckbox').prop('checked', true);
         $('.capturemessage').html(localStorage['custommessage']);
+      }
+
+      if (localStorage['visitedfirst'] == user) { //If the prior girl had visited me first, and I selected this already, the usernames will match here, and correctly recheck the box
+        console.log("Looks like you've specified that she has visited you first. Checking off the box...")
+        $('#visitedfirst').prop('checked', true);
       }
 
       //Add functionality back in
@@ -247,7 +252,7 @@ var listEmOut = function(babesArr){
 //Create message-updating functionality
 function updateMessage(babesArr) {
       $('input').click(function(event){  //Captures all of the checked boxes that match the class of the box checked or unchecked
-        if ($(this).val() != "messaged" && $(this).val() != "custom") {
+        if ($(this).val() != "messaged" && $(this).val() != "custom" && $(this).val() != "visitedfirst") { //Makes sure to ignore the checkboxes for sending to database
 
           var messages = babesArr.matched;
           var clickedName = $(event.target).attr('class');
@@ -379,6 +384,14 @@ function prepareDatabase(babesArray) {
       $('#senddatabase').fadeOut();
     }  
   });
+  
+  $('#visitedfirst').click(function(){
+    if($(this).is(':checked')) {
+      localStorage['visitedfirst'] = babesArray.user;
+    } else {
+      localStorage['visitedfirst'] = "";
+    }
+  });
 
   $('#senddatabase').click(function() {
       var babeObj = {};
@@ -393,6 +406,12 @@ function prepareDatabase(babesArray) {
         var custom = true;
       } else {
         var custom = false;
+      }
+
+      if ($('#visitedfirst').is(':checked')) {
+        var visitedFirst = true;
+      } else {
+        var visitedFirst = false;
       }
 
       var keywords = $('.keywords input:checkbox:checked').map(function () { 
@@ -412,6 +431,7 @@ function prepareDatabase(babesArray) {
       babeObj.customized = custom;
       babeObj.opener = babesArray.opener;
       babeObj.closer = babesArray.closer;
+      babeObj.visited_first = visitedFirst;
 
       //Now, sending the babeObj to the background js file to push to the server
       chrome.runtime.sendMessage({database:babeObj},function(response){

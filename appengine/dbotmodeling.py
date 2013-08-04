@@ -32,6 +32,7 @@ class Message(ndb.Model):
     keywords = ndb.JsonProperty()
     used_dbot = ndb.BooleanProperty(default=True) #This will be for experiment where I flip a coin and either use or don't use DBot. Defaults to true
     response = ndb.BooleanProperty(default=False) #This gets updated when I scan my inbox
+    visited_first = ndb.BooleanProperty(default=False) #This is true if I used DBot on this person and they visited me first -- i.e. Robert's Remarketing
 
 
 class Keywords(ndb.Model):
@@ -112,10 +113,10 @@ class SubmitMessage(webapp2.RequestHandler):
     def post(self):
 
         #Prints some values for testing
-        print self.request.get("interaction[customized]", "Couldn't pull the customized parameter")
-        print self.request.get("interaction[opener]", "Couldn't pull opener").strip()
-        print self.request.get("interaction[username]", "Couldn't pull username")
-        print self.request.get("interaction[closer]", "Couldn't pull closer")
+        # print self.request.get("interaction[customized]", "Couldn't pull the customized parameter")
+        # print self.request.get("interaction[opener]", "Couldn't pull opener").strip()
+        # print self.request.get("interaction[username]", "Couldn't pull username")
+        # print self.request.get("interaction[closer]", "Couldn't pull closer")
 
         #Get active user
         if self.request.get("username") is not None:
@@ -131,12 +132,17 @@ class SubmitMessage(webapp2.RequestHandler):
         message.opener = self.request.get('interaction[opener]').strip()
         message.closer = self.request.get('interaction[closer]').strip()
 
+        #Determine if the message is customized
         if self.request.get('interaction[customized]') in ('true', 'True', True):
             message.customized = True
-            print "Customized? True"
         else:
-            print "Customized? False"
             message.customized = False
+
+        #Determine if the message was sent to someone who visited me first (i.e. remarketing)
+        if self.request.get('interaction[visited_first]') in ('true', 'True', True):
+            message.visited_first = True
+        else:
+            message.visited_first = False
 
         message.keywords = process_keywords(self.request, self.request.arguments())
         if self.request.get('used_dbot'):
