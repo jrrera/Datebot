@@ -7,21 +7,22 @@ var testEnvironment = false;
 //Opens the options page so that the .js can run on that page. Once that's create, callback function sends a message containing the keyword
 //that the options page can grab
 function sendKeyword(info,tab) {
-    console.log("Word " + info.selectionText + " was clicked.");
-    chrome.tabs.create({ 
-        url: "chrome-extension://dmjakdbcahkjfnkchfbiolmkagnfhgkd/options.html",
-        active: false
-    }, function(){
-        chrome.tabs.query({}, function (tab){ //This is necessary to make sure the page fully loads in the browser before the message is sent
-          for(var i =0; i < tab.length; i++) {
-            if (tab[i].url === "chrome-extension://dmjakdbcahkjfnkchfbiolmkagnfhgkd/options.html") {
-              console.log("Looks like the page has loaded. Sending the message!");
-              chrome.runtime.sendMessage({newKeyword:info.selectionText},function(response){});
-              break;
-            }
+  var extId = chrome.i18n.getMessage("@@extension_id"); //Gets the extension ID for opening the options page. Not required for creating the tab, but required for checking to see if the URL is open
+  console.log("Word " + info.selectionText + " was clicked.");
+  chrome.tabs.create({ 
+      url: "chrome-extension://" + extId + "/options.html",
+      active: false
+  }, function(){
+      chrome.tabs.query({}, function (tab){ //This is necessary to make sure the page fully loads in the browser before the message is sent
+        for(var i =0; i < tab.length; i++) {
+          if (tab[i].url === "chrome-extension://" + extId + "/options.html") {
+            console.log("Looks like the page has loaded. Sending the message!");
+            chrome.runtime.sendMessage({newKeyword:info.selectionText},function(response){});
+            break;
           }
-        });
-    });
+        }
+      });
+  });
 }
 
 //Creates the context menu, and runs the sendKeyword function once a keyword has been selected
