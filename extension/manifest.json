@@ -17,7 +17,7 @@
 
   "description": "People write long profiles. Don't spend a long time reading them.",
   "background": {"page":"background.html"},
-  "options_page": "options.html",
+  "options_page": "options/interests.html",
   "browser_action": {
     "name": "Let's read some profiles",
     "icons": {"16":"Thomas-Hello16.png","48":"Thomas-Hello.png","128":"Thomas-Hello.png"},

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" ng-app="keywordsApp" ng-csp>
+<head>
+	<meta charset="utf-8">
+	<title>Interest Management</title>
+	<link rel="stylesheet" href="/options/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/options/css/app.css">
+</head>
+<body ng-cloak>
+<div class="container">
+	<div class="navbar">
+		<div class="navbar-inner">
+			<ul class="nav">
+
+			</ul>
+		</div>
+	</div>
+	<div>
+		<h1>Interest Management</h1><br />
+	</div>
+	<div ng-controller="KeywordController" style="padding-left: 20px; padding-right: 20px;">
+		<!-- <img ng-src="{{keyword.imageUrl}}" alt="{{keyword.name}}" /> -->
+		<div class="row">
+			<div class="span5">
+				<strong>Opener:</strong><br />
+				<textarea class="openclose" placeholder="Write your opener here" ng-bind="keyword.opener"></textarea>
+			</div>
+			<div class="span5">
+				<strong>Closer:</strong><br />
+				<textarea class="openclose" placeholder="Write your closer here" ng-bind="keyword.closer"></textarea>
+			</div>
+			<div style="position:absolute; left:75%;">
+				<img src="http://iconhaze.com/wp-content/uploads/2009/09/Thomas-Hello.png" width="150px" />
+			</div>
+		</div>
+		<div class="row">
+			<div class="span5">
+				<strong>First Transition:</strong> <br />
+				<textarea class="transition" placeholder="Write your first transition here. (ex: 'Also,')" ng-bind="keyword.first_transition"></textarea>
+			</div>
+			<div class="span5">
+				<strong>Second Transition:</strong> <br />
+				<textarea class="transition" placeholder="Write your second transition here. (ex: 'Oh, and')" ng-bind="keyword.second_transition"></textarea>
+			</div>
+		</div>		
+
+		<hr />
+
+		<h3>Interests and Templates</h3>
+
+		<h5>You have {{keyword.pairs.length}} interests in the database. Only {{100 - keyword.pairs.length}} to go before you hit the goal of 100!</h5>
+		<div class="progress progress-striped active">
+			<div class="bar" style="width: {{keyword.pairs.length}}%">{{keyword.pairs.length}}%</div>
+		</div>			
+		Order By:
+		<select ng-model="sortorder" class="input-small">
+			<option selected value="keyword">Name</option>
+			<option selected value="-responses">Responses Received</option><!--This doesn't exist in the data yet :)-->
+		</select>		
+		<ul class="thumbnails">
+			<li ng-repeat="pair in keyword.pairs | orderBy: sortorder">
+				<div class="row session">
+					<div class="span3">
+						<input type="text" name="{{pair.keyword}}" ng-model="pair.keyword"/>
+					</div>
+					<div class="span7">
+						<textarea class="message" ng-model="pair.message"></textarea>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+<script src="/options/lib/jquery.min.js"></script>
+<script src="/options/lib/underscore-min.js"></script>
+<script src="/options/lib/bootstrap.min.js"></script>
+<script src="/options/lib/angular/angular.min.js"></script>
+<script src="/options/lib/angular/angular-sanitize.js"></script>
+<script src="/options/lib/angular/angular-resource.js"></script>
+<script src="/options/js/app.js"></script>
+<script src="/options/js/controllers/KeywordController.js"></script>
+<script src="/options/js/services/KeywordData.js"></script>
+</body>
+</html>
