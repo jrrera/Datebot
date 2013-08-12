@@ -1,12 +1,76 @@
 'use strict';
 
 keywordsApp.controller('KeywordController', 
-	function KeywordController($scope, keywordData) {
-		$scope.keyword = keywordData.keywords;
-		
-		//Uncomment this section once ready to integrate into Chrome extension
-		//$scope.keyword = keywordData.keywordsAjax();
+	function KeywordController($scope, $timeout, $filter, keywordData) {
+		$scope.loading = true;
+		$scope.missingField = false;
+		$scope.added = false; //Indicates if there is a keyword waiting to be added to the list from ContextMenu.
+		$scope.sortorder = '';
 
-		$scope.sortorder = 'keyword';
+		keywordData.keywordsAjax(function(data){
+			$scope.keyword = angular.fromJson(data);
+			$scope.loading = false; //Turns off loading notifications
+			$scope.completed = true; //Turns on successful load notif
+			$timeout(function(){
+				$scope.completed = false;	//Turns it off 5 seconds later
+			}, 5000);
+			
+			console.log('Is there a keyword waiting? State of $scope.added: ', $scope.added);
+			
+			if ($scope.added) {
+			  console.log('A keyword is waiting!');
+		      if (keywordData.checkForExistingKeywords($scope.newKeyword, $scope.keyword.pairs) === false) {
+				$scope.keyword.pairs.unshift({'keyword':$scope.newKeyword, 'message':'[[Requires a related message]]'}); //Add to top of keywords list
+				keywordData.saveKeywords($scope.keyword); //Save the data
+		      }
+			}
+		});
+
+		$scope.save = function() {
+			keywordData.saveKeywords($scope.keyword);
+			$scope.saved = true;
+			
+			$timeout(function(){
+				$scope.saved = false;	
+			}, 5000);
+		}
+		
+		$scope.cancelEdit = function(){
+			window.location = 'interests.html';
+		}
+
+		$scope.addRow = function(){
+			$scope.sortorder = '';
+			$scope.keyword.pairs.unshift({'keyword':'', 'message':''});
+		}
+
+		$scope.deleteRow = function(index){
+			$scope.keyword.pairs.splice(index, 1);
+		}
+		
+		//This listener handles any new keywords sent in from the Context Menu (right click).
+		chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+		  if (msg.newKeyword) {
+		    console.log("contextMenus listener was triggered. We received this keyword:", msg.newKeyword);
+
+		    var newKeyword = keywordData.trimKeyword(msg.newKeyword).toLowerCase();
+		   
+		    if (newKeyword.length > 0) {
+		    	if (!$scope.loading) { //Checks to see if the AJAX call has completed for the keywords yet. If loading = false, the process is complete, so we move forward as planned
+			      
+			      if (keywordData.checkForExistingKeywords(newKeyword, $scope.keyword.pairs) === false){ //If no matching keywords were found, create it.
+					$scope.keyword.pairs.unshift({'keyword':newKeyword, 'message':'[[Requires a related message]]'}); //Add to top of keywords list
+					keywordData.saveKeywords($scope.keyword); //Save the data
+			      }		    		
+		    	
+		    	} else {	    		
+			    	console.log('Keywords not loaded yet. Making $scope.added true!');
+			    	$scope.added = true; //Queues up this keyword to get added along with AJAX call still in progress
+			    	$scope.newKeyword = newKeyword; //This is where the new keyword is held until the AJAX call finishes (See code above for how this gets handled)
+		    	}
+		    }
+		    sendResponse('Received!');
+		  }
+		});	
 	}
 );

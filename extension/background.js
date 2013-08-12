@@ -6,18 +6,30 @@ var testEnvironment = false;
 
 //Opens the options page so that the .js can run on that page. Once that's create, callback function sends a message containing the keyword
 //that the options page can grab
+
+function sendKeywordMessage(selectionText) {
+  chrome.runtime.sendMessage({"newKeyword":selectionText},function(response){
+    if (!response) {
+      console.log("Options page hasn't received it. Resending message!");
+      sendKeywordMessage(selectionText);
+    } else {
+      console.log("Keyword successfully received by options page.");
+    }
+  });
+}
+
 function sendKeyword(info,tab) {
   var extId = chrome.i18n.getMessage("@@extension_id"); //Gets the extension ID for opening the options page. Not required for creating the tab, but required for checking to see if the URL is open
   console.log("Word " + info.selectionText + " was clicked.");
   chrome.tabs.create({ 
-      url: "chrome-extension://" + extId + "/options.html",
+      url: "chrome-extension://" + extId + "/options/interests.html",
       active: false
   }, function(){
       chrome.tabs.query({}, function (tab){ //This is necessary to make sure the page fully loads in the browser before the message is sent
         for(var i =0; i < tab.length; i++) {
-          if (tab[i].url === "chrome-extension://" + extId + "/options.html") {
+          if (tab[i].url === "chrome-extension://" + extId + "/options/interests.html") {
             console.log("Looks like the page has loaded. Sending the message!");
-            chrome.runtime.sendMessage({newKeyword:info.selectionText},function(response){});
+            sendKeywordMessage(info.selectionText); //Recursive function that sends the message until response is received
             break;
           }
         }
