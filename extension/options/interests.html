@@ -31,6 +31,9 @@
 			</div>		
 		</div>	
 		<div class="row">
+			<div class="span3">
+				<input type="text" name="username" ng-model="username" ng-change="updateUserData(username)" placeholder="Enter username here..." />
+			</div>
 			<div class="span1">	
 				<button class="btn btn-primary" ng-click="save()">Save</button>
 			</div>

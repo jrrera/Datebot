@@ -6,8 +6,9 @@ keywordsApp.controller('KeywordController',
 		$scope.missingField = false;
 		$scope.added = false; //Indicates if there is a keyword waiting to be added to the list from ContextMenu.
 		$scope.sortorder = '';
+		$scope.username = keywordData.getUsername();
 
-		keywordData.keywordsAjax(function(data){
+		keywordData.keywordsAjax($scope.username, function(data){
 			$scope.keyword = angular.fromJson(data);
 			$scope.loading = false; //Turns off loading notifications
 			$scope.completed = true; //Turns on successful load notif
@@ -26,8 +27,17 @@ keywordsApp.controller('KeywordController',
 			}
 		});
 
+		$scope.updateUserData = function(username) { //Redundant code, but not sure how else to do this for username.
+			localStorage["dbotUser"] = username;
+			keywordData.keywordsAjax(username, function(data){
+				$scope.keyword = angular.fromJson(data);
+			});
+		}
+
 		$scope.save = function() {
-			keywordData.saveKeywords($scope.keyword);
+			localStorage["dbotUser"] = $scope.username //This is what's populated in the username field, and can be changed
+			localStorage["dbotSaveUser"] = $scope.username //This marks the last user to save data
+			keywordData.saveKeywords($scope.username, $scope.keyword);
 			$scope.saved = true;
 			
 			$timeout(function(){
