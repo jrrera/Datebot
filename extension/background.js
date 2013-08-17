@@ -145,7 +145,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   if(msg.method == "getProfile") {
     if (testEnvironment === false) {
       try {
-        var profile = JSON.parse(localStorage["keywords"]);   
+        var profile = JSON.parse(localStorage["dbotKeywords"]);   
       } 
       catch(e) {
         console.log ("Warning! Error. Unable to parse localStorage['keywords']. Try saving your user settings again");
