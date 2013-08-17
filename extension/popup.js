@@ -137,7 +137,7 @@ var processKeywords = function(keywords) {
     console.log("keywords in processKeywords function: " + keywords);
 
     if (k === 0 ) {
-      upArrow = "";
+      upArrow = ""; //No up arrow for the top result
     } else {
       upArrow = '&nbsp;<a class="moveup" data-user="' + keywords.user + '" data-keyword="' + keywords.matched[k].keyword + '" data-position="' + k + ' " href="#">&uarr;</a>';
     }
@@ -330,6 +330,9 @@ function updateOrder(babesArr) {
 
     var user = $(this).data("user");
     var thisKeyword = $(this).data("keyword");
+    
+    console.log("thisKeyword is defined as:", thisKeyword);
+
     var thisPosition = parseInt($(this).data("position"));
     var preKeyword = $(this).prev().prev().prev().data("keyword");
 

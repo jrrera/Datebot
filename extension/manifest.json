@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "DBot",
-  "version": "2.5",
+  "version": "2.51",
   "permissions": [
     "tabs",
     "background",
@@ -10,9 +10,9 @@
     "http://dbotapp.appspot.com/*"
   ],
   "icons": {
-    "16":"Thomas-Hello16.png",
-    "48":"Thomas-Hello.png",
-    "128":"Thomas-Hello.png"
+    "16":"img/Thomas-Hello16.png",
+    "48":"img/Thomas-Hello48.png",
+    "128":"img/Thomas-Hello128.png"
   },
 
   "description": "People write long profiles. Don't spend a long time reading them.",
@@ -20,8 +20,8 @@
   "options_page": "options/interests.html",
   "browser_action": {
     "name": "Let's read some profiles",
-    "icons": {"16":"Thomas-Hello16.png","48":"Thomas-Hello.png","128":"Thomas-Hello.png"},
-    "default_icon": "Thomas-Hello.png",
+    "icons": {"16":"img/Thomas-Hello16.png","48":"img/Thomas-Hello48.png","128":"img/Thomas-Hello128.png"},
+    "default_icon": "img/Thomas-Hello128.png",
     "default_popup": "popup.html"
   },
   "content_scripts": [ {
