@@ -1,6 +1,6 @@
 var testEnvironment = false;
 
-//localStorage["xp"] = 1040; //Uncomment this if you need to reset the XP after testing
+localStorage["xp"] = 1180; //Uncomment this if you need to reset the XP after testing
 
 var self = this;
 var checkedKeywords = [];
@@ -127,14 +127,14 @@ function levelUp() {
 }
 
 var processKeywords = function(keywords) {     
-  // Creates the checkboxes for the keywords. API sorts in order of priority, so by default, picks the first two to be pre-checked
+  // Creates the checkboxes for the keywords. Sorts in order of priority, so by default, picks the first two to be pre-checked
   var keywordList = "";
   var progressBar;
   var progressBarText;
   var upArrow;
   var downArrow;
   for (var k = 0; k < keywords.matched.length; k++) {
-    console.log("keywords in processKeywords function: " + keywords);
+    //console.log("keywords in processKeywords function:", keywords);
 
     if (k === 0 ) {
       upArrow = ""; //No up arrow for the top result
@@ -191,7 +191,7 @@ var processContext = function(keywords) {
 
   for (var k = 0; k < keywords.matched.length; k++) {
     keywordContextList += "<li>" + keywords.matched[k].context + "</li><br />";
-    console.log("keywords.matched[k].context: ", keywords.matched[k].context);
+    //console.log("keywords.matched[k].context: ", keywords.matched[k].context);
   } //Creates the <li> context list
 
   for (k = 0; k < keywords.matched.length; k++) {
@@ -209,7 +209,7 @@ var processMessage = function(babesArray) {
   var finalMessage = "";
   var fullArray = [];
   console.log("babesArray in processMessage: ", babesArray);    
-  console.log("checkedKeywords array: ", checkedKeywords);
+  //console.log("checkedKeywords array: ", checkedKeywords);
   for (var k = 0; k < babesArray.matched.length; k++) {
     if ($.inArray(babesArray.matched[k].keyword, checkedKeywords) > -1) {
       fullArray.push(babesArray.matched[k].message);
@@ -218,7 +218,7 @@ var processMessage = function(babesArray) {
 
   for (var l = 0; l < fullArray.length; l++) {
     if (l === 0) {leadIn = babesArray.opener.replace(/\n/gi,"<br />");} else if (l===1){leadIn = babesArray.first_transition;} else {leadIn = babesArray.second_transition;}
-    console.log("leadIn:", leadIn);
+    //console.log("leadIn:", leadIn);
     finalMessage += "<p>" + leadIn + fullArray[l] + "</p>";
   }
 
@@ -265,7 +265,6 @@ function updateMessage(babesArr) {
 
           //Nested for loops determine which keywords in the babesArray match the array containing checked keywords. 
           for (var i = 0; i < messages.length; i++) {
-            console.log('Messages for loop initiated');
             matched = false; //Resets the match indicator for each keywords cycled through
 
             for (var k = 0; k < valuesArr.length; k++) {
@@ -281,10 +280,8 @@ function updateMessage(babesArr) {
           localStorage['customcheckbox'] = false; //Removes the user name from localStorage, since using defaults, as mentioned above
 
           $("tbody").empty();
-          listEmOut(babesArr);
-          //setEventListeners(babesArray);
-          updateMessage(babesArr);
-          updateOrder(babesArr);
+          listEmOut(babesArr); //Recreates the table
+          updateMessage(babesArr); //Sets up event handlers on the new table
           prepareDatabase(babesArr); //Sets up event handlers and messages to background.js that fire when you submit data to the database
           
           localStorage['babesArray'] = JSON.stringify(babesArr); //Saves the update back to local storage
@@ -326,7 +323,7 @@ function updateMessage(babesArr) {
 
 function updateOrder(babesArr) {
   $(document.body).on('click','.moveup',function(){
-    console.log("Here's the babesArr coming into the updateOrder function: ", babesArr);
+    //console.log("Here's the babesArr coming into the updateOrder function: ", babesArr);
 
     var user = $(this).data("user");
     var thisKeyword = $(this).data("keyword");
@@ -339,13 +336,10 @@ function updateOrder(babesArr) {
     var thisObject = babesArr.matched[thisPosition];
     var prevObject = babesArr.matched[thisPosition-1];
 
-    console.log("thisObject: ", thisObject);
-    console.log("prevObject: ", prevObject);
-
     babesArr.matched[thisPosition] = prevObject;
     babesArr.matched[thisPosition-1] = thisObject;
 
-    console.log("Here's the babesArr leaving the updateOrder function: ", babesArr);
+    //console.log("Here's the babesArr leaving the updateOrder function: ", babesArr);
     $("tbody").empty();
     listEmOut(babesArr);
     updateMessage(babesArr); //This reactivates the onclick handlers for updating message
@@ -353,7 +347,7 @@ function updateOrder(babesArr) {
   });
 
   $(document.body).on('click','.movedown',function(){
-    console.log("Here's the babesArr coming into the updateOrder function: ", babesArr);
+    //console.log("Here's the babesArr coming into the updateOrder function: ", babesArr);
 
     var user = $(this).data("user");
     var thisKeyword = $(this).data("keyword");
@@ -363,13 +357,10 @@ function updateOrder(babesArr) {
     var thisObject = babesArr.matched[thisPosition];
     var nextObject = babesArr.matched[thisPosition+1];
 
-    console.log("thisObject: ", thisObject);
-    console.log("nextObject: ", nextObject);
-
     babesArr.matched[thisPosition] = nextObject;
     babesArr.matched[thisPosition+1] = thisObject;
 
-    console.log("Here's the babesArr leaving the updateOrder function: ", babesArr);
+    //console.log("Here's the babesArr leaving the updateOrder function: ", babesArr);
     $("tbody").empty();
     listEmOut(babesArr);
     updateMessage(babesArr); //This reactivates the onclick handlers for updating message
