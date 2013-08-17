@@ -64,7 +64,7 @@ function findEssayTitle(keyword, essays){
   console.log(keyword);
   console.log(essays);
   var final;
-  var keywordRe = new RegExp(keyword, 'i');
+  var keywordRe = new RegExp('[^a-zA-Z]' + keyword + '[^a-zA-Z]', 'i');
 
   for (var i = 0; i < essays.length; i++) {
     var essay = essays[i].essay;
