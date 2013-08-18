@@ -16,7 +16,7 @@ keywordsApp.controller('KeywordController',
 				$scope.completed = false;	//Turns it off 5 seconds later
 			}, 5000);
 			
-			console.log('Is there a keyword waiting? State of $scope.added: ', $scope.added);
+			//console.log('Is there a keyword waiting? State of $scope.added: ', $scope.added);
 			
 			if ($scope.added) {
 			  console.log('A keyword is waiting!');
@@ -29,8 +29,14 @@ keywordsApp.controller('KeywordController',
 
 		$scope.updateUserData = function(username) { //Redundant code, but not sure how else to do this for username.
 			localStorage["dbotUser"] = username;
+			$scope.loading = true;
 			keywordData.keywordsAjax(username, function(data){
 				$scope.keyword = angular.fromJson(data);
+				$scope.loading = false;
+				$scope.completed = true; //Turns on successful load notif
+				$timeout(function(){
+					$scope.completed = false;	//Turns it off 5 seconds later
+				}, 5000);
 			});
 		}
 
