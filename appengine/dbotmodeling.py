@@ -38,6 +38,7 @@ class Message(ndb.Model):
 class Keywords(ndb.Model):
     """Stores the JSON file containing all keywords"""
     date = ndb.DateTimeProperty(auto_now_add=True)
+    user = ndb.StringProperty(default="jrrera")
     keywords = ndb.JsonProperty()    
 
 def user_key(user="Anonymous"):
@@ -213,11 +214,12 @@ class ReceiveKeywords(webapp2.RequestHandler):
         keyword_list = json.dumps(full_json['keywords']) #Converts keywords back into JSON for storage
 
         keywords = Keywords(parent=user_key(user))
+        keywords.user = user
         keywords.keywords = keyword_list
         keywords.put()
 
     def get(self):
-        username = "jrrera" #Will be updated upon having additional users
+        username = self.request.get('user') #Will be updated upon having additional users
         query = Keywords.query(ancestor=user_key(username)).order(-Message.date).get()
         
         keyword_json = query.keywords

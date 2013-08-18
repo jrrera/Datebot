@@ -17,8 +17,8 @@ keywordsApp.factory('keywordData', function($http, $log, $q){
 		},
 
 		keywordsAjax: function(username, successcb) {
-			if (username === 'jrrera') {
-				$http({method: 'GET', url:'http://dbotapp.appspot.com/keywords'}).
+			if (username === 'jrrera' || username === 'jrrera@gmail.com') {
+				$http({method: 'GET', url:'http://dbotapp.appspot.com/keywords?user='+username}).
 					success(function (data, status, headers, config){
 						var finalJson = angular.fromJson(data);
 						localStorage["dbotKeywords"] = JSON.stringify(finalJson);
@@ -72,14 +72,14 @@ keywordsApp.factory('keywordData', function($http, $log, $q){
 				keywordObj.pairs[i].keyword = keywordObj.pairs[i].keyword.toLowerCase(); //Converts all keywords to lower case, since everything is matched to OKC profile in lower case
 			}
 
-			if (username === 'jrrera') { //Only works for my username so far
+			if (username === 'jrrera' || username ==='jrrera@gmail.com') { //Only works for my username so far
 				$http({
 					method: 'POST', 
 					url:'http://dbotapp.appspot.com/keywords',
 					//url:'http://localhost:8080/keywords', //for testing
 					dataType: 'json',
 	    			data: {
-			          "username":"jrrera",
+			          "username": username,
 			          "keywords": keywordObj,
 	         		},
 	    			headers: {
