@@ -106,6 +106,7 @@
 			<li ng-repeat="pair in keyword.pairs | orderBy: sortorder">
 				<div class="row session">
 					<div class="span3">
+						<!-- <i class="icon-exclamation-sign" ng-show="recommendation()"></i> -->
 						<input type="text" name="{{pair.keyword}}" ng-model="pair.keyword" placeholder="Interest/keyword goes here" required />
 					</div>
 					<div class="span7">

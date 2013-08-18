@@ -64,6 +64,11 @@ keywordsApp.controller('KeywordController',
 			$scope.keyword.pairs.splice(index, 1);
 		}
 		
+
+		$scope.recommendation = function(text) {
+
+		}
+
 		//This listener handles any new keywords sent in from the Context Menu (right click).
 		chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 		  if (msg.newKeyword) {
