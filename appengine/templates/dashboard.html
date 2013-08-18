@@ -6,13 +6,34 @@
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
   </head>
   <body>
-    <h2>Summary</h2>
+  <div class="container">
 
-    <p class="lead">Messages Sent: <strong>{{ count }}</strong></p>
-    <p class="lead">Responses Received: <strong>{{ responses }}</strong></p>
-    <p class="lead">Response Rate: <strong>{{ response_rate }}%</strong></p>
-
-    <h2>Data Table</h2>
+    <div class="row navbar">
+      <div class="navbar-inner">
+        <a class="brand" href="#">Datebot {{admin}}</a>
+        <ul class="nav pull-right">
+          <li><a href="{{ url|safe }}">{{ url_linktext }}</a></li>
+        </ul>
+      </div>
+    </div>  
+    <div class="row">
+      <h2>Summary</h2>
+    </div>
+    
+    <div class="row">
+      <div class="span7">
+        <p class="lead">Messages Sent: <strong>{{ count }}</strong></p>
+        <p class="lead">Responses Received: <strong>{{ responses }}</strong></p>
+        <p class="lead">Response Rate: <strong>{{ response_rate }}%</strong></p>
+      </div>
+      <div class="span5 pull-right">
+        <img class="pull-right" width="175px" src="img/Thomas-Hello.png" />
+      </div>
+    </div>
+    
+    <div class="row">
+      <h2>Data Table</h2>
+    </div>
     <table class="table table-striped">
       <thead>
         <tr>
@@ -52,7 +73,8 @@
 
 
     <a href="{{ url|safe }}">{{ url_linktext }}</a>
-    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+  </div>
+  <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
   </body>
 </html>
 {% endautoescape %}

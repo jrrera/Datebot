@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+<head>
+<title>DBot App!</title>
+<link href="//netdna.bootstrapcdn.com/bootswatch/2.3.2/spacelab/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+
+  <div class="row navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="#">Datebot</a>
+      <ul class="nav pull-right">
+        <li><a href="{{ url|safe }}">{{ url_linktext }}</a></li>
+      </ul>
+    </div>
+  </div>  
+
+
+  <div class="row hero-unit">
+    <div class="row">
+      <div class="span7">
+        <h1>Online Dating Sucks.</h1>
+        <br />
+        <p>That's where Datebot comes in.</p>
+        <p>
+          <a class="btn btn-primary btn-large" href="{{ url|safe }}">
+            Get Started
+          </a>
+        </p>
+      </div>
+      <div class="span3">  
+        <img src="img/Thomas-Hello.png" width="250px" />
+      </div>
+    </div>
+  </div>  
+   
+  <ul class="thumbnails">
+    <li class="span4">
+      <div class="thumbnail">
+        <img data-src="holder.js/300x200" alt="">
+        <h3>Simplified Messaging</h3>
+        <p>Thumbnail caption...</p>
+        <a class="btn btn-primary" href="{{ url|safe }}">
+          Learn More
+        </a>      
+      </div>
+    </li>
+    <li class="span4">
+      <div class="thumbnail">
+        <img data-src="holder.js/300x200" alt="">
+        <h3>Extraordinary ROI</h3>
+        <p>Thumbnail caption...</p>
+        <a class="btn btn-primary" href="{{ url|safe }}">
+          Learn More
+        </a>
+      </div>
+    </li>
+    <li class="span4">
+      <div class="thumbnail">
+        <img data-src="holder.js/300x200" alt="">
+        <h3>Auto-Optimized</h3>
+        <p>Thumbnail caption...</p>
+        <a class="btn btn-primary" href="{{ url|safe }}">
+          Learn More
+        </a>      
+      </div>
+    </li>  
+  </ul> 
+</div>
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+{% endautoescape %}

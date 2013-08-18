@@ -55,43 +55,58 @@ def count_responses(messages):
 class MainPage(webapp2.RequestHandler):
 
     def get(self):
-        if users.get_current_user():
+        if users.get_current_user(): #checks to see if a user is logged in
             user_name = users.get_current_user().nickname()
+            message_query = Message.query(
+                ancestor=user_key(user_name)).order(-Message.date)
+            messages = message_query.fetch(100)
+
+            if users.get_current_user():
+                url = users.create_logout_url(self.request.uri)
+                url_linktext = 'Logout'
+            else:
+                url = users.create_login_url(self.request.uri)
+                url_linktext = 'Login'
+
+            if users.is_current_user_admin():
+                admin = "Admin"
+            else:
+                admin = ""
+
+            counter = len(messages)
+            responses = count_responses(messages)
+
+            if counter == 0:
+                print "Counter was 0!"
+                response_rate = 0
+            else:
+                response_rate = ((responses*100)//counter)
+                print "response_rate is", response_rate
+
+            template_values = {
+                'messages': messages,
+                'url': url,
+                'url_linktext': url_linktext,
+                'count': counter,
+                'responses': responses,
+                'response_rate': response_rate,
+                'admin': admin
+            }
+
+            template = JINJA_ENVIRONMENT.get_template('templates/dashboard.html')
+            self.response.write(template.render(template_values))            
+        
         else: 
-        	user_name = "Anonymous"
-
-        message_query = Message.query(
-            ancestor=user_key(user_name)).order(-Message.date)
-        messages = message_query.fetch(100)
-
-        if users.get_current_user():
-            url = users.create_logout_url(self.request.uri)
-            url_linktext = 'Logout'
-        else:
             url = users.create_login_url(self.request.uri)
-            url_linktext = 'Login'
+            url_linktext = 'Login / Signup'
+            template_values = {
+                'url': url,
+                'url_linktext': url_linktext
+            }
+            template = JINJA_ENVIRONMENT.get_template('templates/index.html')
+            self.response.write(template.render(template_values))  
 
-        counter = len(messages)
-        responses = count_responses(messages)
 
-        if counter == 0:
-            print "Counter was 0!"
-            response_rate = 0
-        else:
-            response_rate = ((responses*100)//counter)
-            print "response_rate is", response_rate
-
-        template_values = {
-            'messages': messages,
-            'url': url,
-            'url_linktext': url_linktext,
-            'count': counter,
-            'responses': responses,
-            'response_rate': response_rate
-        }
-
-        template = JINJA_ENVIRONMENT.get_template('index.html')
-        self.response.write(template.render(template_values))
 
 
 def process_keywords(request, arguments):
