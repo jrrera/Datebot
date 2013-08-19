@@ -15,6 +15,9 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
+- url: /datescraper
+  script: datescraper.app
+
 - url: /.*
   script: dbotmodeling.app
 
