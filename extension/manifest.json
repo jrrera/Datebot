@@ -25,7 +25,7 @@
     "default_popup": "popup.html"
   },
   "content_scripts": [ {
-    "js": [ "jquery.min.js", "content_script.js" ],
+    "js": [ "globals.js", "config.js", "jquery.min.js", "content_script.js" ],
     "matches": [ "http://www.okcupid.com/*", "https://www.okcupid.com/*"]
   }]
 }
