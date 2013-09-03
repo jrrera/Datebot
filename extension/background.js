@@ -1,9 +1,7 @@
 /*
- * @desc:  
- * @created:
+ * @desc: script for passing data between site and popup
 */
 
-(function(window, document, DEBUG, chrome, DateBot){
     var testEnvironment = false;
 
     //START DEFINING FUNCTIONS
@@ -366,4 +364,3 @@
       // if(msg.method == "triggerMessageScrape") {    
       // }  
     });
-})();

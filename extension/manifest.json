@@ -16,7 +16,7 @@
   },
 
   "description": "People write long profiles. Don't spend a long time reading them.",
-  "background": {"page":"background.html"},
+  "background": {"scripts":["background.js"]},
   "options_page": "options/interests.html",
   "browser_action": {
     "name": "Let's read some profiles",
@@ -25,7 +25,7 @@
     "default_popup": "popup.html"
   },
   "content_scripts": [ {
-    "js": [ "globals.js", "config.js", "jquery.min.js", "content_script.js" ],
+    "js": [ "globals.js", "jquery.min.js", "background.js", "content_script.js" ],
     "matches": [ "http://www.okcupid.com/*", "https://www.okcupid.com/*"]
   }]
 }

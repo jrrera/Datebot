@@ -3,10 +3,12 @@
  * @created:
 */
 
-
-// Wrap script in a closure for protected/private namespace
-(function(window, document, DEBUG, chrome, DateBot){
+$(function(){
     var testEnvironment = false;
+    var DEBUG = window.DEBUG = true;
+    var DateBot = window.DateBot || {};
+
+    console.log("chrome::", window.chrome, "datebot::", DateBot);
 
     //localStorage["xp"] = 1180; //Uncomment this if you need to reset the XP after testing
 
@@ -15,7 +17,9 @@
         messageCopy,
         experiencePoints = parseInt(localStorage["xp"]),
         newLevel,
-        currentLevel = gamify(experiencePoints); //Returns current level for comparison later
+        currentLevel = gamify(experiencePoints), //Returns current level for comparison later
+        defaultMessage = "<p>Hey, how\'s it going? Just wanted to let you know that your profile "+
+                     "is pretty awesome &ndash; very well written. Do you write in your spare time?<br /><br />Jon</p>";
 
 
 
@@ -35,7 +39,7 @@
       
       var pattern = new RegExp(user,'i'); //The username will be compared to URL, since username can be found in URL
 
-      chrome.runtime.sendMessage({url:"getURL"},function(response){
+      window.chrome.runtime.sendMessage({url:"getURL"},function(response){
         url = response; //Need to get the URL of the active tab from background.html via send message
         console.log(url);
         if (pattern.test(url) == true) {
@@ -134,6 +138,7 @@
       },6000);
     }
 
+
     var processKeywords = function(keywords) {     
       // Creates the checkboxes for the keywords. Sorts in order of priority, so by default, picks the first two to be pre-checked
       var keywordList = "";
@@ -209,6 +214,7 @@
 
       return(keywordContextList);
     };
+
 
     var processMessage = function(babesArray) {
       //Processes the message to be used in the listEmOut() function
@@ -436,7 +442,7 @@
           babeObj.visited_first = visitedFirst;
 
           //Now, sending the babeObj to the background js file to push to the server
-          chrome.runtime.sendMessage({database:babeObj},function(response){
+          window.chrome.runtime.sendMessage({database:babeObj},function(response){
             console.log("Successfully sent the babeObj!", response);
             $('#senddatabase').fadeOut();
             $('#confirmation').html("<br /><p><strong>Success! +25 XP for you!</strong></p><p>FYI, here's what we sent over:</p><p>" + JSON.stringify(babeObj, null, " ") + "</p>");
@@ -462,20 +468,20 @@
     }
 
     function processLineBreaks(text) {
-      var final;
-      final = text.replace(/\s*<br><br>\s*/gi,"\n\n");
-      final = final.replace(/\s*<br \/><br \/>\s*/gi,"\n\n");
-      final = final.replace(/\s*<\/p>\s?<p>\s*/gi,"\n\n");
-      final = final.replace(/\s*<p>\s*/gi,"");
-      final = final.replace(/\s*<\/p>\s*/gi,"");
-      final = final.replace(/\s*<br>\s*/gi,"\n");
-      return final;
+        var final;
+        final = text.replace(/\s*<br><br>\s*/gi,"\n\n");
+        final = final.replace(/\s*<br \/><br \/>\s*/gi,"\n\n");
+        final = final.replace(/\s*<\/p>\s?<p>\s*/gi,"\n\n");
+        final = final.replace(/\s*<p>\s*/gi,"");
+        final = final.replace(/\s*<\/p>\s*/gi,"");
+        final = final.replace(/\s*<br>\s*/gi,"\n");
+        return final;
     }
 
     function reverseLineBreaks(text) {
-      var final;
-      final = text.replace(/\n/gi, "<br />");
-      return final
+        var final;
+        final = text.replace(/\n/gi, "<br />");
+        return final
     }
 
 
@@ -486,102 +492,105 @@
     var rescan = 0; //An incrementor that will prevent the rescan from adding additional event listeners
 
     $('#portover').click(function(){
-      var raw = $('.capturemessage').html();
-      var messageToPort = processLineBreaks(raw);
-      chrome.runtime.sendMessage({portover:messageToPort},function(response){});
+        var raw = $('.capturemessage').html();
+        var messageToPort = processLineBreaks(raw);
+        window.chrome.runtime.sendMessage({portover:messageToPort},function(response){});
     });
 
     $('#rescan').click(function(){ //This will clear the table, grab the data from the page again, and generate a new set of results. Most commonly used when you add a new keyword and want to update the view
-      localStorage["name"] = null;
-      $("tbody").empty();
-      $("#picture").empty();
-      $('#the-progress-bar').css('display', 'none');
-      chrome.runtime.sendMessage({method:"triggerScript"},function(response){});
-      if (rescan == 0) {
-        chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-          generateResultsView(msg, sender, sendResponse);
-        }); 
-      }
-      rescan++; //Increments rescan so if you click 'rescan' again during same session, won't add a duplicate generateResultsView event listener
+        localStorage["name"] = null;
+        $("tbody").empty();
+        $("#picture").empty();
+        $('#the-progress-bar').css('display', 'none');
+        window.chrome.runtime.sendMessage({method:"triggerScript"},function(response){});
+        if (rescan == 0) {
+            window.chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+                generateResultsView(msg, sender, sendResponse);
+            }); 
+        }
+        rescan++; //Increments rescan so if you click 'rescan' again during same session, won't add a duplicate generateResultsView event listener
     });
 
 
     //jQuery event handling for clicking on the "Scan Page" button when on an OKC profile
     $("#initiate").click(function() {
-      console.log("Button has been initated.")
+        console.log("Button has been initated.")
 
-      //First, we send a runtime message to the background script. Then, we add a listener for the result back the content and background scripts. 
-      chrome.runtime.sendMessage({method:"triggerScript"},function(response){});
-      chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-        generateResultsView(msg, sender, sendResponse);
-      });  
+        //First, we send a runtime message to the background script. Then, we add a listener for the result back the content and background scripts. 
+        window.chrome.runtime.sendMessage({method:"triggerScript"},function(response){});
+        window.chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+            generateResultsView(msg, sender, sendResponse);
+        });  
     });
 
     function generateResultsView(msg, sender, sendResponse){
-      if (msg.finalresult == "ready") {
-          console.log("Asynchronous call was successful!");
-          
-          if ($('#picture').html().length > 0) {
-            console.log("Has already run!");
-          } else {
-            //Sends a message to the background.js file with the method "getProfile". Upon receiving response, updates DOM of popup.html
-            chrome.runtime.sendMessage({method:"getProfile"},function(response){
-            
-              if (!response) {
-                $('#info').html('<span style="color:red;">Can\'t find any profiles on this page. Are you on an OKCupid profile right now? If so, refreshing the page should fix this error</span>');
-              } else {
-                $('#robot').slideUp();
-                $('#initiate').fadeOut();
-                $('#portover').fadeIn();
-                $('#rescan').fadeIn();
-                response = response.replace(/\n/gi,"\\n");
-                console.log("response: ", response);
-                console.log("babesArray: ", babesArray);
-                var babesArray = JSON.parse(response);
-              }
+        if (msg.finalresult == "ready") {
+            console.log("Asynchronous call was successful!");
 
-              if (babesArray.matched.length != 0) {
-                localStorage['babesArray'] = JSON.stringify(babesArray);
-                $('#gtable').slideDown('slow');
-                $('#thecheckbox').fadeIn('slow');
-                
-                //Adds 5 points to XP bar for each match you find. 
-                var userLastScanned = localStorage["name"]; //Will be used to make sure we don't get additional points for rescans of the same girl. Also, will be used for possibly keeping the table active if you're on the same page
-                console.log("The name of the girl just scanned is", userLastScanned);
-                
-                if (babesArray.user == userLastScanned) {
-                  console.log("No XP for you. She was just scanned before.");
-                } else {
-                  if (testEnvironment == false) {
-                    experiencePoints += 5;
-                  }
-                  localStorage["xp"] = experiencePoints;
-                  newLevel = gamify(experiencePoints);
-                  
-                  if (newLevel > currentLevel) {
-                    console.log("LEVEL UP!");
-                    levelUp();
-                    currentLevel = newLevel; //This is so if you level up during scan, you don't get another level up message from subsequent message send
-                  }
-                }
-                
-                localStorage["name"] = babesArray.user; //This will be used to make sure you don't get more XP for a duplicate scan of same girl
+            if ($('#picture').html().length > 0) {
+                console.log("Has already run!");
+                return false;
+            } else {
 
-              } else {
-                $('#info').html('<p style="color:DarkRed;">Looks like this girl has nothing in common with you based on your keywords. Bummer. Try this default message on for size:</p><div style="border-style:dotted; padding:5px;">' + DateBot.config.defaultMessage + '</div>');
-              }
-              
-              $('#the-progress-bar').css('display', 'block');
+                //Sends a message to the background.js file with the method "getProfile". Upon receiving response, updates DOM of popup.html
+                window.chrome.runtime.sendMessage({method:"getProfile"},function(response){
 
-              listEmOut(babesArray);
-              //setEventListeners(babesArray);
-              updateMessage(babesArray);
-              updateOrder(babesArray);
-              prepareDatabase(babesArray); //Sets up event handlers and messages to background.js that fire when you submit data to the database
-              
-            }); //Ends chrome sendmessage response code
-          } //Ends the else statement for the image check
+                    if (!response) {
+                        $('#info').html('<span style="color:red;">Can\'t find any profiles on this page. Are you on an OKCupid profile right now? If so, refreshing the page should fix this error</span>');
+                        return false;
+                    } else {
+                        $('#robot').slideUp();
+                        $('#initiate').fadeOut();
+                        $('#portover').fadeIn();
+                        $('#rescan').fadeIn();
+                        response = response.replace(/\n/gi,"\\n");
+                        console.log("response: ", response);
+                        console.log("babesArray: ", babesArray);
+                        var babesArray = JSON.parse(response);
+
+                        if (babesArray.matched.length != 0) {
+                            localStorage['babesArray'] = JSON.stringify(babesArray);
+                            $('#gtable').slideDown('slow');
+                            $('#thecheckbox').fadeIn('slow');
+
+                            //Adds 5 points to XP bar for each match you find. 
+                            var userLastScanned = localStorage["name"]; //Will be used to make sure we don't get additional points for rescans of the same girl. Also, will be used for possibly keeping the table active if you're on the same page
+                            console.log("The name of the girl just scanned is", userLastScanned);
+
+                            if (babesArray.user == userLastScanned) {
+                                console.log("No XP for you. She was just scanned before.");
+                            } else {
+                                if (testEnvironment == false) {
+                                    experiencePoints += 5;
+                                }
+                                localStorage["xp"] = experiencePoints;
+                                newLevel = gamify(experiencePoints);
+
+                                if (newLevel > currentLevel) {
+                                    console.log("LEVEL UP!");
+                                    levelUp();
+                                    currentLevel = newLevel; //This is so if you level up during scan, you don't get another level up message from subsequent message send
+                                }
+                            }
+
+                            localStorage["name"] = babesArray.user; //This will be used to make sure you don't get more XP for a duplicate scan of same girl
+
+                        } else {
+                            $('#info').html('<p style="color:DarkRed;">Looks like this girl has nothing in common with you based on your keywords. Bummer. Try this default message on for size:</p><div style="border-style:dotted; padding:5px;">' + defaultMessage + '</div>');
+                        }
+
+                        $('#the-progress-bar').css('display', 'block');
+
+                        listEmOut(babesArray);
+                        //setEventListeners(babesArray);
+                        updateMessage(babesArray);
+                        updateOrder(babesArray);
+                        prepareDatabase(babesArray); //Sets up event handlers and messages to background.js that fire when you submit data to the database
+                    }
+
+                }); //Ends chrome sendmessage response code
+            } //Ends the else statement for the image check
         } //End the if statement for msg.finalresult
     }
 
-})();
+});
