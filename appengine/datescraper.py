@@ -7,260 +7,143 @@ sys.path.insert(0, 'libs') #for being able to use third party libraries
 import webapp2
 from bs4 import BeautifulSoup
 import mechanize
+import re
+import time #for delaying how often a scrape occurs.
+
+from google.appengine.api import users
+from google.appengine.ext import ndb
+
+from google.appengine.api import urlfetch
+urlfetch.set_default_fetch_deadline(45) #Extends HTTP request timeout to 45 seconds
+
+def user_key(user="Anonymous"):
+    """Constructs a Datastore key for a user entity who sent the message."""
+    return ndb.Key('User', user)
+
+def processProfile(resp, userMatch, user):
+    # Print the site
+    content = resp.get_data()
+
+    #Will use this to parse HTML in front end: http://stackoverflow.com/questions/9551230/jquery-selectors-on-a-html-string
+    #Create a new message object and assign the values from POST request
+    profile = Profile(parent=user_key(user))
+    profile.user = user
+    profile.profile_name = userMatch #need to parse this from URL
+    profile.html = content
+    
+    #Begin upsert logic
+    preexist_query = Profile.query(Profile.profile_name == profile.profile_name, ancestor=user_key(user)).fetch()
+    if len(preexist_query) > 0:
+        print "You've already scraped this girl's profile, as the user: %s! Not creating a new entry, but will update HTML in case profile changed" % user
+        print preexist_query
+        for entry in preexist_query:
+            entry.html = profile.html
+            entry.put()
+    else:
+        #Save entry
+        profile.put()
+        print "Profile scraped and saved! Here is what was written:", str(profile)
+
+
+class Profile(ndb.Model):
+    """Models a profile scraped via Mechanize"""
+
+    date = ndb.DateTimeProperty(auto_now_add=True)
+    user = ndb.StringProperty()
+    profile_name = ndb.StringProperty()
+    html = ndb.TextProperty()
+    visited_first = ndb.BooleanProperty(default=False) #This will get updated in a different cron process, TBD
 
 class ScrapeOkc(webapp2.RequestHandler):
     def get(self):
-        print "Scrape request received!"
-        self.response.write("Scrape request received!")            
-        
-        # br = mechanize.Browser()
-        # br.open("http://www.livingforimprovement.com/")
-        
-        # # follow second link with element text matching regular expression
-        # response1 = br.follow_link(text_regex=r"g", nr=1)
-        # assert br.viewing_html()
-        # print br.title()
-        # print response1.geturl()
-        # print response1.info()  # headers
-        # print response1.read()  # body     
 
-        response = mechanize.urlopen("http://www.okcupid.com/")
-        print response.read()           
+        #Get active user
+        user = users.get_current_user().nickname()
+        
+        #Check if user object came back with a match. If so, script continues
+        if not user:
+            print 'No user! Time to log in'
+            self.redirect(users.create_login_url(self.request.uri))
+
+        username = 'kr7l3g3nd'
+        password = 'mewtwo'
+
+        self.response.write("Scrape request received!")            
+
+        #Initialize mechanize
+        br = mechanize.Browser()
+
+        # Browser options
+        br.set_handle_equiv(True) #This handles a particular type of HTTP equiv meta tag
+        br.set_handle_gzip(True) #Handles gzip content type if necessary
+        br.set_handle_redirect(True) #Handles 30x redirects
+        br.set_handle_referer(True) #Handles being referred to another location
+        br.set_handle_robots(False)  # Ignore rules set in robots.txt. 
+        
+        # Follows refresh 0 but not hangs on refresh > 0
+        br.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+        br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
+        br.open('http://www.okcupid.com/')
+        br.select_form(name='loginf')
+        br['username'] = username
+        br['password'] = password
+        br.submit()
+
+        assert br.viewing_html() #Check to make sure browser has access to the HTML
+        
+        #Open the matches page with certain filters already defined
+        
+        # #This is the REAL filter. Enable when going live.
+        # br.open('http://www.okcupid.com/match?filter1=0,34&filter2=2,20,26&filter3=3,10&filter4=5,2678400&filter5=1,1&filter6=35,2&filter7=32,76&filter8=10,0,16002&locid=0&timekey=1&matchOrderBy=SPECIAL_BLEND&custom_search=0&fromWhoOnline=0&mygender=m&update_prefs=1&sort_type=0&sa=1&using_saved_search=')
+        
+        #This is a testing filter for more matches
+        br.open('http://www.okcupid.com/match?filter1=0,34&filter2=2,20,26&filter3=3,10&filter4=5,2678400&filter5=1,1&filter6=35,2&locid=0&timekey=1&matchOrderBy=MATCH&custom_search=0&fromWhoOnline=0&mygender=m&update_prefs=1&sort_type=0&sa=1&using_saved_search=')
+
+
+        # Initializing patterns and iterator for handling links we're about to scrape
+        resp = None
+        pattern = re.compile( '/profile/' ) #looks for a link that brings you to a profile page
+        ignore_pattern = re.compile('cf=recently_visited') #We don't want to open a profile of someone already visited
+        userMatch = "initalizing userMatch" #declared as global variable so that we don't get "Referenced before assignment" error in loop below
+        iterator = 1 #will used to only scrape 20 profiles at a time
+
+        for link in br.links():
+            print link.url
+
+        for link in br.links():
+            if iterator > 20:
+                print "Breaking because iterator is greater than 20"
+                break
+
+            siteMatch = pattern.search( link.url )
+            ignoreMatch = ignore_pattern.search ( link.url )
+            
+            if siteMatch and not ignoreMatch:
+
+                #We found a potential valid link. Now, need to check if this was JUST scraped, since the same username appears in a link 3 times per entry. Following the same profile link three times is wasteful
+                if re.search(userMatch, link.url):
+                    print "We just looked at this profile. Moving on to next link..."
+                    continue
+
+                #If above test passes, we've not seen this profile is this browsing session. Continue with scraping
+                print 'Found a match that wasn\'t someone I already visited! It was %s' % (link.url)
+                print "This is match number " + str(iterator)
+                
+                userPattern = re.search('/profile/(.*)\?', link.url) #Extracts the username from the URL
+                if userPattern:
+                    global userMatch #This keeps the variable global, so that we don't get a "Referenced before assignment" error when checking to see if we just looked at this profile
+                    userMatch = userPattern.group(1)
+                    print userMatch
+                
+                resp = br.follow_link( link )
+                processProfile(resp, userMatch, user) #Function to process the response given by okcupid
+                print 'Delaying by 10 seconds...'
+                time.sleep(10)
+                iterator += 1
+                br.back()          
+
 
 app = webapp2.WSGIApplication([
     ('/datescraper', ScrapeOkc)
 ], debug=True)
-
-
-###########
-
-# import cgi
-# import urllib
-# import json
-# import ast #for converting strings into dictionaries. Not needed right now, but here just in case
-# import re  #regular expressions
-# import logging #for logging stuff to console
-
-# from google.appengine.api import users
-# from google.appengine.ext import ndb
-
-# import os
-# import jinja2
-
-# JINJA_ENVIRONMENT = jinja2.Environment(
-#     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-#     extensions=['jinja2.ext.autoescape'])
-
-
-# class Message(ndb.Model):
-#     """Models a message sent via DBot"""
-
-#     date = ndb.DateTimeProperty(auto_now_add=True)
-#     user = ndb.StringProperty()
-#     sent_to = ndb.StringProperty()
-#     opener = ndb.StringProperty()
-#     closer = ndb.StringProperty()
-#     customized = ndb.BooleanProperty()
-#     keywords = ndb.JsonProperty()
-#     used_dbot = ndb.BooleanProperty(default=True) #This will be for experiment where I flip a coin and either use or don't use DBot. Defaults to true
-#     response = ndb.BooleanProperty(default=False) #This gets updated when I scan my inbox
-#     visited_first = ndb.BooleanProperty(default=False) #This is true if I used DBot on this person and they visited me first -- i.e. Robert's Remarketing
-
-
-# class Keywords(ndb.Model):
-#     """Stores the JSON file containing all keywords"""
-#     date = ndb.DateTimeProperty(auto_now_add=True)
-#     user = ndb.StringProperty(default="jrrera")
-#     keywords = ndb.JsonProperty()    
-
-# def user_key(user="Anonymous"):
-#     """Constructs a Datastore key for a user entity who sent the message."""
-#     return ndb.Key('User', user)
-
-# def count_responses(messages):
-#     """Counts the number of messages pulled from the database that received a response."""
-#     responses = 0
-#     for message in messages:
-#         if message.response == True:
-#             responses += 1
-#     return responses
-
-# class MainPage(webapp2.RequestHandler):
-
-#     def get(self):
-#         if users.get_current_user(): #checks to see if a user is logged in
-#             user_name = users.get_current_user().nickname()
-#             message_query = Message.query(
-#                 ancestor=user_key(user_name)).order(-Message.date)
-#             messages = message_query.fetch(100)
-
-#             if users.get_current_user():
-#                 url = users.create_logout_url(self.request.uri)
-#                 url_linktext = 'Logout'
-#             else:
-#                 url = users.create_login_url(self.request.uri)
-#                 url_linktext = 'Login'
-
-#             if users.is_current_user_admin():
-#                 admin = "Admin"
-#             else:
-#                 admin = ""
-
-#             counter = len(messages)
-#             responses = count_responses(messages)
-
-#             if counter == 0:
-#                 print "Counter was 0!"
-#                 response_rate = 0
-#             else:
-#                 response_rate = ((responses*100)//counter)
-#                 print "response_rate is", response_rate
-
-#             template_values = {
-#                 'messages': messages,
-#                 'url': url,
-#                 'url_linktext': url_linktext,
-#                 'count': counter,
-#                 'responses': responses,
-#                 'response_rate': response_rate,
-#                 'admin': admin
-#             }
-
-#             template = JINJA_ENVIRONMENT.get_template('templates/dashboard.html')
-#             self.response.write(template.render(template_values))            
-        
-#         else: 
-#             url = users.create_login_url(self.request.uri)
-#             url_linktext = 'Login / Signup'
-#             template_values = {
-#                 'url': url,
-#                 'url_linktext': url_linktext
-#             }
-#             template = JINJA_ENVIRONMENT.get_template('templates/index.html')
-#             self.response.write(template.render(template_values))  
-
-
-
-
-# def process_keywords(request, arguments):
-#     """ Cycles through all of the arguments, and constructs a dictionary out of the 'keyword' arguments and their respective position """
-#     final = {}
-#     p = re.compile('keywords')
-
-#     for argument in arguments:
-#         if p.search(argument):
-#             substrings = re.findall(r'(\[keywords\])\[(.*)\]', argument)
-#             keyword = str(substrings[0][1]) #This substring ends up being the name of the keyword based on RegEx
-#             position = request.get(argument) #This gets the position of the keyword
-#             final[keyword] = int(position)
-
-#     print final
-#     return final
-
-# class SubmitMessage(webapp2.RequestHandler):
-#     def post(self):
-
-#         #Prints some values for testing
-#         # print self.request.get("interaction[customized]", "Couldn't pull the customized parameter")
-#         # print self.request.get("interaction[opener]", "Couldn't pull opener").strip()
-#         # print self.request.get("interaction[username]", "Couldn't pull username")
-#         # print self.request.get("interaction[closer]", "Couldn't pull closer")
-
-#         #Get active user
-#         if self.request.get("username") is not None:
-#             user = self.request.get("username")
-#         else: 
-#         	user = "Anonymous"
-
-#         #Create a new message object and assign the values from POST request
-#         message = Message(parent=user_key(user))
-
-#         message.user = user
-#         message.sent_to = self.request.get('interaction[username]')
-#         message.opener = self.request.get('interaction[opener]').strip()
-#         message.closer = self.request.get('interaction[closer]').strip()
-
-#         #Determine if the message is customized
-#         if self.request.get('interaction[customized]') in ('true', 'True', True):
-#             message.customized = True
-#         else:
-#             message.customized = False
-
-#         #Determine if the message was sent to someone who visited me first (i.e. remarketing)
-#         if self.request.get('interaction[visited_first]') in ('true', 'True', True):
-#             message.visited_first = True
-#         else:
-#             message.visited_first = False
-
-#         message.keywords = process_keywords(self.request, self.request.arguments())
-#         if self.request.get('used_dbot'):
-#             message.used_dbot = self.request.get('used_dbot')
-
-#         #Begin upsert logic
-#         preexist_query = Message.query(Message.sent_to == message.sent_to, ancestor=user_key(user)).fetch()
-#         if len(preexist_query) > 0:
-#             print "You've already messaged this girl, as the user: %s! Not creating a new entry" % user
-#             print preexist_query
-#             #Will eventually update this to update the entry, rather than reject it
-#             self.response.write('Girl already exists. No new entry created.')
-#         else:
-#             message.put()
-#             print "Success! Here is what was written:", str(message)
-#             self.response.write('New entry written! Here\'s what was written:' + str(message))
-
-# class ReceiveMessages(webapp2.RequestHandler):
-#     def post(self):
-
-#         #Captures all names in an array
-#         names = self.request.POST.getall('names[]')
-#         print names
-
-#         self.response.write('Got it, thanks!')
-
-#         #Get the correct user for querying the database
-#         if self.request.get("username") is not None:
-#             user = self.request.get("username")
-#         else: 
-#             user = "Anonymous"        
-
-
-#         #Begin upsert logic
-#         preexist_query = Message.query(Message.response == False, ancestor=user_key(user)).fetch()
-
-#         list_of_entities = []
-#         for entry in preexist_query:
-#             for name in names:
-#                 if entry.sent_to == name:
-#                     print "Found a match!"
-#                     print name
-#                     entry.response = True
-#                     list_of_entities.append(entry)
-#         ndb.put_multi(list_of_entities)
-
-# class ReceiveKeywords(webapp2.RequestHandler):
-#     def post(self):
-#         self.response.write('Received request for keywords!')
-
-#         full_json = json.loads(self.request.body)
-#         user = full_json['username'] #No support for anonymous here.
-#         keyword_list = json.dumps(full_json['keywords']) #Converts keywords back into JSON for storage
-
-#         keywords = Keywords(parent=user_key(user))
-#         keywords.user = user
-#         keywords.keywords = keyword_list
-#         keywords.put()
-
-#     def get(self):
-#         username = self.request.get('user') #Will be updated upon having additional users
-#         query = Keywords.query(ancestor=user_key(username)).order(-Message.date).get()
-        
-#         keyword_json = query.keywords
-#         self.response.write(keyword_json)
-
-# app = webapp2.WSGIApplication([
-#     ('/', MainPage),
-#     ('/int', SubmitMessage),
-#     ('/messages', ReceiveMessages),
-#     ('/keywords', ReceiveKeywords)
-# ], debug=True)
-
