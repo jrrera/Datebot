@@ -15,7 +15,13 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
-- url: /datescraper
+- url: /static
+  static_dir: static
+
+- url: /datescraper.*
+  script: datescraper.app
+
+- url: /getscrapes
   script: datescraper.app
 
 - url: /.*
