@@ -264,10 +264,18 @@ class ScrapeOkc2(webapp2.RequestHandler):
         
 class GetScrapes(webapp2.RequestHandler):
     def get(self):
-        result = Profile.query().fetch(1)
+        results = Profile.query().fetch(5)
 
         json_shell = {}
-        json_shell['result'] = result[0].html
+        profile_array = []
+
+        for profile in results:
+            profile_obj = {}
+            profile_obj['html'] = profile.html
+            profile_array.append(profile_obj)
+
+        json_shell['request'] = 'get_profiles'
+        json_shell['profiles'] = profile_array
         final_json = json.dumps(json_shell, encoding="utf-8", separators=(',',':'), sort_keys=True)
   
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')

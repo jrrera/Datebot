@@ -1,0 +1,51 @@
+<html ng-app="scraperApp">
+<head>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container" ng-controller="ProfileController">
+	<h1>Datebot Web Alpha</h1>
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th class="columntitle">Match</th>
+			    <th class="columntitle">Similarities</th>
+			    <th class="columntitle">Context</th>
+			    <th class="columntitle">The Message</th>
+			</tr>
+		</thead>
+		<tr ng-repeat="profile in profiles">
+			<td id="matchinfo">
+				{{profile.okcUsername}}	
+				<img src="{{profile.okcPicture}}" />				
+			</td>
+			<td id="similarities">
+				<div ng-repeat="match in profile.matches.matched">
+					<input type="checkbox" ng-model="match.checked" ng-checked="match.checked" /> {{match.keyword}}
+				</div>
+			</td>
+			<td id="match_context">
+				<p ng-repeat="match in profile.matches.matched" ng-bind-html-unsafe="match.context"></p>
+			</td>
+			<td id="the_message">
+				<p ng-bind-html-unsafe="profile.matches.opener"></p>
+				<p ng-repeat="match in profile.matches.matched" ng-show="match.checked">{{match.message}}</p>
+				<p ng-bind-html-unsafe="profile.matches.closer"></p>
+			</td>
+			
+			{{profile.okcText}}
+		</tr>
+	</table>
+	<!--$('#output').children(":visible").text() WIL NEED TO USE THIS CODE FOR TRANSFERRING OVER TO OKCUPID-->
+</div>
+<script src="lib/jquery.min.js"></script>
+<!-- <script src="lib/underscore-min.js"></script> -->
+<script src="lib/bootstrap.min.js"></script>
+<script src="lib/angular/angular.min.js"></script>
+<!--<script src="http://codeorigin.jquery.com/jquery-1.10.2.min.js"></script>-->
+<script src="js/app.js"></script>
+<script src="js/services/ScraperData.js"></script>
+<script src="js/controllers/ProfileController.js"></script>
+
+</body>
+</html>
