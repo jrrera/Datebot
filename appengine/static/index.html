@@ -1,6 +1,23 @@
 <html ng-app="scraperApp">
 <head>
 	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<style>
+	#container { width:900px; height:800px; margin:auto; }
+
+	#outerdiv {
+		width:446px;
+		height:246px;
+		overflow:hidden;
+		position:relative;
+	}
+	#innerdiv {
+		position:absolute;
+		top:-100px;
+		left:-618px;
+		width:1280px;
+		height:1200px;
+	}
+	</style>
 </head>
 <body>
 <div class="container" ng-controller="ProfileController">
@@ -11,6 +28,7 @@
 				<th class="columntitle">Match</th>
 			    <th class="columntitle">Similarities</th>
 			    <th class="columntitle">Context</th>
+			    <th class="columntitle" ng-show="false">Full Profile</th>
 			    <th class="columntitle">The Message</th>
 			</tr>
 		</thead>
@@ -27,6 +45,12 @@
 			<td id="match_context">
 				<p ng-repeat="match in profile.matches.matched" ng-bind-html-unsafe="match.context"></p>
 			</td>
+			<td id="full_profile" ng-show="false">
+				<div ng-repeat="section in profile.okcContext">
+					<p><strong>{{section.name}}</strong></p>
+					<p>{{section.essay}}</p>
+				</div>
+			</td>
 			<td id="the_message">
 				<p ng-bind-html-unsafe="profile.matches.opener"></p>
 				<p ng-repeat="match in profile.matches.matched" ng-show="match.checked">{{match.message}}</p>
@@ -37,7 +61,14 @@
 		</tr>
 	</table>
 	<!--$('#output').children(":visible").text() WIL NEED TO USE THIS CODE FOR TRANSFERRING OVER TO OKCUPID-->
+
+<div id="container">
+<div id="outerdiv">      
+    <iframe id="innerdiv" width="500" height="560" src="http://www.okcupid.com/profile/Elsmerry" scrolling="yes" frameborder="0"></iframe>
 </div>
+</div>
+
+
 <script src="lib/jquery.min.js"></script>
 <!-- <script src="lib/underscore-min.js"></script> -->
 <script src="lib/bootstrap.min.js"></script>
