@@ -264,7 +264,7 @@ class ScrapeOkc2(webapp2.RequestHandler):
         
 class GetScrapes(webapp2.RequestHandler):
     def get(self):
-        results = Profile.query().fetch(5)
+        results = Profile.query().fetch(15)
 
         json_shell = {}
         profile_array = []

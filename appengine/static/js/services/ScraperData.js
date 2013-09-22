@@ -65,19 +65,22 @@ scraperApp.factory('ScraperData', function($http, $log, $q){
 		},
 
 		turnIntoJquery: function(html) {
-			var okcText = $(html).find("#main_column").text().toLowerCase();
-			var okcUserName = $(html).find('#basic_info_sn').text();
-			var okcPicture = $(html).find('#thumb0 img').attr('src');
+			var htmlObj = $(html);
+
+			var okcText = htmlObj.find("#main_column").text().toLowerCase();
+			var okcUserName = htmlObj.find('#basic_info_sn').text();
+			var okcPicture = htmlObj.find('#thumb0 img').attr('src');
 			return [okcText, okcUserName, okcPicture];
 		},
 
 		processContext: function(html){
-            var contextArr = [];
-            var name, essay, finalEssay;
+			var htmlObj = $(html), contextArr = [], name, essay, finalEssay;
+
             for (var i = 0; i < 9; i++) {
                 var contextObj = {};
-                name = $(html).find('#essay_'+i+'> a').text();
-                essay = $(html).find('#essay_text_'+i).text();
+                
+                name = htmlObj.find('#essay_'+i+'> a').text();
+                essay = htmlObj.find('#essay_text_'+i).text();
 
                 finalEssay = essay.replace(/\n/gi," ");
 

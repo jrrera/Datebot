@@ -1,23 +1,6 @@
 <html ng-app="scraperApp">
 <head>
 	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<style>
-	#container { width:900px; height:800px; margin:auto; }
-
-	#outerdiv {
-		width:446px;
-		height:246px;
-		overflow:hidden;
-		position:relative;
-	}
-	#innerdiv {
-		position:absolute;
-		top:-100px;
-		left:-618px;
-		width:1280px;
-		height:1200px;
-	}
-	</style>
 </head>
 <body>
 <div class="container" ng-controller="ProfileController">
@@ -34,7 +17,7 @@
 		</thead>
 		<tr ng-repeat="profile in profiles">
 			<td id="matchinfo">
-				{{profile.okcUsername}}	
+				<a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>	
 				<img src="{{profile.okcPicture}}" />				
 			</td>
 			<td id="similarities">
@@ -52,27 +35,30 @@
 				</div>
 			</td>
 			<td id="the_message">
-				<p ng-bind-html-unsafe="profile.matches.opener"></p>
-				<p ng-repeat="match in profile.matches.matched" ng-show="match.checked">{{match.message}}</p>
-				<p ng-bind-html-unsafe="profile.matches.closer"></p>
+				<div>
+					<p ng-bind-html-unsafe="profile.matches.opener"></p>
+					<p ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
+					<p ng-bind-html-unsafe="profile.matches.closer"></p>
+				</div>
+				<button>Send the message!</button>
 			</td>
 			
-			{{profile.okcText}}
+			<td ng-show="false">{{profile.okcText}}</td>
 		</tr>
 	</table>
 	<!--$('#output').children(":visible").text() WIL NEED TO USE THIS CODE FOR TRANSFERRING OVER TO OKCUPID-->
 
-<div id="container">
+<!-- <div id="container">
 <div id="outerdiv">      
     <iframe id="innerdiv" width="500" height="560" src="http://www.okcupid.com/profile/Elsmerry" scrolling="yes" frameborder="0"></iframe>
 </div>
-</div>
+</div> -->
 
 
 <script src="lib/jquery.min.js"></script>
 <!-- <script src="lib/underscore-min.js"></script> -->
 <script src="lib/bootstrap.min.js"></script>
-<script src="lib/angular/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
 <!--<script src="http://codeorigin.jquery.com/jquery-1.10.2.min.js"></script>-->
 <script src="js/app.js"></script>
 <script src="js/services/ScraperData.js"></script>
