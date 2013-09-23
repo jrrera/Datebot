@@ -35,12 +35,12 @@
 				</div>
 			</td>
 			<td id="the_message">
-				<div>
+				<div class="finalmessage">
 					<p ng-bind-html-unsafe="profile.matches.opener"></p>
 					<p ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
 					<p ng-bind-html-unsafe="profile.matches.closer"></p>
 				</div>
-				<button>Send the message!</button>
+				<button id="{{profile.okcUsername}}" class="sendmessage">Send the message!</button>
 			</td>
 			
 			<td ng-show="false">{{profile.okcText}}</td>

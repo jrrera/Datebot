@@ -78,7 +78,7 @@ scraperApp.factory('ScraperData', function($http, $log, $q){
 
             for (var i = 0; i < 9; i++) {
                 var contextObj = {};
-                
+
                 name = htmlObj.find('#essay_'+i+'> a').text();
                 essay = htmlObj.find('#essay_text_'+i).text();
 
@@ -211,7 +211,7 @@ scraperApp.factory('ScraperData', function($http, $log, $q){
         	  desiredMessage.push(keywords.pairs[i].message);
         	}
 
-        	console.log("desiredKeywords", desiredKeywords);
+        	//console.log("desiredKeywords", desiredKeywords);
 
         	var finalKeywords = extractMatchedKeywords(profile, desiredKeywords);
         	var finalContext = extractContext(profile, desiredKeywords, context);
@@ -248,7 +248,7 @@ scraperApp.factory('ScraperData', function($http, $log, $q){
         	    finalResult.matched.push(oneMatchObj);
         	}
         	
-        	console.log('finalResult', finalResult);
+        	//console.log('finalResult', finalResult);
         	return finalResult;
         }
 	};
