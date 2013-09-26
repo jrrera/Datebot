@@ -15,10 +15,11 @@
 			    <th class="columntitle">The Message</th>
 			</tr>
 		</thead>
-		<tr ng-repeat="profile in profiles">
+		<tr ng-repeat="profile in profiles" ng-show="profile.matches.matched.length">
 			<td id="matchinfo">
 				<a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>	
-				<img src="{{profile.okcPicture}}" />				
+				<img src="{{profile.okcPicture}}" /><br /><br />
+				<button class="btn" ng-click="open(profile.okcUsername, profile.okcContext)">Full Profile</button>				
 			</td>
 			<td id="similarities">
 				<div ng-repeat="match in profile.matches.matched">
@@ -40,10 +41,8 @@
 					<p ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
 					<p ng-bind-html-unsafe="profile.matches.closer"></p>
 				</div>
-				<button id="{{profile.okcUsername}}" class="sendmessage">Send the message!</button>
+				<button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage">Send the message!</button>
 			</td>
-			
-			<td ng-show="false">{{profile.okcText}}</td>
 		</tr>
 	</table>
 	<!--$('#output').children(":visible").text() WIL NEED TO USE THIS CODE FOR TRANSFERRING OVER TO OKCUPID-->
@@ -54,15 +53,34 @@
 </div>
 </div> -->
 
+<div ng-controller="ProfileController">
+    <script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-header">
+            <h3>Profile for {{user}}</h3>
+        </div>
+        <p>{{text}}</p>
+        <div class="modal-body">
+			<div ng-repeat="section in profile">
+					<h2>{{section.name}}</h2>
+					<p>{{section.essay}}</p>
+			</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+</div>
 
-<script src="lib/jquery.min.js"></script>
 <!-- <script src="lib/underscore-min.js"></script> -->
-<script src="lib/bootstrap.min.js"></script>
+<!-- <script src="lib/bootstrap.min.js"></script> -->
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
-<!--<script src="http://codeorigin.jquery.com/jquery-1.10.2.min.js"></script>-->
+<script src="lib/jquery.min.js"></script>
+<script src="lib/ui-bootstrap-tpls-0.6.0.js"></script>
 <script src="js/app.js"></script>
 <script src="js/services/ScraperData.js"></script>
 <script src="js/controllers/ProfileController.js"></script>
+<script src="js/controllers/ModalController.js"></script>
 
 </body>
 </html>

@@ -1,13 +1,9 @@
 'use strict';
 
 scraperApp.controller('ProfileController', 
-	function ProfileController($scope, $timeout, $filter, ScraperData) {
+	function ProfileController($scope, $timeout, $filter, $log, $modal, ScraperData) {
 		
 		var sd = ScraperData; //shorthand for coding
-
-		// $scope.missingField = false;
-		// $scope.added = false; //Indicates if there is a keyword waiting to be added to the list from ContextMenu.
-		// $scope.sortorder = '';
 
 		$scope.loading = true;
 		$scope.username = sd.getUsername();
@@ -39,5 +35,20 @@ scraperApp.controller('ProfileController',
 				console.log($scope.profiles);
 			});
 
+		$scope.open = function (user, profile) {
+
+		  var modalInstance = $modal.open({
+		    templateUrl: 'myModalContent.html',
+		    controller: ModalInstanceCtrl,
+		    resolve: {
+		      profile: function () {
+		        return profile;
+		      },
+		      user: function() {
+		      	return user;
+		      }
+		    }
+		  });
+		};
 	}
 );
