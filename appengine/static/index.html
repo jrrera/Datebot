@@ -2,6 +2,11 @@
 <head>
 	<link href="css/bootstrap.min.css" rel="stylesheet">
 	<title>Datebot WebApp Alpha</title>
+	<style>
+	.messaged {
+		background-color: green;
+	}
+	</style>
 </head>
 <body>
 <div class="container" ng-controller="ProfileController">
@@ -17,11 +22,12 @@
 				<th class="columntitle">Match</th>
 			    <th class="columntitle">Similarities</th>
 			    <th class="columntitle">Context</th>
-			    <th class="columntitle" ng-show="false">Full Profile</th>
 			    <th class="columntitle">The Message</th>
 			</tr>
 		</thead>
-		<tr ng-repeat="profile in profiles" ng-show="profile.matches.matched.length">
+		<!--<tr ng-repeat="profile in profiles" ng-show="profile.matches.matched.length">-->
+		<!--<tr ng-repeat="profile in profiles" ng-hide="successes.indexOf(profile.okcUsername) != -1">-->
+		<tr ng-repeat="profile in profiles" ng-class="{messaged: successes.indexOf(profile.okcUsername) != -1}">
 			<td id="matchinfo">
 				<a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>	
 				<img src="{{profile.okcPicture}}" /><br /><br />

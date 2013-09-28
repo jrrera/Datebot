@@ -42,10 +42,6 @@ scraperApp.controller('ProfileController',
 				$scope.loading = false;
 			});
 
-		$scope.messagedArr = []; //This is where successfully messaged people will be passed temporarily.
-
-
-
 		$scope.open = function (user, profile) {
 
 		  var modalInstance = $modal.open({
