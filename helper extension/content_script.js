@@ -54,9 +54,10 @@ function checkForTextBox(message) {
 
     createScript('openWindow');
     setTimeout(function(){
-      createScript('sendMessage'); //2 seconds after opening the message window, we send the message
-    }, 2000);
+      createScript('sendMessage'); //4 seconds after opening the message window, we send the message
+    }, 4000);
 
+    return 'success';
   }
 }
 
@@ -87,7 +88,26 @@ $(document.body).on('click', '.sendmessage', function(){
 
 chrome.extension.onMessage.addListener(function (msg, sender, sendResponse) {
   if (msg.portover2) {
-      console.log('Received command to send over a message. The message was:', msg.portover2);
-      checkForTextBox(msg.portover2);
+      console.log('Received command to send over a message. The message was:', msg.portover2.message);
+      
+      //If the textbox was found and scripts deployed, this will return success
+      if (checkForTextBox(msg.portover2.message) === 'success') {
+        sendResponse(msg.portover2.user);
+      };
   }
+
+  if (msg.user) {
+    console.log('Received a response from the background script after sending a message! It was', msg.user);
+    //Now, we inject a script to execute window function created by an Angular service to get this data in Angular's ecosystem. 
+    //Typically not accessible by content script, hence using script tag injection workaround
+    scriptNode = document.createElement('script');
+    scriptNode.textContent = "window.addSuccess('" + msg.user + "')";
+
+    console.log('user', msg.user);
+    console.log('Code to be run:', scriptNode.textContent);
+    
+    document.body.appendChild(scriptNode);
+
+  }
+
 });

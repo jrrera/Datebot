@@ -1,11 +1,17 @@
 <html ng-app="scraperApp">
 <head>
 	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<title>Datebot WebApp Alpha</title>
 </head>
 <body>
 <div class="container" ng-controller="ProfileController">
 	<h1>Datebot Web Alpha</h1>
-	<table class="table table-bordered">
+
+	<p class="lead" style="margin-top:150px; text-align:center;" ng-show="loading">Datebot is grabbing your matches...</p>
+
+	<img style="position:absolute; left:50%; top:50%;" src="img/ajax-loader.gif" ng-show="loading" />
+
+	<table class="table table-bordered" ng-hide="loading">
 		<thead>
 			<tr>
 				<th class="columntitle">Match</th>
@@ -45,13 +51,14 @@
 			</td>
 		</tr>
 	</table>
-	<!--$('#output').children(":visible").text() WIL NEED TO USE THIS CODE FOR TRANSFERRING OVER TO OKCUPID-->
 
-<!-- <div id="container">
-<div id="outerdiv">      
-    <iframe id="innerdiv" width="500" height="560" src="http://www.okcupid.com/profile/Elsmerry" scrolling="yes" frameborder="0"></iframe>
+	<ul>
+		<li ng-repeat="user in successes">
+			{{user}}
+		</li>
+	</ul>
+
 </div>
-</div> -->
 
 <div ng-controller="ProfileController">
     <script type="text/ng-template" id="myModalContent.html">
@@ -79,6 +86,7 @@
 <script src="lib/ui-bootstrap-tpls-0.6.0.js"></script>
 <script src="js/app.js"></script>
 <script src="js/services/ScraperData.js"></script>
+<script src="js/services/MessageSuccessData.js"></script>
 <script src="js/controllers/ProfileController.js"></script>
 <script src="js/controllers/ModalController.js"></script>
 <script src="js/filters.js"></script>

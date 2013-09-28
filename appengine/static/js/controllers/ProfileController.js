@@ -1,13 +1,19 @@
 'use strict';
 
 scraperApp.controller('ProfileController', 
-	function ProfileController($scope, $timeout, $filter, $log, $modal, ScraperData) {
+	function ProfileController($scope, $timeout, $filter, $log, $modal, ScraperData, SuccessReceiver) {
 		
 		var sd = ScraperData; //shorthand for coding
+		var sr = SuccessReceiver;
 
 		$scope.loading = true;
 		$scope.username = sd.getUsername();
 		$scope.profiles = []; //Profile objects will be pushed here after processing.
+
+
+		sr.register($scope); //Registeres this controller as one that should receive updates from SuccessReceiver
+		$scope.successes = sr.users; //Syncs with list of successfully messaged users in this session
+		console.log('SuccessReceivers service array of users:', sr.users);
 		
 		$scope.keywords = sd.getKeywords("jrrera@gmail.com"); //This may need to be put inside sd.getProfiles.then() since this will also be async once calling from database
 		
@@ -33,7 +39,12 @@ scraperApp.controller('ProfileController',
 
 				});
 				console.log($scope.profiles);
+				$scope.loading = false;
 			});
+
+		$scope.messagedArr = []; //This is where successfully messaged people will be passed temporarily.
+
+
 
 		$scope.open = function (user, profile) {
 
