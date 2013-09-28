@@ -22,7 +22,8 @@
 
 	<img class="ajaxloader" src="img/ajax-loader.gif" ng-show="loading" />
 
-	<input type="checkbox" ng-model="showMessaged" ng-hide="loading"/> Show girls you've already messaged?
+	<input type="checkbox" ng-model="showMessaged" ng-hide="loading"/> 
+	<span ng-hide="loading">Show girls you've already messaged?</span>
 	<table class="table table-bordered" ng-hide="loading">
 		<thead>
 			<tr>
@@ -68,12 +69,6 @@
 			</td>
 		</tr>
 	</table>
-
-	<ul>
-		<li ng-repeat="user in successes">
-			{{user}}
-		</li>
-	</ul>
 
 </div>
 
