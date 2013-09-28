@@ -9,6 +9,7 @@ scraperApp.controller('ProfileController',
 		$scope.loading = true;
 		$scope.username = sd.getUsername();
 		$scope.profiles = []; //Profile objects will be pushed here after processing.
+		$scope.showMessaged = true; //Shows already-messaged results
 
 
 		sr.register($scope); //Registeres this controller as one that should receive updates from SuccessReceiver

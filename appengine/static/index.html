@@ -10,7 +10,7 @@
 	.ajaxloader {
 		display: block;
     	margin-left: auto;
-    	margin-right: auto 
+    	margin-right: auto;
 	}
 	</style>
 </head>
@@ -22,6 +22,7 @@
 
 	<img class="ajaxloader" src="img/ajax-loader.gif" ng-show="loading" />
 
+	<input type="checkbox" ng-model="showMessaged" ng-hide="loading"/> Show girls you've already messaged?
 	<table class="table table-bordered" ng-hide="loading">
 		<thead>
 			<tr>
@@ -33,7 +34,7 @@
 		</thead>
 		<!--<tr ng-repeat="profile in profiles" ng-show="profile.matches.matched.length">-->
 		<!--<tr ng-repeat="profile in profiles" ng-hide="successes.indexOf(profile.okcUsername) != -1">-->
-		<tr ng-repeat="profile in profiles" ng-class="{messaged: successes.indexOf(profile.okcUsername) != -1 || profile.messaged}" ng-class>
+		<tr ng-repeat="profile in profiles | filterMessaged:showMessaged " ng-class="{messaged: successes.indexOf(profile.okcUsername) != -1 || profile.messaged}">
 			<td id="matchinfo">
 				<a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>	
 				<img src="{{profile.okcPicture}}" /><br /><br />
