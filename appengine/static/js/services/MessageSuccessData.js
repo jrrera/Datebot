@@ -1,20 +1,28 @@
 //This service allows non-angular scripts to access the Angular world through the $window.addSuccess
 //See here: http://stackoverflow.com/questions/14945177/angularjs-passing-variables-into-controller
 
-scraperApp.factory('SuccessReceiver', function($window) {
+scraperApp.factory('SuccessReceiver', function($http, $log, $window) {
   var successUsers = [];
   var scopes = [];
 
   $window.addSuccess = function(user) {
-    console.log("Within addSuccess function, user is:", user);
+
+    //Add user to model
     successUsers.push(user);
+    console.log('successUsers array:', successUsers);
+
     angular.forEach(scopes, function(scope) {
         scope.$digest();
     });
 
-    console.log('successUsers array:', successUsers);
-    
-    //I would also push this to the server as a success from this service.
+    //Post update to the server
+    $http({method: 'POST', url:'http://localhost:8080/update?profile=' + user}).
+      success(function (data, status, headers, config){
+        $log.info('Success!');
+      }).
+      error(function (data, status, headers, config) {
+        $log.warn(status, headers);
+      });
   };
 
   return {

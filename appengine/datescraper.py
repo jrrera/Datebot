@@ -20,6 +20,7 @@ from google.appengine.api import urlfetch
 urlfetch.set_default_fetch_deadline(120) #Extends HTTP request timeout to 120 seconds
 
 def user_key(user="Anonymous"):
+    
     """Constructs a Datastore key for a user entity who sent the message."""
     return ndb.Key('User', user)
 
@@ -55,6 +56,7 @@ class Profile(ndb.Model):
     user = ndb.StringProperty()
     profile_name = ndb.StringProperty()
     html = ndb.TextProperty()
+    messaged = ndb.BooleanProperty(default=False)
     visited_first = ndb.BooleanProperty(default=False) #This will get updated in a different cron process, TBD
 
 class ScrapeOkc(webapp2.RequestHandler):
@@ -259,7 +261,7 @@ class ScrapeOkc2(webapp2.RequestHandler):
 
         #Here comes the magic
         br.open('http://www.okcupid.com/match?filter1=0,34&filter2=2,20,26&filter3=3,10&filter4=5,2678400&filter5=1,1&filter6=35,2&locid=0&timekey=1&matchOrderBy=MATCH&custom_search=0&fromWhoOnline=0&mygender=m&update_prefs=1&sort_type=0&sa=1&using_saved_search=')
-        for scrape in range(1,20):
+        for scrape in range(1,10):
             runTheSearch(user, br, scrape)
         
 class GetScrapes(webapp2.RequestHandler):
@@ -272,6 +274,8 @@ class GetScrapes(webapp2.RequestHandler):
         for profile in results:
             profile_obj = {}
             profile_obj['html'] = profile.html
+            profile_obj['messaged'] = profile.messaged
+            profile_obj['id'] = profile.key.id()
             profile_array.append(profile_obj)
 
         json_shell['request'] = 'get_profiles'
@@ -281,8 +285,32 @@ class GetScrapes(webapp2.RequestHandler):
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
         self.response.write(final_json)
 
+class ProcessUpdates(webapp2.RequestHandler):
+    def post(self):
+
+        #Get the user
+        if users.get_current_user():
+            user = users.get_current_user().nickname()
+        else:
+            print 'No user! Use default for testing'
+            user = 'test@example.com'
+
+        #Get the param values
+        profile_name = self.request.get('profile')
+
+        #Query datastore for that user and extract the first result in the array
+        match = Profile.query(Profile.profile_name == profile_name, ancestor=user_key(user)).fetch()[0]
+
+        #Update the one entry that comes back with a message as messaged = True
+        match.messaged = True
+        match.put()
+
+        #Send response back!
+        self.response.write('Success!');
+
 app = webapp2.WSGIApplication([
     ('/datescraper', ScrapeOkc),
     ('/datescraper2', ScrapeOkc2),
-    ('/getscrapes', GetScrapes)
+    ('/getscrapes', GetScrapes),
+    ('/update', ProcessUpdates)
 ], debug=True)

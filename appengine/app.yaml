@@ -5,6 +5,8 @@ api_version: 1
 threadsafe: yes
 
 handlers:
+
+#Static handlers
 - url: /stylesheets
   static_dir: stylesheets
 
@@ -18,15 +20,21 @@ handlers:
 - url: /static
   static_dir: static
 
+#Datescraper script
 - url: /datescraper.*
   script: datescraper.app
 
 - url: /getscrapes
   script: datescraper.app
 
+- url: /update.*
+  script: datescraper.app
+
+#Dbotmodeling script
 - url: /.*
   script: dbotmodeling.app
 
+#Libraries
 libraries:
 - name: webapp2
   version: "2.5.2"

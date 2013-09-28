@@ -32,6 +32,8 @@ scraperApp.controller('ProfileController',
 						okcUsername: jqueryArr[1],
 						okcPicture: jqueryArr[2],
 						okcContext: jqueryArr[3],
+						id: profileObj.id,
+						messaged: profileObj.messaged,
 						matches: sd.findSimilarities(jqueryArr[0], $scope.keywords, jqueryArr[3]) //Generates the object that the Chrome extension front end looks for
 					}
 					

@@ -4,7 +4,13 @@
 	<title>Datebot WebApp Alpha</title>
 	<style>
 	.messaged {
-		background-color: green;
+		background-color: LightGreen;
+	}
+
+	.ajaxloader {
+		display: block;
+    	margin-left: auto;
+    	margin-right: auto 
 	}
 	</style>
 </head>
@@ -14,7 +20,7 @@
 
 	<p class="lead" style="margin-top:150px; text-align:center;" ng-show="loading">Datebot is grabbing your matches...</p>
 
-	<img style="position:absolute; left:50%; top:50%;" src="img/ajax-loader.gif" ng-show="loading" />
+	<img class="ajaxloader" src="img/ajax-loader.gif" ng-show="loading" />
 
 	<table class="table table-bordered" ng-hide="loading">
 		<thead>
@@ -27,19 +33,19 @@
 		</thead>
 		<!--<tr ng-repeat="profile in profiles" ng-show="profile.matches.matched.length">-->
 		<!--<tr ng-repeat="profile in profiles" ng-hide="successes.indexOf(profile.okcUsername) != -1">-->
-		<tr ng-repeat="profile in profiles" ng-class="{messaged: successes.indexOf(profile.okcUsername) != -1}">
+		<tr ng-repeat="profile in profiles" ng-class="{messaged: successes.indexOf(profile.okcUsername) != -1 || profile.messaged}" ng-class>
 			<td id="matchinfo">
 				<a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>	
 				<img src="{{profile.okcPicture}}" /><br /><br />
 				<button class="btn" ng-click="open(profile.okcUsername, profile.okcContext)">Full Profile</button>				
 			</td>
 			<td id="similarities">
-				<div ng-repeat="match in profile.matches.matched">
+				<div ng-repeat="match in profile.matches.matched" ng-hide="profile.messaged">
 					<input type="checkbox" ng-model="match.checked" ng-checked="match.checked" /> {{match.keyword}}
 				</div>
 			</td>
 			<td id="match_context">
-				<p ng-repeat="match in profile.matches.matched" ng-bind-html-unsafe="match.context"></p>
+				<p ng-repeat="match in profile.matches.matched" ng-bind-html-unsafe="match.context" ng-hide="profile.messaged"></p>
 			</td>
 			<td id="full_profile" ng-show="false">
 				<div ng-repeat="section in profile.okcContext">
@@ -48,12 +54,16 @@
 				</div>
 			</td>
 			<td id="the_message">
-				<div class="finalmessage">
+				<div class="finalmessage" ng-hide="profile.messaged">
 					<p ng-bind-html-unsafe="profile.matches.opener"></p>
 					<p ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
 					<p ng-bind-html-unsafe="profile.matches.closer"></p>
 				</div>
-				<button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage">Send the message!</button>
+				<button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.messaged || successes.indexOf(profile.okcUsername) != -1">Send the message!</button>
+				
+				<p class="lead" style="text-align:center;" ng-show="profile.messaged">Already Messaged! You stud.</p>
+				<p class="lead" style="text-align:center;" ng-show="successes.indexOf(profile.okcUsername) != -1">Success!</p>
+
 			</td>
 		</tr>
 	</table>
