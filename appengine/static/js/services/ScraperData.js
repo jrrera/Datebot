@@ -70,11 +70,11 @@ scraperApp.factory('ScraperData', function($http, $log, $q){
 			var okcText = htmlObj.find("#main_column").text().toLowerCase();
 			var okcUserName = htmlObj.find('#basic_info_sn').text();
 			var okcPicture = htmlObj.find('#thumb0 img').attr('src');
-			return [okcText, okcUserName, okcPicture];
+			return [okcText, okcUserName, okcPicture, htmlObj];
 		},
 
-		processContext: function(html){
-			var htmlObj = $(html), contextArr = [], name, essay, finalEssay;
+		processContext: function(htmlObj){
+			var contextArr = [], name, essay, finalEssay;
 
             for (var i = 0; i < 9; i++) {
                 var contextObj = {};

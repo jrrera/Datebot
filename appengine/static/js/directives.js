@@ -1,10 +1,10 @@
 'use strict';
 
 //TEST
-scraperApp.direction('popularitycheck', function(scope, elem){
+scraperApp.direction('popularitycheck', function(){
 	return {
 		restrict: 'A',
-		link: function() {
+		link: function($scope, element, attrs) {
 			if (popular) {
 				return elem.innerHTML.toUpperCase();
 			}

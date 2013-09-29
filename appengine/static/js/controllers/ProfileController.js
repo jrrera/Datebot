@@ -9,7 +9,7 @@ scraperApp.controller('ProfileController',
 		$scope.loading = true;
 		$scope.username = sd.getUsername();
 		$scope.profiles = []; //Profile objects will be pushed here after processing.
-		$scope.showMessaged = true; //Shows already-messaged results
+		$scope.toggleMessaged = false; //Shows already-messaged results. Turned off by default
 
 
 		sr.register($scope); //Registeres this controller as one that should receive updates from SuccessReceiver
@@ -21,21 +21,28 @@ scraperApp.controller('ProfileController',
 		sd.getProfiles($scope.username)
 			.then(function(data){
 				angular.forEach(data, function(profileObj){
-					//console.log(profileObj);
 
-					var okcContext = sd.processContext(profileObj.html);
+					//Returns an array of - in order - okcText, okcContext (for matched interests), the picture URL, and the jquery object
 					var jqueryArr = sd.turnIntoJquery(profileObj.html);
-					jqueryArr[0] = sd.processProfileText(jqueryArr[0]); //Processes the profile text
+
+					//Returns an array of objects (the essays scraped from the profile)
+					var okcContext = sd.processContext(jqueryArr[3]);
+
+					//Processes the profile text with find-and-replace
+					jqueryArr[0] = sd.processProfileText(jqueryArr[0]); 
+
+					//Adds the okcContext as the fifth item in the jqueryArr array
 					jqueryArr.push(okcContext);
 
+					//Create the final profile object to send to the front-end
 					profileObj = {
 						okcText: jqueryArr[0],
 						okcUsername: jqueryArr[1],
 						okcPicture: jqueryArr[2],
-						okcContext: jqueryArr[3],
+						okcContext: jqueryArr[4],
 						id: profileObj.id,
 						messaged: profileObj.messaged,
-						matches: sd.findSimilarities(jqueryArr[0], $scope.keywords, jqueryArr[3]) //Generates the object that the Chrome extension front end looks for
+						matches: sd.findSimilarities(jqueryArr[0], $scope.keywords, jqueryArr[4]) //Generates the object that the Chrome extension front end looks for
 					}
 					
 					$scope.profiles.push(profileObj);
@@ -45,7 +52,7 @@ scraperApp.controller('ProfileController',
 				$scope.loading = false;
 			});
 
-		$scope.open = function (user, profile) {
+		$scope.open = function (user, profile) { //Function for initializing a modal instance
 
 		  var modalInstance = $modal.open({
 		    templateUrl: 'myModalContent.html',
