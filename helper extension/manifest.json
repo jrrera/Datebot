@@ -16,7 +16,7 @@
   },
 
   "description": "People write long profiles. Don't spend a long time reading them.",
-  "background": {"scripts":["background.js"]},
+  "background": {"scripts":["jquery.min.js", "background.js"]},
   "browser_action": {
     "name": "Let's read some profiles",
     "icons": {"16":"img/Thomas-Hello16.png","48":"img/Thomas-Hello48.png","128":"img/Thomas-Hello128.png"},

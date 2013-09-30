@@ -24,9 +24,12 @@ def user_key(user="Anonymous"):
     """Constructs a Datastore key for a user entity who sent the message."""
     return ndb.Key('User', user)
 
-def processProfile(resp, userMatch, user):
+def processProfile(type, resp, userMatch, user):
     # Print the site
-    content = resp.get_data()
+    if type == 'mechanize':
+        content = resp.get_data()
+    else:
+        content = resp
 
     #Will use this to parse HTML in front end: http://stackoverflow.com/questions/9551230/jquery-selectors-on-a-html-string
     #Create a new message object and assign the values from POST request
@@ -59,129 +62,6 @@ class Profile(ndb.Model):
     messaged = ndb.BooleanProperty(default=False)
     visited_first = ndb.BooleanProperty(default=False) #This will get updated in a different cron process, TBD
 
-class ScrapeOkc(webapp2.RequestHandler):
-    def get(self):
-        print "Don't use this version. ScrapeOkc2 is superior"
-        # #Get active user
-        # if users.get_current_user():
-        #     print users
-        #     user = users.get_current_user().nickname()
-        # else:
-        #     print 'No user! Time to log in'
-        #     self.redirect(users.create_login_url(self.request.uri))
-        #     return
-
-        # username = 'kr7l3g3nd'
-        # password = 'mewtwo'
-
-        # self.response.write("Scrape request received!")            
-
-        # #Initialize mechanize
-        # br = mechanize.Browser()
-
-        # # Browser options
-        # br.set_handle_equiv(True) #This handles a particular type of HTTP equiv meta tag
-        # br.set_handle_gzip(True) #Handles gzip content type if necessary
-        # br.set_handle_redirect(True) #Handles 30x redirects
-        # br.set_handle_referer(True) #Handles being referred to another location
-        # br.set_handle_robots(False)  # Ignore rules set in robots.txt. 
-        
-        # # Follows refresh 0 but not hangs on refresh > 0
-        # br.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
-
-        # br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
-        # br.open('http://www.okcupid.com/')
-        # br.select_form(name='loginf')
-        # br['username'] = username
-        # br['password'] = password
-        # br.submit()
-
-        # assert br.viewing_html() #Check to make sure browser has access to the HTML
-        
-        # #Open the matches page with certain filters already defined
-        
-        # # #This is the REAL filter. Enable when going live.
-        # # br.open('http://www.okcupid.com/match?filter1=0,34&filter2=2,20,26&filter3=3,10&filter4=5,2678400&filter5=1,1&filter6=35,2&filter7=32,76&filter8=10,0,16002&locid=0&timekey=1&matchOrderBy=SPECIAL_BLEND&custom_search=0&fromWhoOnline=0&mygender=m&update_prefs=1&sort_type=0&sa=1&using_saved_search=')
-        
-        # #This is a testing filter for more matches
-        # br.open('http://www.okcupid.com/match?filter1=0,34&filter2=2,20,26&filter3=3,10&filter4=5,2678400&filter5=1,1&filter6=35,2&locid=0&timekey=1&matchOrderBy=MATCH&custom_search=0&fromWhoOnline=0&mygender=m&update_prefs=1&sort_type=0&sa=1&using_saved_search=')
-
-
-        # # Initializing patterns and iterator for handling links we're about to scrape
-        # resp = None
-        # pattern = re.compile( '/profile/' ) #looks for a link that brings you to a profile page
-        # ignore_pattern = re.compile('cf=recently_visited') #We don't want to open a profile of someone already visited
-        # userMatch = "initalizing userMatch" #declared as global variable so that we don't get "Referenced before assignment" error in loop below
-        # iterator = 1 #will used to only scrape 20 profiles at a time
-
-        # for link in br.links():
-        #     print link.url
-
-        # for link in br.links():
-        #     if iterator > 20:
-        #         print "Breaking because iterator is greater than 20"
-        #         break
-
-        #     siteMatch = pattern.search( link.url )
-        #     ignoreMatch = ignore_pattern.search ( link.url )
-            
-        #     if siteMatch and not ignoreMatch:
-
-        #         #We found a potential valid link. Now, need to check if this was JUST scraped, since the same username appears in a link 3 times per entry. Following the same profile link three times is wasteful
-        #         if re.search(userMatch, link.url):
-        #             print "We just looked at this profile. Moving on to next link..."
-        #             continue
-
-        #         #If above test passes, we've not seen this profile is this browsing session. Continue with scraping
-        #         print 'Found a match that wasn\'t someone I already visited! It was %s' % (link.url)
-        #         print "This is match number " + str(iterator)
-                
-        #         userPattern = re.search('/profile/(.*)\?', link.url) #Extracts the username from the URL
-        #         if userPattern:
-        #             global userMatch #This keeps the variable global, so that we don't get a "Referenced before assignment" error when checking to see if we just looked at this profile
-        #             userMatch = userPattern.group(1)
-        #             print userMatch
-                
-        #         resp = br.follow_link( link )
-        #         processProfile(resp, userMatch, user) #Function to process the response given by okcupid
-        #         print 'Delaying by 5/10 seconds...'
-        #         time.sleep(5)
-        #         iterator += 1
-        #         br.back() 
-        #         #Currently, no way to handle the infinite scroll with Mechanize, so will adopt Robert's leftbar scraping         
-        
-        # # br.open('http://www.okcupid.com/match?filter1=0,34&filter2=2,20,26&filter3=3,10&filter4=5,2678400&filter5=1,1&filter6=35,2&locid=0&timekey=1&matchOrderBy=MATCH&custom_search=0&fromWhoOnline=0&mygender=m&update_prefs=1&sort_type=0&sa=1&count=20&low=%d&using_saved_search=' % (iterator)) 
-        # # for link in br.links():
-        # #     if iterator > 20:
-        # #         print "Breaking because iterator is greater than 20"
-        # #         break
-
-        # #     siteMatch = pattern.search( link.url )
-        # #     ignoreMatch = ignore_pattern.search ( link.url )
-            
-        # #     if siteMatch and not ignoreMatch:
-
-        # #         #We found a potential valid link. Now, need to check if this was JUST scraped, since the same username appears in a link 3 times per entry. Following the same profile link three times is wasteful
-        # #         if re.search(userMatch, link.url):
-        # #             print "We just looked at this profile. Moving on to next link..."
-        # #             continue
-
-        # #         #If above test passes, we've not seen this profile is this browsing session. Continue with scraping
-        # #         print 'Round2! Found a match that wasn\'t someone I already visited! It was %s' % (link.url)
-        # #         print "Round2! This is match number " + str(iterator)
-                
-        # #         userPattern = re.search('/profile/(.*)\?', link.url) #Extracts the username from the URL
-        # #         if userPattern:
-        # #             global userMatch #This keeps the variable global, so that we don't get a "Referenced before assignment" error when checking to see if we just looked at this profile
-        # #             userMatch = userPattern.group(1)
-        # #             print userMatch
-                
-        # #         resp = br.follow_link( link )
-        # #         processProfile(resp, userMatch, user) #Function to process the response given by okcupid
-        # #         print 'Delaying by 5/10 seconds...'
-        # #         time.sleep(5)
-        # #         iterator += 1
-        # #         br.back() 
 
 def runTheSearch(user, br, scrape):
     userMatch = "initalizing userMatch"
@@ -217,9 +97,15 @@ def runTheSearch(user, br, scrape):
             print userMatch
         
         resp = br.follow_link( link )
-        processProfile(resp, userMatch, user) #Function to process the response given by okcupid
+        processProfile('mechanize', resp, userMatch, user) #Function to process the response given by okcupid
         print 'Delaying by 5 seconds...'
         time.sleep(5)
+
+# class PostScrapes(webapp2.RequestHandler):
+#     def get(self):
+#         self.response.write('hey!')
+
+
 
 class ScrapeOkc2(webapp2.RequestHandler):
     def get(self):
@@ -264,7 +150,7 @@ class ScrapeOkc2(webapp2.RequestHandler):
         for scrape in range(1,10):
             runTheSearch(user, br, scrape)
         
-class GetScrapes(webapp2.RequestHandler):
+class HandleScrapes(webapp2.RequestHandler):
     def get(self):
         results = Profile.query().fetch(15)
 
@@ -284,6 +170,19 @@ class GetScrapes(webapp2.RequestHandler):
   
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
         self.response.write(final_json)
+
+    def post(self):
+        self.response.write('Received payload of profile!')
+
+        print "Lets post some scrapes!"
+
+        full_json = json.loads(self.request.body)
+
+        resp = full_json['html']
+        userMatch = full_json['profile_name']
+        user = full_json['user']
+        
+        processProfile('chromeext', resp, userMatch, user) #Function to process the response given by okcupid
 
 class ProcessUpdates(webapp2.RequestHandler):
     def post(self):
@@ -309,8 +208,8 @@ class ProcessUpdates(webapp2.RequestHandler):
         self.response.write('Success!');
 
 app = webapp2.WSGIApplication([
-    ('/datescraper', ScrapeOkc),
+    ('/datescraper', ScrapeOkc2),
     ('/datescraper2', ScrapeOkc2),
-    ('/getscrapes', GetScrapes),
+    ('/getscrapes', HandleScrapes),
     ('/update', ProcessUpdates)
 ], debug=True)

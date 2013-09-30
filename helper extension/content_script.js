@@ -3,7 +3,49 @@
  * @created:
 */
 
-console.log('Injected content script into the page!')
+//console.log('Injected content script into the page!');
+
+function scrapeThePage() {
+  console.log('lets scrape the page!');
+
+  var scrape = $('body').html();
+  
+  console.log('Here\'s what we scrape!', scrape);
+  return scrape;
+}
+
+function initializeScrape() {
+  //Initialize the array that will hold all of the links to scrape. 
+  var babesQ = babesQ || [],
+  link, result;
+
+  //Grab all of the list items with a class of 'match', and then cycle through looking for the correct link
+  $('.match').each(function(i, elem) {
+    //console.log(i, elem, $(this));
+
+    //Assign the anchor tag children to result
+    result = $(this).children('a')[0];
+
+    //If result is truthy (i.e. anchor tags were found), grab the href attribute
+    if (result) {
+
+      //Assign href to link
+      link = result.href;      
+
+      //Since we found a link, push it to the queue if not already there
+      if (babesQ.indexOf(link) === -1) {
+        babesQ.push(link);
+      } 
+    }
+
+  });
+
+  console.log(babesQ); 
+
+  //Send the babesQ to the background page to open up a new tab
+  chrome.runtime.sendMessage({babesQ: babesQ}, function(response) {});
+
+}
 
 function processLineBreaks(text) {
     var final;
@@ -110,4 +152,27 @@ chrome.extension.onMessage.addListener(function (msg, sender, sendResponse) {
 
   }
 
+  if (msg.needScrapes) {
+    console.log('Looks like you need some scrapes, eh?');
+    
+    var result = scrapeThePage();
+    sendResponse({html: result});
+  }
+
 });
+
+
+
+//If the OKCupid page is where we're injecting the script, add a button to the page that will allow us to begin scraping
+if (location.href.indexOf('okcupid.com') !== -1) {
+  $('<button id="initiate_dbot">Start Scraping</button>').appendTo('body');
+  $('#initiate_dbot').click(function(){
+    initializeScrape(); 
+  });
+
+  //If the script sees youve just navigated to a leftbar match, assumes scraping is your goal, and continues running
+  if (location.href.indexOf('cf=leftbar_match') !== -1) {
+    initializeScrape();
+  }
+}
+
