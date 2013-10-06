@@ -5,7 +5,7 @@
   console.log('background loaded!');
 
   var babesQ = babesQ || [], //This array will hold the URLs to scrape
-  scrapeLimit = 5, //This hard codes the limit of scrapes per session
+  scrapeLimit, //This hard codes the limit of scrapes per session
   scrapeCount = 0; //Initializes counter at 0
 
   //Relays the message from the popup to the content script to initiate the scrape for the first time. 
@@ -166,7 +166,10 @@
     }
 
     //Message from popup to initiate the scraping process
-    if (msg.action === "triggerScrape") {
+    if (msg.triggerScrape > 0) { //the triggerScrape property has a value for number of scrapes
+
+      scrapeLimit = msg.triggerScrape;
+      
       chrome.tabs.create({ 
           url: "http://www.okcupid.com/match",
           active: true
