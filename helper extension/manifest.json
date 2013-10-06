@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "DBot Web App Helper",
-  "version": "0.1",
+  "version": "0.3",
   "permissions": [
     "tabs",
     "background",

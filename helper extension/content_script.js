@@ -14,7 +14,8 @@ function scrapeThePage() {
   return scrape;
 }
 
-function initializeScrape() {
+//I initialize the scraping process by creating a babesQ and returning 1 or more URLs to start scraping
+function fillQueue() {
   //Initialize the array that will hold all of the links to scrape. 
   var babesQ = babesQ || [],
   link, result;
@@ -154,25 +155,22 @@ chrome.extension.onMessage.addListener(function (msg, sender, sendResponse) {
 
   if (msg.needScrapes) {
     console.log('Looks like you need some scrapes, eh?');
+
+    fillQueue();  //Fills up the babesQ with more scrapes before scraping the page
     
     var result = scrapeThePage();
     sendResponse({html: result});
+  }
+
+  //This is the message initiated by the popup to start scraping. 
+  if(msg.initialize) {
+    sendResponse('got it!');
+    console.log('received a message from popup to initialize scrape!')
+    fillQueue();  //Fills up the babesQ with more scrapes
   }
 
 });
 
 
 
-//If the OKCupid page is where we're injecting the script, add a button to the page that will allow us to begin scraping
-if (location.href.indexOf('okcupid.com') !== -1) {
-  $('<button id="initiate_dbot">Start Scraping</button>').appendTo('body');
-  $('#initiate_dbot').click(function(){
-    initializeScrape(); 
-  });
-
-  //If the script sees youve just navigated to a leftbar match, assumes scraping is your goal, and continues running
-  if (location.href.indexOf('cf=leftbar_match') !== -1) {
-    initializeScrape();
-  }
-}
 
