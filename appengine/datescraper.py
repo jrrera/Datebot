@@ -187,12 +187,14 @@ class HandleScrapes(webapp2.RequestHandler):
 class ProcessUpdates(webapp2.RequestHandler):
     def post(self):
 
-        #Get the user
-        if users.get_current_user():
-            user = users.get_current_user().nickname()
-        else:
-            print 'No user! Use default for testing'
-            user = 'test@example.com'
+        # #Get the user
+        # if users.get_current_user():
+        #     user = users.get_current_user().nickname()
+        # else:
+        #     print 'No user! Use default for testing'
+        #     user = 'test@example.com'
+
+        user = 'jrrera@gmail.com'
 
         #Get the param values
         profile_name = self.request.get('profile')

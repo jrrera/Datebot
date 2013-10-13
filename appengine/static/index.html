@@ -12,6 +12,10 @@
     	margin-left: auto;
     	margin-right: auto;
 	}
+
+	.bluekeywords {
+		color: blue;
+	}
 	</style>
 </head>
 <body>
@@ -35,7 +39,7 @@
 		</thead>
 		<!--<tr ng-repeat="profile in profiles" ng-show="profile.matches.matched.length">-->
 		<!--<tr ng-repeat="profile in profiles" ng-hide="successes.indexOf(profile.okcUsername) != -1">-->
-		<tr ng-repeat="profile in profiles | filterMessaged:toggleMessaged " ng-class="{messaged: successes.indexOf(profile.okcUsername) != -1 || profile.messaged}">
+		<tr ng-repeat="profile in profiles | filterMessaged:toggleMessaged" ng-class="{messaged: successes.indexOf(profile.okcUsername) != -1 || profile.messaged}">
 			<td id="matchinfo">
 				<a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>	
 				<img src="{{profile.okcPicture}}" /><br /><br />

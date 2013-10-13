@@ -153,8 +153,9 @@ scraperApp.factory('ScraperData', function($http, $log, $q){
         findSimilarities: function(profile, keywords, context) {
 
         	function extractContext(response, keywords, essays) {
-        	  //console.log("This is what we're extracting context from: ", response);
+        	  //receives a list of keywords and essays, and pulls a snippet of text from each essay surrounding the matched keyword. Returns an array containing the snippets of context
         	  var contextArr = [], findKeyword, essayTitle, final;
+        	  
         	  for (var i = 0; i < keywords.length; i++) {
         	    findKeyword = new RegExp('([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)', 'g');
 
@@ -171,10 +172,8 @@ scraperApp.factory('ScraperData', function($http, $log, $q){
         	}
 
         	function findEssayTitle(keyword, essays){
-        	  //console.log(keyword);
-        	  //console.log("essays", essays);
-        	  var final;
-        	  var keywordRe = new RegExp('[^a-zA-Z]' + keyword + '[^a-zA-Z]', 'i');
+        	  //For any bit of context grabbed, will also grab the title of that essay for the UI. Returns a string of HTML
+        	  var final, keywordRe = new RegExp('[^a-zA-Z]' + keyword + '[^a-zA-Z]', 'i');
 
         	  for (var i = 0; i < essays.length; i++) {
         	    var essay = essays[i].essay;
@@ -185,33 +184,36 @@ scraperApp.factory('ScraperData', function($http, $log, $q){
         	      return final;
         	    } 
         	  }
+
         	  return "<strong>Unknown</strong><br />";
         	}
 
         	function extractMatchedKeywords(response, keywords) {
-        	  var matchedKeywords = [];
-        	  var findKeyword;
+        	  //Returns any array of matched keywords by looking through the HTML of the page
+        	  var matchedKeywords = [], findKeyword;
+        	  
         	  for (var i = 0; i < keywords.length; i++) {
         	    findKeyword = new RegExp('[^a-zA-Z]' + keywords[i] + '[^a-zA-Z]', 'g');
         	    if (response.search(findKeyword) != -1) {
         	      matchedKeywords.push(keywords[i]);
         	    }
         	  } 
-        	  //console.log(matchedKeywords);
         	  return matchedKeywords;
         	}
 
-        	//Begin calculating final keywords and final context for this match
-        	//console.log("keywords", keywords);
+        	function highlightMatches(keyword, context) {
+				//A processor function that highlights the keyword in the context paragraph for easier reference
+				var keywordReg = new RegExp('[^a-zA-Z]' + keyword + '[^a-zA-Z]', 'g'); //The RegEx that looks for the keyword with a non-letter char on either side.
+				return context = context.replace(keywordReg, '<span class="bluekeywords">' + keywordReg.exec(context) + '</span>'); //Replace the keyword in the context with the keyword wrapped in span tags 
+        	}
         	
         	var desiredKeywords = [], desiredMessage = [], finalMessage = [];
 
+        	//Put the desiredKeywords in one array, and the related message in another array.
         	for (var i = 0; i < keywords.pairs.length; i++) {
         	  desiredKeywords.push(keywords.pairs[i].keyword);
         	  desiredMessage.push(keywords.pairs[i].message);
         	}
-
-        	//console.log("desiredKeywords", desiredKeywords);
 
         	var finalKeywords = extractMatchedKeywords(profile, desiredKeywords);
         	var finalContext = extractContext(profile, desiredKeywords, context);
@@ -236,7 +238,7 @@ scraperApp.factory('ScraperData', function($http, $log, $q){
         		var oneMatchObj = {};
 
         		oneMatchObj.keyword = finalKeywords[i];
-        		oneMatchObj.context = finalContext[i];
+        		oneMatchObj.context = highlightMatches(finalKeywords[i], finalContext[i]); //highlightMatches will turn the matched keyword blue, and receives the keyword and the context as the arguments, and will return the higlhighted context
         		oneMatchObj.message = finalMessage[i];
 
         		if (i == 0 || i == 1) {

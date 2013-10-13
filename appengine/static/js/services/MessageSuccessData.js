@@ -10,6 +10,7 @@ scraperApp.factory('SuccessReceiver', function($http, $log, $window) {
     //Add user to model
     successUsers.push(user);
     console.log('successUsers array:', successUsers);
+    console.log('scopes array:', scopes);
 
     angular.forEach(scopes, function(scope) {
         scope.$digest();
