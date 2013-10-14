@@ -24,6 +24,8 @@ scraperApp.factory('SuccessReceiver', function($http, $log, $window) {
       error(function (data, status, headers, config) {
         $log.warn(status, headers);
       });
+
+      //Note: The logging of the actual interaction takes place in the background.js script.
   };
 
   return {

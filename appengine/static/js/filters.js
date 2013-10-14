@@ -26,10 +26,10 @@ scraperApp.filter('filterForDatabase', function() {
 	return function (profileObj) {
 
 		function produceKeywordObj(matchArr) {
-			//Takes in the matched array, and processes it to return the required keyword-specific object that the server looks for.
+			//Takes in the 'matched' array, and processes it to return the required keyword-specific object that the server looks for. (keyword and position in message, i.e. {'running': 1})
 			var keywordObj = {}, counter = 0;
 			angular.forEach(matchArr, function(match){
-				if (match.checked) keywordObj[match.keyword] = counter++ + 1; //Add one to index to signify position of keyword used when messaging, assuming it was checked, i.e. used, and then increments the counter
+				if (match.checked) keywordObj[match.keyword] = counter++ + 1; //Add one to index to signify position of keyword used when messaging, assuming it was used in the message, and then increments the counter
 			}); 
 			return keywordObj;
 		}

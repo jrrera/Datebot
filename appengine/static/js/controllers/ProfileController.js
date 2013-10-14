@@ -52,6 +52,30 @@ scraperApp.controller('ProfileController',
 				$scope.loading = false;
 			});
 
+		$scope.raiseKeywordPosition = function(clickedMatch, matchesArr) {
+			//This function moves a particular keyword one slot higher for arranging your message. 
+			var thisPosition, thisObject, prevObject;
+			
+			thisPosition = matchesArr.indexOf(clickedMatch);
+			thisObject = clickedMatch;
+			prevObject = matchesArr[thisPosition-1];
+
+			matchesArr[thisPosition] = prevObject;
+			matchesArr[thisPosition-1] = thisObject;
+		};
+
+		$scope.lowerKeywordPosition = function(clickedMatch, matchesArr) {
+			//This function moves a particular keyword one slot higher for arranging your message. 
+			var thisPosition, thisObject, nextObject;
+			
+			thisPosition = matchesArr.indexOf(clickedMatch);
+			thisObject = clickedMatch;
+			nextObject = matchesArr[thisPosition+1];
+
+			matchesArr[thisPosition] = nextObject;
+			matchesArr[thisPosition+1] = thisObject;
+		};
+
 		$scope.open = function (user, profile) { //Function for initializing a modal instance
 
 		  var modalInstance = $modal.open({
