@@ -108,7 +108,7 @@
 
   ////The below two functions are related to passing the final message to OKC
   //A function that updates the dom of the Datebot Web App upon completion of sending the okc message
-  function relaySuccess(user) {
+  function relaySuccess(user, messageObj) {
     chrome.tabs.query({}, function (tab){ 
       for(var i =0; i < tab.length; i++) {
         if (tab[i].url === "http://localhost:8080/static/index.html") { //This will eventually be the real Datebot URL
@@ -116,25 +116,36 @@
           dbotTabId = tab[i].id;
           chrome.tabs.sendMessage(dbotTabId, {'user': user},function(response){});
           break;
-          //Will also eventually have to send this to the server for safe keeping. This is just to update the DOM.
         }
       }
+
+      //Now, update App Engine to record the interaction
+      $.post("http://localhost:8080/int", {"interaction": messageObj.databaseData, "username": "jrrera"}, function(result){
+        console.log("Posted the interaction to the App Engine server. The server wrote back: ", result);
+      });
     });
   }
 
   //A function that calls itself recursively as it attempts to pass a message to the OKC page containing the message you want to send
-  function sendMessage(okcTabId, messageObj) {
-    chrome.tabs.sendMessage(okcTabId, {'portover2': messageObj},function(response){
-      if (!response) {
-        console.log("OKC page hasn't received it. Resending message object in .5 seconds!");
-        setTimeout(function(){
-          sendMessage(okcTabId, messageObj);
-        }, 500);
-      } else {
-        console.log("Response", response);
-        relaySuccess(response); //Sends the username to another function that will pass back success to Datebot Web App
-      }
-    });
+  sendMessage.attempt = 20;
+  function sendMessage(okcTabId, messageObj, attempt) {
+    if (sendMessage.attempt) { //If the counter hits zero, stop attempting
+      chrome.tabs.sendMessage(okcTabId, {'portover2': messageObj},function(response){
+        if (!response) {
+          console.log("OKC page hasn't received it. Resending message object in .5 seconds!");
+          setTimeout(function(){
+            sendMessage(okcTabId, messageObj, --sendMessage.attempt);
+          }, 500);
+        } else {
+          console.log("Response", response);
+          sendMessage.attempt = 20; //Reset the attempt counter for next function run
+          relaySuccess(response, messageObj); //Sends the username to another function that will pass back success to Datebot Web App
+        }
+      });
+    } else {
+      sendMessage.attempt = 20; //Reset the attempt counter for the next attempt
+      console.log('Ran out of attempts to contact the server.');
+    }
   }
   ////End functions that pass the final message
 

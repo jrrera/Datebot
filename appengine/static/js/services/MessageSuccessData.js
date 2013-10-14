@@ -31,3 +31,4 @@ scraperApp.factory('SuccessReceiver', function($http, $log, $window) {
     register: function(scope) { scopes.push(scope); }
   };
 });
+

@@ -65,6 +65,7 @@
 					<p ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
 					<p ng-bind-html-unsafe="profile.matches.closer"></p>
 				</div>
+				<div id="{{profile.okcUsername}}_data" ng-hide="true">{{profile.matches | filterForDatabase}}</div><!--This div preps the data for the database if we choose to send the msg-->
 				<button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.messaged || successes.indexOf(profile.okcUsername) != -1">Send the message!</button>
 				
 				<p class="lead" style="text-align:center;" ng-show="profile.messaged">Already Messaged! You stud.</p>

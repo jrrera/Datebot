@@ -59,6 +59,7 @@ function processLineBreaks(text) {
 
     final = final.replace(/\s*<br>\s*/gi,"\n");
     final = final.replace(/\s*<br \/><br \/>\s*/gi,"\n\n");
+    final = final.replace(/\s*&lt;br \/&gt;\s*/gi,"\\n");
 
     final = final.replace(/\s*<\/p>\s*/gi,"\n\n");
     final = final.replace(/\s*<\/p>\s?<p>\s*/gi,"\n\n");
@@ -106,22 +107,29 @@ function checkForTextBox(message) {
 
 $(document.body).on('click', '.sendmessage', function(){
 
-  console.log('Button was clicked!');
-  var message, user;
+  //console.log('Button was clicked!');
+  var message, user, databaseData;
   
-  console.log($(this).siblings('.finalmessage').html());
+  //console.log($(this).siblings('.finalmessage').html());
   message = processLineBreaks($(this).siblings('.finalmessage').html());
   
   user = $(this).attr('id');
+  
+  //databaseData is what's going to be sent to the database after the message is sent. 
+  databaseData = JSON.parse(processLineBreaks($('#'+user+"_data").html())); //This is the JSON that should be sent to the server upon successful send.
+  databaseData.username = user;
+  //console.log(databaseData);
+
   url = 'http://www.okcupid.com/profile/' + user;
 
-  console.log('message', message);
-  console.log('user', user);
+  //console.log('message', message);
+  //console.log('user', user);
 
   var portObj = {
     message: message,
-    user: user
-  }
+    user: user,
+    databaseData: databaseData
+  };
 
   chrome.runtime.sendMessage({portover2: portObj}, function(response) {
     //console.log('message received and response set:', response);

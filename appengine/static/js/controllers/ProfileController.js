@@ -6,7 +6,7 @@ scraperApp.controller('ProfileController',
 		var sd = ScraperData; //shorthand for coding
 		var sr = SuccessReceiver;
 
-		$scope.loading = true;
+		$scope.loading = true; //Shows the AJAX loader graphic, and hides the results table. Will flip after AJAX call comes back
 		$scope.username = sd.getUsername();
 		$scope.profiles = []; //Profile objects will be pushed here after processing.
 		$scope.toggleMessaged = false; //Shows already-messaged results. Turned off by default
