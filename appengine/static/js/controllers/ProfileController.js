@@ -3,8 +3,8 @@
 scraperApp.controller('ProfileController', 
 	function ProfileController($scope, $timeout, $filter, $log, $modal, ScraperData, SuccessReceiver) {
 		
-		var sd = ScraperData; //shorthand for coding
-		var sr = SuccessReceiver;
+		var sd = ScraperData, //shorthand for coding
+		sr = SuccessReceiver;
 
 		$scope.loading = true; //Shows the AJAX loader graphic, and hides the results table. Will flip after AJAX call comes back
 		$scope.username = sd.getUsername();

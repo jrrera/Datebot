@@ -157,12 +157,12 @@ scraperApp.factory('ScraperData', function($http, $log, $q){
         	  var contextArr = [], findKeyword, essayTitle, final;
         	  
         	  for (var i = 0; i < keywords.length; i++) {
-        	    findKeyword = new RegExp('([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)', 'g');
+        	    findKeyword = new RegExp('([^a-zA-Z]|\\n|\\r|\\r\\n)' + keywords[i] + '([^a-zA-Z]|\\n|\\r|\\r\\n)', 'g');
 
         	    if (response.search(findKeyword) != -1) {
 
         	      essayTitle = findEssayTitle(keywords[i], essays);
-        	      var contextGrabber = response.match(new RegExp('\S{0,10}(\n|.){0,50}([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)(\n|.){0,50}\S{0,10}', 'g')); //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
+        	      var contextGrabber = response.match(new RegExp('\\S{0,10}(\\n|.){0,50}([^a-zA-Z]|\\n|\\r|\\r\\n)' + keywords[i] + '([^a-zA-Z]|\\n|\\r|\\r\\n)(\\n|.){0,50}\\S{0,10}', 'g')); //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
         	      
         	      final = essayTitle + contextGrabber[0];
         	      contextArr.push(final);

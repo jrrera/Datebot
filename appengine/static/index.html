@@ -75,6 +75,7 @@
 				<div class="finalmessage" ng-hide="profile.messaged">
 					<p ng-bind-html-unsafe="profile.matches.opener"></p>
 					<p ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
+					<!--<p ng-show="!profile.matches.matched.length">How's your week going?</p>-->
 					<p ng-bind-html-unsafe="profile.matches.closer"></p>
 				</div>
 				<div id="{{profile.okcUsername}}_data" ng-hide="true">{{profile.matches | filterForDatabase}}</div><!--This div preps the data for the database if we choose to send the msg-->
