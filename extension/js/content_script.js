@@ -32,14 +32,12 @@
         if (msg.finalmessage) {
           //Open the window composer on OKC
           createScript('openWindow');
-
-          //Populate message container
-          $('#message_text').val(msg.finalmessage.message);
-          
-          //3 seconds after opening the message window, we send the message
+           
+          //2 seconds after opening the message window, we populate the container and send the message
           setTimeout(function(){
+            $('#message_text').val(msg.finalmessage.message);
             createScript('sendMessage'); 
-          }, 3000);
+          }, 2000);
         }
 
         //This is the listener for the command to scrape received messages from the OKC inbox, and send back as an array
