@@ -43,18 +43,6 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
 		        	});
 		        }
 		    });  
-			
-			// $http({method: 'GET', url:'http://localhost:8080/getscrapes'}).
-			// 	success(function (data, status, headers, config){
-			// 		var finalJson = angular.fromJson(data);
-			// 		$log.info('Success!');
-			// 		$log.info(finalJson.profiles);
-			// 		deferred.resolve(finalJson.profiles);
-			// 	}).
-			// 	error(function (data, status, headers, config) {
-			// 		deferred.reject(status);
-			// 		$log.warn(status, headers);
-			// 	});
 
 			return deferred.promise;			
 		},

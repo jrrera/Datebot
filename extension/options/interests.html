@@ -27,7 +27,8 @@
 		  		Settings loaded successfully!
 			</div>
 			<div class="alert alert-success" ng-show="saved">
-		  		Everything was saved successfully!
+		  		<p>Everything was saved successfully!</p>
+		  		<p><strong>Remember</strong>: Your data is stored locally, so don't forget to download your keyword data every so often with the 'Export' button! :)
 			</div>		
 		</div>	
 		<div class="row">
@@ -87,10 +88,13 @@
 				<button class="btn btn-primary" ng-click="save()">Save</button>
 			</div>	
 			<div class="span1">
+				<a style="color:white;" href="{{exportUrl}}" download="dbot_export"><button ng-disabled="!exportTurnOn" id="exporter" class="btn btn-primary">Export</button></a>
+			</div>
+			<div class="span1">
 				<button class="btn" ng-click="addRow()"> Add </button>
 			</div>
 			<div class="span1">	
-				<button class="btn" ng-click="cancelEdit()">Reset</button>
+				<button class="btn" ng-click="cancelEdit()">Undo Edits</button>
 			</div>
 		
 			<div class="span3">			

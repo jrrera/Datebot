@@ -6,18 +6,25 @@ keywordsApp.controller('KeywordController',
 		$scope.missingField = false;
 		$scope.added = false; //Indicates if there is a keyword waiting to be added to the list from ContextMenu.
 		$scope.sortorder = '';
+		$scope.exportTurnOn = false; //Disables export button until file is ready
 		$scope.username = keywordData.getUsername();
 
 		keywordData.keywordsAjax($scope.username, function(data){
 			$scope.keyword = angular.fromJson(data);
 			$scope.loading = false; //Turns off loading notifications
 			$scope.completed = true; //Turns on successful load notif
+
+			//Generates the URL for exporting your keyword JSON to a .txt file
+			keywordData.generateExport($scope.keyword).then(function(url){
+				$scope.exportUrl = url;
+				$scope.exportTurnOn = true; //Makes the button clickable once exporting is done.
+			}); 
+
 			$timeout(function(){
-				$scope.completed = false;	//Turns it off 5 seconds later
+				$scope.completed = false;	//Turns off loading notification 5 seconds later
 			}, 5000);
-			
-			//console.log('Is there a keyword waiting? State of $scope.added: ', $scope.added);
-			
+				
+			//Logic for handling keywords passing via context menu across tabs		
 			if ($scope.added) {
 			  console.log('A keyword is waiting!');
 		      if (keywordData.checkForExistingKeywords($scope.newKeyword, $scope.keyword.pairs) === false) {
@@ -43,7 +50,8 @@ keywordsApp.controller('KeywordController',
 		$scope.save = function() {
 			localStorage["dbotUser"] = $scope.username //This is what's populated in the username field, and can be changed
 			localStorage["dbotSaveUser"] = $scope.username //This marks the last user to save data
-			keywordData.saveKeywords($scope.username, $scope.keyword);
+			keywordData.saveKeywords($scope.username, $scope.keyword); //Saves keywords to local storage
+			keywordData.generateExport($scope.keyword); //Updates the export file
 			$scope.saved = true;
 			
 			$timeout(function(){

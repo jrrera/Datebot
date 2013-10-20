@@ -1,4 +1,5 @@
-keywordsApp.factory('keywordData', function($http, $log, $q){
+keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
+
 	return {
 		getUsername: function() {
 			try {
@@ -22,6 +23,9 @@ keywordsApp.factory('keywordData', function($http, $log, $q){
 					success(function (data, status, headers, config){
 						var finalJson = angular.fromJson(data);
 						localStorage["dbotKeywords"] = JSON.stringify(finalJson);
+
+						//window.URL.createObjectURL();
+						
 						return successcb(finalJson);
 					}).
 					error(function (data, status, headers, config) {
@@ -98,7 +102,81 @@ keywordsApp.factory('keywordData', function($http, $log, $q){
 			}
 
 			localStorage["dbotKeywords"] = JSON.stringify(keywordObj);
-			console.log('Saved to local storage!');
+			
+			this.generateExport(keywordObj); //Updates the export file
+		},
+
+		generateExport: function(keywordObj) {
+
+			//Filer system code from: http://www.html5rocks.com/en/tutorials/file/filesystem/#toc-file-creatingempty
+			
+			function errorHandler(e) {
+			  var msg = '';
+
+			  switch (e.code) {
+			    case FileError.QUOTA_EXCEEDED_ERR:
+			      msg = 'QUOTA_EXCEEDED_ERR';
+			      break;
+			    case FileError.NOT_FOUND_ERR:
+			      msg = 'NOT_FOUND_ERR';
+			      break;
+			    case FileError.SECURITY_ERR:
+			      msg = 'SECURITY_ERR';
+			      break;
+			    case FileError.INVALID_MODIFICATION_ERR:
+			      msg = 'INVALID_MODIFICATION_ERR';
+			      break;
+			    case FileError.INVALID_STATE_ERR:
+			      msg = 'INVALID_STATE_ERR';
+			      break;
+			    default:
+			      msg = 'Unknown Error';
+			      break;
+			  };
+
+			  console.log('Error: ' + msg);
+			}
+
+			function onInitFs(filesystem) {
+
+			  var fs = filesystem, url;
+			  
+			  fs.root.getFile('dbot_export.txt', {create: false, exclusive: true}, function(fileEntry) {
+
+			    // Create a FileWriter object for our FileEntry (log.txt).
+			    fileEntry.createWriter(function(fileWriter) {
+
+			      fileWriter.onwriteend = function(e) {
+			        console.log('Write completed.');
+			      };
+
+			      fileWriter.onerror = function(e) {
+			        console.log('Write failed: ' + e.toString());
+			      };
+
+			      // Create a new Blob and write it to log.txt.
+			      var keywords = localStorage["dbotKeywords"];
+			      var blob = new Blob([keywords], {type: 'application/json'});
+
+			      fileWriter.write(blob);
+			      console.log('fileEntry', fileEntry.toURL());
+			      
+			      url = fileEntry.toURL(); //Puts the file URL on the scope
+
+			      $rootScope.$apply(function(){
+			      	deferred.resolve(url); //Returns the URL location of the file for downloading
+			      });
+
+			    }, errorHandler);
+			  }, errorHandler);
+			}
+
+			var deferred = $q.defer();
+						
+			window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+			window.requestFileSystem(window.TEMPORARY, 1024*1024, onInitFs, errorHandler);
+
+			return deferred.promise;			
 		},
 
 		checkForExistingKeywords: function(keyword, pairs) {
