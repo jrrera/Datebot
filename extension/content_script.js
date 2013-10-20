@@ -1,6 +1,6 @@
 /*
  * @desc: script for interaction with underlying okc page  
- * @created:
+ * @created: 10/19/2013
 */
 
 (function(){
@@ -61,11 +61,5 @@
                 chrome.runtime.sendMessage({messages: "Couldn't find any messages"});
             }
         }
-
-        // if (msg.portover) {
-        //     console.log('Received command to send over a message. The message was:', msg.portover);
-        //     $('#message_text').text(msg.portover);
-        //     $('#action_message').text(msg.portover);
-        // }
     });
 })(); //IIFE

@@ -8,16 +8,6 @@
   <body>
   <div ng-controller="ProfileController">
       <h2>DateBot Extension Beta</h2>
-<!--       <div class="gamify" id="level"><p>Level <span id="levelnumber">1</span></p></div>
-      <div class="gamify" id="xp"><p><span id="xpnumber">256</span> Total XP</p></div>
-      <div class="progress">
-        <div class="bar" id="gamifybar" style="width: 0%;"><span id="pbarcurrent">256</span>/<span id="pbarrequired">500</span> XP</div>
-      </div> -->
-      <!-- <div id="levelup"><p id="levelupp1">Level Up!</p><br /><p><em>Keep killin' it.</em></p></div> -->
-      
-      <!-- <img id="robot" src="img/Thomas-Hello.png" width="300px" alt="Datebot"> -->
-      
-<!--       <center><button type="button" class="btn btn-primary btn-large" id="initiate">Scan The Page</button></center> -->
 
     <div id="picture"></div>
     <button id="portover" class="btn">Port Over</button>
@@ -37,8 +27,7 @@
           <th class="columntitle">The Message</th>
       </tr>
     </thead>
-    <!--<tr ng-repeat="profile in profiles" ng-show="profile.matches.matched.length">-->
-    <!--<tr ng-repeat="profile in profiles" ng-hide="successes.indexOf(profile.okcUsername) != -1">-->
+    <tbody>
     <tr ng-repeat="profile in profiles">
       <td id="matchinfo">
         <a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>  
@@ -74,20 +63,8 @@
 
       </td>
     </tr>
-  </table>
-
-    <div id="thecheckbox">
-        <input id="messagedcheckbox" type="checkbox" name="messaged" value="messaged"> I messaged her with the selected keywords, with the selected order.
-        <br />
-        <input id="customcheckbox" type="checkbox" name="custom" value="custom">I customized the message, above and beyond default text
-        <br />
-        <input id="visitedfirst" type="checkbox" name="visitedfirst" value="visitedfirst">This girl visited my profile before I messaged her
-        <br />
-        <button id="senddatabase" class="btn" style="display:none;">Send to Database</button>
-    </div>
-    <div id="confirmation">
-    </div>
-  
+  </tbody>
+  </table>  
 
     <div id="messagescraper">
       <a href="http://www.okcupid.com/messages" target="_blank"><button type="button" class="btn" id="messagescrape">Check for Messages</button></a>
