@@ -49,23 +49,11 @@ function fillQueue() {
 }
 
 function processLineBreaks(text) {
-    var final;
-    //Handling BR tags
-    final = text.replace(/\s*<br><br>\s*/gi,"\n\n");
-
-    final = final.replace(/\s*<p>\s*/gi,"");
-    final = final.replace(/\s*<p ng-repeat="match in profile.matches.matched \| filter:{checked: true}" class="ng-scope ng-binding">\s*/gi,"");
-    final = final.replace(/\s*<p.*ng-binding\">\s*/gi,"");
-
-    final = final.replace(/\s*<br>\s*/gi,"\n");
-    final = final.replace(/\s*<br \/><br \/>\s*/gi,"\n\n");
-    final = final.replace(/\s*&lt;br \/&gt;\s*/gi,"\\n");
-
-    final = final.replace(/\s*<\/p>\s*/gi,"\n\n");
-    final = final.replace(/\s*<\/p>\s?<p>\s*/gi,"\n\n");
-    
-    final = final.replace(/<\!\-\- ngRepeat:.* \-\-\>/, "");
-    return final;
+  var final = text.replace(/\s*<p[^>]+">\s*/gi,""); //Filters out all P tags
+  final = final.replace(/\s*<br\s?\/?>\s*/gi,"\n"); //Puts a line break for any <br> tag
+  final = final.replace(/\s*<\/p>\s*/gi,"\n\n"); //Adds two lines breaks for any closing p tags
+  final = final.replace(/<!--.*-->/gi, ""); //Removes commented out HTML from Angular
+  return final;
 }
 
 function createScript(action) {

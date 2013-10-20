@@ -2,7 +2,7 @@
  * @desc: script for passing data between site and popup
 */
 
-    var testEnvironment = false;
+    var testEnvironment = true;
 
     //START DEFINING FUNCTIONS
 
@@ -50,72 +50,72 @@
 
 
 
-    //If can find a keyword in the blob of context, push the keyword to one array, and RegEx the context into another array. Pass both of those arrays back.
-    function extractMatchedKeywords(response, keywords) {
-      var matchedKeywords = [];
-      var findKeyword;
-      for (var i = 0; i < keywords.length; i++) {
-        findKeyword = new RegExp('[^a-zA-Z]' + keywords[i] + '[^a-zA-Z]', 'g');
-        if (response.search(findKeyword) != -1) {
-          matchedKeywords.push(keywords[i]);
-        }
-      } 
-      console.log(matchedKeywords);
-      return matchedKeywords;
-    }
+    // //If can find a keyword in the blob of context, push the keyword to one array, and RegEx the context into another array. Pass both of those arrays back.
+    // function extractMatchedKeywords(response, keywords) {
+    //   var matchedKeywords = [];
+    //   var findKeyword;
+    //   for (var i = 0; i < keywords.length; i++) {
+    //     findKeyword = new RegExp('[^a-zA-Z]' + keywords[i] + '[^a-zA-Z]', 'g');
+    //     if (response.search(findKeyword) != -1) {
+    //       matchedKeywords.push(keywords[i]);
+    //     }
+    //   } 
+    //   console.log(matchedKeywords);
+    //   return matchedKeywords;
+    // }
 
-    function findEssayTitle(keyword, essays){
-      console.log(keyword);
-      console.log(essays);
-      var final;
-      var keywordRe = new RegExp('[^a-zA-Z]' + keyword + '[^a-zA-Z]', 'i');
+    // function findEssayTitle(keyword, essays){
+    //   console.log(keyword);
+    //   console.log(essays);
+    //   var final;
+    //   var keywordRe = new RegExp('[^a-zA-Z]' + keyword + '[^a-zA-Z]', 'i');
 
-      for (var i = 0; i < essays.length; i++) {
-        var essay = essays[i].essay;
-        console.log("Now looking through this essay: ", essay);
-        if (essay.search(keywordRe) != -1) {
-          console.log("Found a match for " + keyword + ": ", + essays[i].name);
-          final = '<strong>' + essays[i].name + '</strong><br />';
-          return final;
-        } 
-      }
-      return "<strong>Unknown</strong><br />";
-    }
+    //   for (var i = 0; i < essays.length; i++) {
+    //     var essay = essays[i].essay;
+    //     console.log("Now looking through this essay: ", essay);
+    //     if (essay.search(keywordRe) != -1) {
+    //       console.log("Found a match for " + keyword + ": ", + essays[i].name);
+    //       final = '<strong>' + essays[i].name + '</strong><br />';
+    //       return final;
+    //     } 
+    //   }
+    //   return "<strong>Unknown</strong><br />";
+    // }
 
 
-    function extractContext(response, keywords, essays) {
-      console.log("This is what we're extracting context from: ", response);
-      var contextArr = [];
-      var findKeyword;
-      var essayTitle;
-      var final;
+    // function extractContext(response, keywords, essays) {
+    //   console.log("This is what we're extracting context from: ", response);
+    //   var contextArr = [];
+    //   var findKeyword;
+    //   var essayTitle;
+    //   var final;
 
-      for (var i = 0; i < keywords.length; i++) {
-        findKeyword = new RegExp('([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)', 'g');
+    //   for (var i = 0; i < keywords.length; i++) {
+    //     findKeyword = new RegExp('([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)', 'g');
 
-        if (response.search(findKeyword) != -1) {
+    //     if (response.search(findKeyword) != -1) {
 
-          essayTitle = findEssayTitle(keywords[i], essays);
-          var contextGrabber = response.match(new RegExp('\S{0,10}(\n|.){0,50}([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)(\n|.){0,50}\S{0,10}', 'g')); //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
+    //       essayTitle = findEssayTitle(keywords[i], essays);
+    //       var contextGrabber = response.match(new RegExp('\S{0,10}(\n|.){0,50}([^a-zA-Z]|\n|\r|\r\n)' + keywords[i] + '([^a-zA-Z]|\n|\r|\r\n)(\n|.){0,50}\S{0,10}', 'g')); //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
           
-          //console.log("contextGrabber for the keyword " + keywords[i] + ": ", contextGrabber);
-          //contextGrabber[0] = contextGrabber[0].replace(/(\r\n|\n|\r)/gm," / "); //Replaces line breaks with a space to prevent code from being broken
-          final = essayTitle + contextGrabber[0];
-          contextArr.push(final);
-        }
-      } 
+    //       //console.log("contextGrabber for the keyword " + keywords[i] + ": ", contextGrabber);
+    //       //contextGrabber[0] = contextGrabber[0].replace(/(\r\n|\n|\r)/gm," / "); //Replaces line breaks with a space to prevent code from being broken
+    //       final = essayTitle + contextGrabber[0];
+    //       contextArr.push(final);
+    //     }
+    //   } 
 
-      return contextArr;
-    }
+    //   return contextArr;
+    // }
 
     //END DEFINING FUNCTIONS
 
 
     //START LISTENERS AND DATA PROCESSING
     //Set a listener that will capture the getProfile request of the popup and content from the content_script
-    var okcText = "";
-    var okcUserName = "";
-    var okcContext = "";
+    // var okcText = "";
+    // var okcUserName = "";
+    // var okcContext = "";
 
     //Event handler for tab changes. Checks if current tab is the messages page on OKC. If so, initiates inbox scrape
     chrome.tabs.onUpdated.addListener(function(tabId,changeInfo,tab){ 
@@ -146,100 +146,114 @@
         console.log(okcContext);
       }
 
-      if(msg.method == "getProfile") {
-        if (testEnvironment === false) {
-          try {
-            var profile = JSON.parse(localStorage["dbotKeywords"]);   
-          } 
-          catch(e) {
-            console.log ("Warning! Error. Unable to parse localStorage['keywords']. Try saving your user settings again");
-          }
+      if (msg.portover3) {
+        var messageToPort = msg.portover3;
+        console.log('Processed message received', messageToPort);
+
+        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) { 
+          var tabId = tabs[0].id;
+                    
+          //Send a request to the content script on the OKCupid page to scrape the HTML
+          chrome.tabs.sendMessage(tabId, {finalmessage: messageToPort},function(response){});
+        });         
+      }
+
+      // if(msg.method == "getProfile") {
+      //   if (testEnvironment === false) {
+      //     try {
+      //       var profile = JSON.parse(localStorage["dbotKeywords"]);   
+      //     } 
+      //     catch(e) {
+      //       console.log ("Warning! Error. Unable to parse localStorage['keywords']. Try saving your user settings again");
+      //     }
           
-        } else if (testEnvironment === true) {
-          var profile = JSON.parse(localStorage["keywordsTestEnvironment"]);
-        }     
-        var pairs = profile.pairs;
+      //   } else if (testEnvironment === true) {
+      //     var profile = JSON.parse(localStorage["keywordsTestEnvironment"]);
+      //   }     
+      //   var pairs = profile.pairs;
 
-        var desiredKeywords = []; 
-        var desiredMessage = [];
-        var finalKeywords, finalContext, okcResponse;
-        var finalMessage = [];
-        var finalResult = "";
-        var opener = profile.opener;
-        var closer = profile.closer;
-        var firstTrans = profile.first_transition;
-        var secondTrans = profile.second_transition;
+      //   var desiredKeywords = []; 
+      //   var desiredMessage = [];
+      //   var finalKeywords, finalContext, okcResponse;
+      //   var finalMessage = [];
+      //   var finalResult = "";
+      //   var opener = profile.opener;
+      //   var closer = profile.closer;
+      //   var firstTrans = profile.first_transition;
+      //   var secondTrans = profile.second_transition;
 
-        for (var i = 0; i < pairs.length; i++) {
-          desiredKeywords.push(pairs[i].keyword);
-          desiredMessage.push(pairs[i].message);
-        }
+      //   for (var i = 0; i < pairs.length; i++) {
+      //     desiredKeywords.push(pairs[i].keyword);
+      //     desiredMessage.push(pairs[i].message);
+      //   }
 
         //console.log("opener: ", opener);
         //console.log("closer: ", closer);
 
         //Now, we create the final JSON object to pass to the popup for processing
-        if (okcText) {
-          okcResponse = okcText;  
+      //   if (okcText) {
+      //     okcResponse = okcText;  
 
-          finalKeywords = extractMatchedKeywords(okcResponse,desiredKeywords);
-          finalContext = extractContext(okcResponse,desiredKeywords, okcContext);
+      //     finalKeywords = extractMatchedKeywords(okcResponse,desiredKeywords);
+      //     finalContext = extractContext(okcResponse,desiredKeywords, okcContext);
 
-          for (var i = 0; i < finalKeywords.length; i++) {
-            if (desiredKeywords.indexOf(finalKeywords[i]) != -1) {
-              var index = desiredKeywords.indexOf(finalKeywords[i]);
-              finalMessage.push(desiredMessage[index]);  
-            }
-            console.log("index: ", index);
-            console.log(finalKeywords);
-            console.log(finalMessage);
-          }
+      //     for (var i = 0; i < finalKeywords.length; i++) {
+      //       if (desiredKeywords.indexOf(finalKeywords[i]) != -1) {
+      //         var index = desiredKeywords.indexOf(finalKeywords[i]);
+      //         finalMessage.push(desiredMessage[index]);  
+      //       }
+      //       console.log("index: ", index);
+      //       console.log(finalKeywords);
+      //       console.log(finalMessage);
+      //     }
 
-          finalResult += '{"user":"' + okcUserName + '",';
-          finalResult += '"age": 23,"location": "San Francisco, CA",';
-          finalResult += '"pic":"' + okcPicture + '",';
-          finalResult += '"opener":"' + opener + ' ",'; //extra space added to this phrase after the variable for proper final sentence structure
-          finalResult += '"closer":"' + closer + ' ",'; //extra space added to this phrase after the variable for proper final sentence structure
-          finalResult += '"first_transition":"' + firstTrans + ' ",';
-          finalResult += '"second_transition":"' + secondTrans + ' ",';
-          finalResult += '"matched": [';
+      //     finalResult += '{"user":"' + okcUserName + '",';
+      //     finalResult += '"age": 23,"location": "San Francisco, CA",';
+      //     finalResult += '"pic":"' + okcPicture + '",';
+      //     finalResult += '"opener":"' + opener + ' ",'; //extra space added to this phrase after the variable for proper final sentence structure
+      //     finalResult += '"closer":"' + closer + ' ",'; //extra space added to this phrase after the variable for proper final sentence structure
+      //     finalResult += '"first_transition":"' + firstTrans + ' ",';
+      //     finalResult += '"second_transition":"' + secondTrans + ' ",';
+      //     finalResult += '"matched": [';
 
-          for (var i = 0; i < finalKeywords.length; i++) {
-              finalResult += '{"keyword":"' + finalKeywords[i] + '",';
-              finalResult += '"context":"' + finalContext[i] + '",';
-              finalResult += '"message":"' + finalMessage[i] + '",';
+      //     for (var i = 0; i < finalKeywords.length; i++) {
+      //         finalResult += '{"keyword":"' + finalKeywords[i] + '",';
+      //         finalResult += '"context":"' + finalContext[i] + '",';
+      //         finalResult += '"message":"' + finalMessage[i] + '",';
 
-              if (i == 0 || i == 1) {
-                finalResult += '"checked":true}';
-              } else {
-                finalResult += '"checked":false}';
-              }
+      //         if (i == 0 || i == 1) {
+      //           finalResult += '"checked":true}';
+      //         } else {
+      //           finalResult += '"checked":false}';
+      //         }
 
-              if (i == (finalKeywords.length - 1)) {
-                console.log("The final keyword!");
-              } else {
-                finalResult += ",";
-              } //Adds a comma for the JSON when the keyword is NOT the last keyword in the list
-          }
+      //         if (i == (finalKeywords.length - 1)) {
+      //           console.log("The final keyword!");
+      //         } else {
+      //           finalResult += ",";
+      //         } //Adds a comma for the JSON when the keyword is NOT the last keyword in the list
+      //     }
 
-          finalResult += ']}';
-        }
-        console.log(finalResult);
-        sendResponse(finalResult);
-      }
+      //     finalResult += ']}';
+      //   }
+      //   console.log(finalResult);
+      //   sendResponse(finalResult);
+      // }
 
 
       if(msg.method == "triggerScript") {
         chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) { 
           var tabId = tabs[0].id;
-          console.log("Was able to get the current tab: ", tabs[0]);
-
+          
+          console.log("Was able to get the current tab: ", tabs[0], 'let us send a message!');
+          
+          //Send a request to the content script on the OKCupid page to scrape the HTML
           chrome.tabs.sendMessage(tabId, {action:"scrape"},function(response){
-            console.log("Sent a message off to the content script and receive a response! It was: ", response);
-            chrome.runtime.sendMessage({finalresult:"ready"},function(response){
-                console.log("The deed has been done!");
-
-            });
+            var html = response;
+            console.log("Sent a message off to the content script and receive a response! It was: ", html);
+            
+            //Send the response, which is the HTML payload, back to the Angular front-end in the pop
+            chrome.runtime.sendMessage({html: html},function(response){});
           });
         });         
       }

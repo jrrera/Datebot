@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "DBot",
-  "version": "2.51",
+  "name": "DateBot Extension Beta",
+  "version": "3.0",
   "permissions": [
     "tabs",
     "background",
@@ -14,7 +14,7 @@
     "48":"img/Thomas-Hello48.png",
     "128":"img/Thomas-Hello128.png"
   },
-
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "description": "People write long profiles. Don't spend a long time reading them.",
   "background": {"scripts":["background.js"]},
   "options_page": "options/interests.html",
@@ -25,7 +25,7 @@
     "default_popup": "popup.html"
   },
   "content_scripts": [ {
-    "js": [ "globals.js", "jquery.min.js", "background.js", "content_script.js" ],
+    "js": [ "jquery.min.js", "content_script.js" ],
     "matches": [ "http://www.okcupid.com/*", "https://www.okcupid.com/*"]
   }]
 }
