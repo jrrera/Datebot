@@ -9,16 +9,8 @@
   <div ng-controller="ProfileController">
       <h2>DateBot Extension Beta</h2>
 
-    <div id="picture"></div>
-    <button id="portover" class="btn">Port Over</button>
-    <button id="rescan" class="btn">Rescan</button>
-    <div id="info"></div>
-    <div id="the-progress-bar" class="progress progress-striped active">
-      <div id="the-progress-bar-2" class="bar" style="width: 0%;"></div>
-    </div>
-
-
-   <table class="table table-bordered">
+  <div class="alert" ng-show="!profiles.length && !loading">Nothing found. Are you sure you're on an OKCupid profile? If so, refreshing the page should do the trick.</div>
+   <table class="table table-bordered" ng-show="profiles.length">
     <thead>
       <tr>
         <th class="columntitle">Match</th>
@@ -28,7 +20,8 @@
       </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="profile in profiles">
+    <tr ng-><td colspan="4" ng-repeat="profile in profiles" ng-hide="profile.matches.matched.length"><span class="alert">Bummer, couldn't find anything in common here. Want to send a generic message?</span></td></tr>
+    <tr ng-repeat="profile in profiles" ng-show="profile.matches.matched.length">
       <td id="matchinfo">
         <a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>  
         <img src="{{profile.okcPicture}}" /><br /><br />
@@ -66,9 +59,9 @@
   </tbody>
   </table>  
 
-    <div id="messagescraper">
+<!--     <div id="messagescraper">
       <a href="http://www.okcupid.com/messages" target="_blank"><button type="button" class="btn" id="messagescrape">Check for Messages</button></a>
-    </div>
+    </div> --><!--This is a shortcut link for the messages page. When you're on that page, the content script runs to scrape all of the responses you've received-->
 
   </div>
     <script src="lib/bootstrap.min.js"></script>

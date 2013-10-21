@@ -47,8 +47,11 @@ dbotExtApp.controller('ProfileController',
 			}
 			
 			$scope.profiles.push(profileObj);
+			$scope.loading = false;
 
 			console.log('$scope.profiles is defined as:', $scope.profiles);
+		}, function(e){
+			console.log(e);
 			$scope.loading = false;
 		});
 
