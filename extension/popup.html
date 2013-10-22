@@ -20,8 +20,7 @@
       </tr>
     </thead>
     <tbody>
-    <tr ng-><td colspan="4" ng-repeat="profile in profiles" ng-hide="profile.matches.matched.length"><span class="alert">Bummer, couldn't find anything in common here. Want to send a generic message?</span></td></tr>
-    <tr ng-repeat="profile in profiles" ng-show="profile.matches.matched.length">
+    <tr ng-repeat="profile in profiles">
       <td id="matchinfo">
         <a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>  
         <img src="{{profile.okcPicture}}" /><br /><br />
@@ -45,15 +44,19 @@
         </div>
       </td>
       <td id="the_message">
+        <div class="alert" ng-hide="profile.matches.matched.length">Bummer, couldn't find anything in common here. Want to send a generic message?</div>
+<!-- 
+          <td colspan="4" ng-repeat="profile in profiles" ng-hide="profile.matches.matched.length"><span class="alert">Bummer, couldn't find anything in common here. Want to send a generic message?</span></td> -->
         <div class="finalmessage">
           <p ng-bind-html-unsafe="profile.matches.opener"></p>
-          <p ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
+          <p ng-hide="(profile.matches.matched | filter:{checked: true}).length" ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
           <p ng-if="!((profile.matches.matched | filter:{checked: true}).length)">How's your week going?</p>
           <p ng-bind-html-unsafe="profile.matches.closer"></p>
         </div>
         <div id="{{profile.okcUsername}}_data" ng-hide="true">{{profile.matches | filterForDatabase}}</div><!--This div preps the data for the database if we choose to send the msg-->
         <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-click="sendToTab()">Send the message!</button>
-
+<!--         <span>----------</span>
+  <textarea>{{testmessage}}</textarea> -->
       </td>
     </tr>
   </tbody>
