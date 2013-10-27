@@ -8,6 +8,6 @@ keywordsApp.config( [
     '$compileProvider',
     function( $compileProvider )
     {   
-        $compileProvider.urlSanitizationWhitelist(/^\s*(https?|filesystem|ftp|mailto|chrome-extension):/);
+        $compileProvider.urlSanitizationWhitelist(/^\s*(https?|filesystem|ftp|blob|mailto|chrome-extension):/);
     }
 ]);
