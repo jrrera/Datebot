@@ -105,5 +105,10 @@
     left: 72%;
     top: 20%;        
   }
+  
+  .custom_editor {
+    width: 350px;
+    height: 300px;
+  }
 
 

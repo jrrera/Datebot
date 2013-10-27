@@ -4,7 +4,7 @@ dbotExtApp.controller('ProfileController',
 	function ProfileController($scope, $timeout, $filter, $log, ScraperData) {
 
 		function processLineBreaks(text) {
-			console.log('text prior to processing', text);
+			//console.log('text prior to processing', text);
 		    var final = text.replace(/\s*<p[^>]+">\s*/gi,""); //Filters out all P tags
 		    final = final.replace(/\n*\s*<!--.*-->\s*\n*/gi, ""); //Removes commented out HTML from Angular
 		    final = final.replace(/\s*<br\s?\/?>\s*\n*<\/p>\n*\s*/gi, "\n\n");
@@ -17,6 +17,9 @@ dbotExtApp.controller('ProfileController',
 		$scope.username = ScraperData.getUsername();
 		$scope.profiles = []; //Profile objects will be pushed here after processing.
 		$scope.toggleMessaged = false; //Shows already-messaged results. Turned off by default
+		$scope.customized = false; //Becomes true when you modify the textarea for custom messages
+		$scope.saveCustomized = false; //Becomes true if $scope.customized is true AND you save
+		$scope.customMessage = ""; //This part of the model will eventually contain the customized message
 		
 		$scope.keywords = ScraperData.getKeywords("jrrera@gmail.com"); //This may need to be put inside ScraperData.getProfiles.then() since this will also be async once calling from database
 		
@@ -56,11 +59,23 @@ dbotExtApp.controller('ProfileController',
 			}
 
 			$scope.loading = false;
+			console.log($scope.profiles);
 
 		}, function(e){
 			console.log(e);
 			$scope.loading = false;
 		});
+		
+		//When the profiles model is updated by adjusting keyword choices, customized becomes false again and we keep the message model in sync.
+		$scope.keywordClick = function(){
+			//Reset the customized message flags
+			$scope.customized = false;
+			$scope.saveCustomized = false;
+
+			//Update the textarea message model
+			$scope.customMessage = processLineBreaks($('.finalmessage').html());
+			//console.log('customMessage model is now', $scope.customMessage);
+		};
 
 		$scope.raiseKeywordPosition = function(clickedMatch, matchesArr) {
 			//This function moves a particular keyword one slot higher for arranging your message. 
@@ -89,7 +104,8 @@ dbotExtApp.controller('ProfileController',
 		$scope.sendToTab = function(){
 			var message, user, databaseData;
 			
-			message = processLineBreaks($('.finalmessage').html());
+			//If customized, $scope.customMessage from textarea is what's sent. Else, the standard .finalmessage div's contents are used
+			message = $scope.saveCustomized ? $scope.customMessage : processLineBreaks($('.finalmessage').html());
 
 			//$scope.testmessage = message; //for testing
 			//console.log('processLinebreaks message after processing is', message);
@@ -103,6 +119,22 @@ dbotExtApp.controller('ProfileController',
 
 
 		};
+
+		$scope.showCustomEditor = function(profile) {
+			$scope.customMessage = processLineBreaks($('.finalmessage').html()); 
+			var username = profile.okcUsername;
+			profile.customEditorActive = true; //adds custom editor property to the profile model
+		};
+
+		//Function that runs as soon as the custom message textarea is edited
+		$scope.markAsCustomized = function(profile) {
+			$scope.customized = true; //Adds customized flag to the model
+		}
+
+		$scope.saveCustomEdit = function(profile) {
+			profile.customEditorActive = false; //Turns off the custom editor
+			if ($scope.customized) $scope.saveCustomized = true; //Becomes true if $scope.customized is true AND you save. This determines which div gets grabbed for sending the final message to the girl
+		}
 
 	}
 );

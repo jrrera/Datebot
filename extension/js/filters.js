@@ -27,3 +27,10 @@ dbotExtApp.filter('filterForDatabase', function() {
 
 	}
 });
+
+dbotExtApp.filter('replaceLineBreaks', function() {
+	return function (message) {
+		//console.log('triggering replaceLineBreaks filter');
+		return message.replace(/\n/g, "<br />");
+	}
+});

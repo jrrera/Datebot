@@ -27,7 +27,7 @@
       </td>
       <td id="similarities">
         <div ng-repeat="match in profile.matches.matched" ng-hide="profile.messaged">
-          <input type="checkbox" ng-model="match.checked" ng-checked="match.checked" /> {{match.keyword}}
+          <input type="checkbox" ng-model="match.checked" ng-checked="match.checked" ng-click="keywordClick()"/> {{match.keyword}}
           <span class="moveit" ng-click="raiseKeywordPosition(match, profile.matches.matched)" ng-hide="$first">&uarr;</span>
           <span class="moveit" ng-click="lowerKeywordPosition(match, profile.matches.matched)" ng-hide="$last">&darr;</span>
 
@@ -47,14 +47,26 @@
         <div class="alert" ng-hide="profile.matches.matched.length">Bummer, couldn't find anything in common here. Want to send a generic message?</div>
 <!-- 
           <td colspan="4" ng-repeat="profile in profiles" ng-hide="profile.matches.matched.length"><span class="alert">Bummer, couldn't find anything in common here. Want to send a generic message?</span></td> -->
-        <div class="finalmessage">
+        <div class="finalmessage" id="{{profile.okcUsername}}_message" ng-hide="profile.customEditorActive || saveCustomized">
           <p ng-bind-html-unsafe="profile.matches.opener"></p>
-          <p ng-hide="(profile.matches.matched | filter:{checked: true}).length" ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
+          <p ng-hide="!((profile.matches.matched | filter:{checked: true}).length)" ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
           <p ng-if="!((profile.matches.matched | filter:{checked: true}).length)">How's your week going?</p>
           <p ng-bind-html-unsafe="profile.matches.closer"></p>
         </div>
+
+        
+        
+        <!--Custom Editor functionality-->
+        <div class="customized_finalmessage" ng-show="saveCustomized && !profile.customEditorActive" ng-bind-html-unsafe="$parent.customMessage | replaceLineBreaks"></div>
+        <textarea class="custom_editor" ng-model="$parent.customMessage" ng-show="profile.customEditorActive" ng-change="markAsCustomized(profile)"></textarea>
+        <button id="{{profile.okcUsername}}_customize" ng-hide="profile.customEditorActive" ng-click="showCustomEditor(profile)">Customize</button>
+        <button id="{{profile.okcUsername}}_customsave" ng-show="profile.customEditorActive" ng-click="saveCustomEdit(profile)">Save</button>
+        
+        <div id="{{profile.okcUsername}}_customized_alert" class="alert" ng-show="saveCustomized">Note: This is a customized message. Adjusting your keyword choices will reset the message to your defaults!</div>
+        <!--End Custom Edtior functionality-->
+
         <div id="{{profile.okcUsername}}_data" ng-hide="true">{{profile.matches | filterForDatabase}}</div><!--This div preps the data for the database if we choose to send the msg-->
-        <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-click="sendToTab()">Send the message!</button>
+        <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.customEditorActive" ng-click="sendToTab()">Send the message!</button>
 <!--         <span>----------</span>
   <textarea>{{testmessage}}</textarea> -->
       </td>
