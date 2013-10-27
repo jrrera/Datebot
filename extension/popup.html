@@ -9,6 +9,16 @@
   <div ng-controller="ProfileController">
       <h2>DateBot Extension Beta</h2>
 
+    <!--Begin username view-->
+      <div ng-show="loggedIn">
+        You're logged in as <strong>{{username}}</strong> <a href="#">(not {{username}}?)</a>
+      </div>
+      <div ng-show="!loggedIn">
+        <span>You're not logged in! Put in your username here: </span><input type="text" ng-model="username" />
+        <button ng-click="setUser(username)">Log In / Create New User</button>
+      </div>
+    <!--End username view-->
+
   <div class="alert" ng-show="!profiles.length && !loading">Nothing found. Are you sure you're on an OKCupid profile? If so, refreshing the page should do the trick.</div>
    <table class="table table-bordered" ng-show="profiles.length">
     <thead>

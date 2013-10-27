@@ -7,7 +7,8 @@
     "background",
     "contextMenus",
     "http://localhost/*",
-    "http://dbotapp.appspot.com/*"
+    "http://dbotapp.appspot.com/*",
+    "storage"
   ],
   "icons": {
     "16":"img/Thomas-Hello16.png",
