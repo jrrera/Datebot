@@ -7,17 +7,16 @@
   </head>
   <body>
   <div ng-controller="ProfileController">
-      <h2>DateBot Extension Beta</h2>
+      <h2>DateBot Beta</h2>
 
-    <!--Begin username view-->
-      <div ng-show="loggedIn">
-        You're logged in as <strong>{{username}}</strong> <a href="#">(not {{username}}?)</a>
+    <!--Begin new user view-->
+      <div ng-show="!foundKeywords">
+        <p class="lead">Welcome to Datebot! It looks like you're a new user. To get started, visit the Options page <button class="btn btn-primary" ng-click="goToOptions()">Go to Options Page</button></p>
+        
+        <span class="import_note">Note: If you're an existing user, your data might've been wiped from your machine :(. If you have an export of your interests/keywords data, you can import it back in on the options page!</span>
+
       </div>
-      <div ng-show="!loggedIn">
-        <span>You're not logged in! Put in your username here: </span><input type="text" ng-model="username" />
-        <button ng-click="setUser(username)">Log In / Create New User</button>
-      </div>
-    <!--End username view-->
+    <!--End new user view-->
 
   <div class="alert" ng-show="!profiles.length && !loading">Nothing found. Are you sure you're on an OKCupid profile? If so, refreshing the page should do the trick.</div>
    <table class="table table-bordered" ng-show="profiles.length">
@@ -64,7 +63,7 @@
           <p ng-bind-html-unsafe="profile.matches.closer"></p>
         </div>
 
-        
+        <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.customEditorActive" ng-click="sendToTab()">Send the message!</button>
         
         <!--Custom Editor functionality-->
         <div class="customized_finalmessage" ng-show="saveCustomized && !profile.customEditorActive" ng-bind-html-unsafe="$parent.customMessage | replaceLineBreaks"></div>
@@ -76,17 +75,12 @@
         <!--End Custom Edtior functionality-->
 
         <div id="{{profile.okcUsername}}_data" ng-hide="true">{{profile.matches | filterForDatabase}}</div><!--This div preps the data for the database if we choose to send the msg-->
-        <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.customEditorActive" ng-click="sendToTab()">Send the message!</button>
-<!--         <span>----------</span>
-  <textarea>{{testmessage}}</textarea> -->
+
       </td>
     </tr>
   </tbody>
   </table>  
 
-<!--     <div id="messagescraper">
-      <a href="http://www.okcupid.com/messages" target="_blank"><button type="button" class="btn" id="messagescrape">Check for Messages</button></a>
-    </div> --><!--This is a shortcut link for the messages page. When you're on that page, the content script runs to scrape all of the responses you've received-->
 
   </div>
     <script src="lib/bootstrap.min.js"></script>

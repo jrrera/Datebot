@@ -14,7 +14,7 @@ dbotExtApp.controller('ProfileController',
 		}
 
 		$scope.loading = true; //Shows the AJAX loader graphic, and hides the results table. Will flip after AJAX call comes back
-		$scope.loggedIn = false; //Will flip to true upon logging in with a username
+		$scope.foundKeywords = false; //Will flip to true upon locating stored keywords in localstorage
 		$scope.profiles = []; //Profile objects will be pushed here after processing.
 		$scope.toggleMessaged = false; //Shows already-messaged results. Turned off by default
 		$scope.customized = false; //Becomes true when you modify the textarea for custom messages
@@ -23,58 +23,49 @@ dbotExtApp.controller('ProfileController',
 
 		//Begin cascade of async calls for username, keywords, and profile
 		$scope.initialize = function() {
-			ScraperData.getUsername($scope).then(function(result){
-				
-				//Grab username once Chrome's local storage returns it back
-				$scope.username = result;
+			ScraperData.getKeywords($scope).then(function(data){
+				$scope.keywords = data;
 
-				if ($scope.username) $scope.loggedIn = true;
+				//Now that keywords have been returned, time to get the profile
+				//We pass in the scope since we need to run $scope.$apply in order for Angular to see that the response came back
+				ScraperData.getProfile($scope).then(function(data){
+					var html, jqueryArr, okcContext, profileObj;
 
-				//Then, get the associated keywords
-				ScraperData.getKeywords($scope).then(function(data){
-					$scope.keywords = data;
+					html = data.html;
+					//console.log('The HTML is in the controller! Lets move on', html);
+					
+					//Returns an array of - in order - okcText, okcContext (for matched interests), the picture URL, and the jquery object
+					jqueryArr = ScraperData.turnIntoJquery(html);
 
-					//Now that username and keywords have been returned, time to get the profile
-					//We pass in the scope since we need to run $scope.$apply in order for Angular to see that the response came back
-					ScraperData.getProfile($scope).then(function(data){
-						var html, jqueryArr, okcContext, profileObj;
+					//Now, we test to see if the OKCText and username were found in the HTML. If not, we're not on a profile page. If yes, continue on
+					if (jqueryArr[0] && jqueryArr[1]) {
+						//Returns an array of objects (the essays scraped from the profile)
+						okcContext = ScraperData.processContext(jqueryArr[3]);
 
-						html = data.html;
-						//console.log('The HTML is in the controller! Lets move on', html);
-						
-						//Returns an array of - in order - okcText, okcContext (for matched interests), the picture URL, and the jquery object
-						jqueryArr = ScraperData.turnIntoJquery(html);
+						//Processes the profile text with find-and-replace
+						jqueryArr[0] = ScraperData.processProfileText(jqueryArr[0]); 
 
-						//Now, we test to see if the OKCText and username were found in the HTML. If not, we're not on a profile page. If yes, continue on
-						if (jqueryArr[0] && jqueryArr[1]) {
-							//Returns an array of objects (the essays scraped from the profile)
-							okcContext = ScraperData.processContext(jqueryArr[3]);
+						//Adds the okcContext as the fifth item in the jqueryArr array
+						jqueryArr.push(okcContext);
 
-							//Processes the profile text with find-and-replace
-							jqueryArr[0] = ScraperData.processProfileText(jqueryArr[0]); 
-
-							//Adds the okcContext as the fifth item in the jqueryArr array
-							jqueryArr.push(okcContext);
-
-							//Create the final profile object to send to the front-end if the profile processed successfully
-							profileObj = {
-								okcText: jqueryArr[0],
-								okcUsername: jqueryArr[1],
-								okcPicture: jqueryArr[2],
-								okcContext: jqueryArr[4],
-								matches: ScraperData.findSimilarities(jqueryArr[0], $scope.keywords, jqueryArr[4]) //Generates the object that the Chrome extension front end looks for
-							}
-							
-							$scope.profiles.push(profileObj);
+						//Create the final profile object to send to the front-end if the profile processed successfully
+						profileObj = {
+							okcText: jqueryArr[0],
+							okcUsername: jqueryArr[1],
+							okcPicture: jqueryArr[2],
+							okcContext: jqueryArr[4],
+							matches: ScraperData.findSimilarities(jqueryArr[0], $scope.keywords, jqueryArr[4]) //Generates the object that the Chrome extension front end looks for
 						}
+						
+						$scope.profiles.push(profileObj);
+					}
 
-						$scope.loading = false;
-						console.log('Profile returned:', $scope.profiles);
+					$scope.loading = false;
+					console.log('Profile returned:', $scope.profiles);
 
-					}, function(e){
-						console.log(e);
-						$scope.loading = false;
-					});
+				}, function(e){
+					console.log(e);
+					$scope.loading = false;
 				});
 			});
 		};
@@ -151,16 +142,11 @@ dbotExtApp.controller('ProfileController',
 			if ($scope.customized) $scope.saveCustomized = true; //Becomes true if $scope.customized is true AND you save. This determines which div gets grabbed for sending the final message to the girl
 		};
 
-		$scope.setUser = function(username) {
-			chrome.storage.local.get('dbotUser', function(result) {
-				if (result.dbotUser) {
-					$scope.initialize(); //If we found a user match, initialize the app
-				} else {
-					//Set the username and intialize the app
-					chrome.storage.local.set({'dbotUser': username},function(){
-						$scope.intialize();
-					});
-				}
+		$scope.goToOptions = function() {
+			var extId = chrome.i18n.getMessage("@@extension_id"); //Gets the extension ID for opening the options page. Not required for creating the tab, but required for checking to see if the URL is open
+			chrome.tabs.create({ 
+			    url: "chrome-extension://" + extId + "/options/interests.html",
+			    active: true
 			});
 		};
 

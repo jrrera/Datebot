@@ -107,61 +107,53 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
         },
 
         getKeywords: function($scope) {
-        	//Eventually, this will grab the keywords from the server ($http({method: 'GET', url:'http://dbotapp.appspot.com/keywords?user='+username}), but for now, uses localstorage
-			var deferred = $q.defer(),
-			username = $scope.username
-			if (username) {
-				chrome.storage.local.get('dbotKeywords', function(result) {
-					try {
-						$scope.$apply(function(){
-							deferred.resolve(angular.fromJson(result.dbotKeywords))
-						});
-					} catch (e) {
-						console.log('Error when parsing keywords in localStorage!', e);
-					}
-				});
+        	var deferred = $q.defer();
+
+			chrome.storage.local.get('dbotKeywords', function(result) {
+				if (result.dbotKeywords) {
+					$scope.$apply(function(){
+						$scope.foundKeywords = true;
+						deferred.resolve(angular.fromJson(result.dbotKeywords))
+					});							
+				} else {
+	        		console.log('no keywords found. giving defaults');
+	        		var defaultKeywords = {
+	        			"opener":"Hey, how's it going?\n\n", 
+	        			"closer":"Cheers,\n{Name}",
+	        			"first_transition" : "Also,",
+	        			"second_transition" : "Oh, and", 
+	        			"pairs": [
+	        				{
+	        					"keyword": "cooking",
+	        					"message": "I'm really into cooking too. Do you have a specialty dish? Mine's {{INSERT DISH NAME HERE}}."
+	        				},
+	        				{
+	        					"keyword": "travel",
+	        					"message": "How was traveling in {{COUNTRY/STATE/PLACE}}? I've been to {{COUNTRY/STATE/PLACE}} and had an amazing time."
+	        				},
+	        				{
+	        					"keyword": "foodie",
+	        					"message": "I'm a total foodie too. Have you ever been to {{PLACE}} in {{NEIGHBORHOOD}}? It's unbelievable."
+	        				},
+	        				{
+	        					"keyword": "thai",
+	        					"message": "Thai food is my absolutely favorite right now. Have you been to {{PLACE}} in {{NEIGHBORHOOD}}? It's fantastic."
+	        				},
+	        				{
+	        					"keyword": "barhopping",
+	        					"message": "Since moving here, I've been loving the bar scene. What's your favorite bar? I'm pretty fond of {{BAR}}."
+	        				},
+	        				{
+	        					"keyword": "game of thrones",
+	        					"message": "I definitely share your love for Game of Thrones. Who's your favorite character? I'd have to give it to Jon Snow on that one."
+	        				},
+	        			]
+	        		};
+	        		deferred.resolve(angular.fromJson(defaultKeywords))
+				}
+			});
+				
 				return deferred.promise;
-        	} else { //No username found
-        		console.log('no user found. giving defaults');
-        		var exampleJson = {
-        			"opener":"Hey, how's it going?\n\n", 
-        			"closer":"Cheers,\n{Name}", 
-        			"pairs": [
-        				{
-        					"keyword": "cooking",
-        					"message": "I'm really into cooking too. Do you have a specialty dish? Mine's {{INSERT DISH NAME HERE}}."
-        				},
-        				{
-        					"keyword": "travel",
-        					"message": "How was traveling in {{COUNTRY/STATE/PLACE}}? I've been to {{COUNTRY/STATE/PLACE}} and had an amazing time."
-        				},
-        				{
-        					"keyword": "foodie",
-        					"message": "I'm a total foodie too. Have you ever been to {{PLACE}} in {{NEIGHBORHOOD}}? It's unbelievable."
-        				},
-        				{
-        					"keyword": "thai",
-        					"message": "Thai food is my absolutely favorite right now. Have you been to {{PLACE}} in {{NEIGHBORHOOD}}? It's fantastic."
-        				},
-        				{
-        					"keyword": "barhopping",
-        					"message": "Since moving here, I've been loving the bar scene. What's your favorite bar? I'm pretty fond of {{BAR}}."
-        				},
-        				{
-        					"keyword": "game of thrones",
-        					"message": "I definitely share your love for Game of Thrones. Who's your favorite character? I'd have to give it to Jon Snow on that one."
-        				},
-        			]
-        		};
-        		//Upon loading the app, we set the default keywords in local storage, and then retrieve them.
-				chrome.storage.sync.set({'dbotKeywordsDefault': JSON.stringify(exampleJson)}, function() {
-					chrome.storage.sync.get('dbotKeywordsDefault', function(result){
-						return angular.fromJson(result.dbotKeywordsDefault);
-					});
-				});
-        		
-        		return deferred.promise;
-        	}
         },
 
         findSimilarities: function(profile, keywords, context) {

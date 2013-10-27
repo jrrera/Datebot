@@ -7,9 +7,8 @@ keywordsApp.controller('KeywordController',
 		$scope.added = false; //Indicates if there is a keyword waiting to be added to the list from ContextMenu.
 		$scope.sortorder = '';
 		$scope.exportTurnOn = false; //Disables export button until file is ready
-		$scope.username = keywordData.getUsername();
 
-		keywordData.keywordsAjax($scope.username, function(data){
+		keywordData.getKeywords($scope).then(function(data) {
 			$scope.keyword = angular.fromJson(data);
 			$scope.loading = false; //Turns off loading notifications
 			$scope.completed = true; //Turns on successful load notif
