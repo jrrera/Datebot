@@ -47,9 +47,7 @@ keywordsApp.controller('KeywordController',
 		}
 
 		$scope.save = function() {
-			localStorage["dbotUser"] = $scope.username //This is what's populated in the username field, and can be changed
-			localStorage["dbotSaveUser"] = $scope.username //This marks the last user to save data
-			keywordData.saveKeywords($scope.username, $scope.keyword); //Saves keywords to local storage
+			keywordData.saveKeywords($scope.keyword); //Saves keywords to local storage
 			keywordData.generateExport($scope.keyword); //Updates the export file
 			$scope.saved = true;
 			

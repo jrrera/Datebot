@@ -53,17 +53,18 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
         },
 
 
-		saveKeywords: function(username, keywordObj) {
+		saveKeywords: function(keywordObj) {
+			var keywordJson;
+
 			for (var i = 0; i < keywordObj.pairs.length; i++) {
 				keywordObj.pairs[i].keyword = keywordObj.pairs[i].keyword.toLowerCase(); //Converts all keywords to lower case, since everything is matched to OKC profile in lower case
 			}
 
-
 			keywordJson = JSON.stringify(keywordObj);
 			
+			chrome.storage.local.set({'dbotKeywords': keywordJson}, function(){});
 
-
-			this.generateExport(keywordObj); //Updates the export file
+			//this.generateExport(keywordObj); //Updates the export file
 		},
 
 		generateExport: function(keywordObj) {
