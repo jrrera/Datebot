@@ -71,22 +71,33 @@
 			<div class="span1">
 				<a style="color:white;" href="{{exportUrl}}" download="dbot_export"><button ng-disabled="!exportTurnOn" id="exporter" class="btn btn-primary">Export</button></a>
 			</div>
+			<div class="span1">	
+				<button class="btn" ng-click="importOn = !importOn">Import</button>
+			</div>
 			<div class="span1">
 				<button class="btn" ng-click="addRow()"> Add </button>
 			</div>
 			<div class="span1">	
-				<button class="btn" ng-click="cancelEdit()">Undo Edits</button>
+				<button class="btn" ng-click="cancelEdit()">Undo</button>
 			</div>
-		
-			<div class="span3">			
-				Order By:
-				<select ng-model="sortorder" class="input-small">
-					<option selected value="keyword">Name</option>
-					<option selected value="-responses">Responses Received</option><!--This doesn't exist in the data yet :)-->
-				</select>
-			</div>	
+
 		</div>
+
+		<!-- Begin import options-->
+		<div class="import_options" ng-show="importOn">
+			<input type="file" id="files"/> <br />
+			<button class="btn btn-primary" ng-click="submitImport()">Upload</button>
+		</div>
+		<div ng-show="importSuccess">
+			Import Successful!
+		</div>
+		<div ng-show="importFailure">
+			There was a problem with the import. Make sure the file is valid JSON, por favor. :)
+		</div>
+		<!-- End import options-->
+
 		<br />
+
 		<ul class="thumbnails">
 			<li ng-repeat="pair in keyword.pairs | orderBy: sortorder">
 				<div class="row session">

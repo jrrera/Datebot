@@ -69,6 +69,9 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 
 		generateExport: function(keywordObj) {
 			//HTML5 filesystem using this: http://stackoverflow.com/questions/16329293/save-json-string-to-client-pc-using-html5-api
+			angular.forEach(keywordObj.pairs, function(pair) {
+				delete pair.$$hashKey;
+			});
 			var json = JSON.stringify(keywordObj);
 			var blob = new Blob([json], {type: "application/json"});
 			var url  = URL.createObjectURL(blob);

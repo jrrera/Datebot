@@ -35,18 +35,47 @@ keywordsApp.controller('KeywordController',
 			}
 		});
 
-		// $scope.updateUserData = function(username) { //Redundant code, but not sure how else to do this for username.
-		// 	localStorage["dbotUser"] = username;
-		// 	$scope.loading = true;
-		// 	keywordData.keywordsAjax(username, function(data){
-		// 		$scope.keyword = angular.fromJson(data);
-		// 		$scope.loading = false;
-		// 		$scope.completed = true; //Turns on successful load notif
-		// 		$timeout(function(){
-		// 			$scope.completed = false;	//Turns it off 5 seconds later
-		// 		}, 5000);
-		// 	});
-		// }
+		$scope.handleFileSelect = function(evt) {
+			var JsonObj,
+		    	files = evt.target.files, // FileList object
+		    	f = files[0],
+		      	reader = new FileReader();
+
+		      // Closure to capture the file information.
+		      reader.onload = (function(theFile) {
+		        return function(e) {
+			        JsonObj = JSON.parse(e.target.result);
+			        $scope.importedData = JsonObj;
+			        console.log('imported data', $scope.importedData);
+		        };
+		      })(f);
+
+		      reader.readAsText(f);
+		};
+
+		$scope.submitImport = function() {
+			var keywords;
+			console.log('data to replace current keywords', $scope.importedData);
+			
+			$scope.importOn = false;
+
+			if (typeof $scope.importedData === 'object') {
+				$scope.keyword = $scope.importedData
+				keywords = JSON.stringify($scope.importedData);
+
+				chrome.storage.local.set({'dbotKeywords': keywords}, function(){});
+				$scope.importSuccess = true;
+				$timeout(function(){
+					$scope.importSuccess = false;
+				}, 5000);
+			} else {
+				$scope.importFailure = true;
+				$timeout(function(){
+					$scope.importFailure = false;
+				}, 5000);
+			}
+		};
+
 
 		$scope.save = function() {
 			keywordData.saveKeywords($scope.keyword); //Saves keywords to local storage
@@ -100,5 +129,8 @@ keywordsApp.controller('KeywordController',
 		    sendResponse('Received!');
 		  }
 		});	
+		
+		//Event listener for import feature
+		document.getElementById('files').addEventListener('change', $scope.handleFileSelect, false);
 	}
 );
