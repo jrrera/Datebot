@@ -11,9 +11,10 @@
 
     <!--Begin new user view-->
       <div ng-show="!foundKeywords">
-        <p class="lead">Welcome to Datebot! It looks like you're a new user. To get started, visit the Options page <button class="btn btn-primary" ng-click="goToOptions()">Go to Options Page</button></p>
-        
-        <span class="import_note">Note: If you're an existing user, your data might've been wiped from your machine :(. If you have an export of your interests/keywords data, you can import it back in on the options page!</span>
+        <div style="position:absolute; left:75%;"><img src="img/Thomas-Hello128.png" alt="Welcome!" /></div><br />  
+        <p class="lead">Welcome to Datebot! It looks like you're a new user. <br />To get started, visit the Options page or read the <a href="https://docs.google.com/document/d/1EQIzJzchrmPx05tBrfrFsu3J58TQyW5z7I-imuz7XFc" target="_blank">Datebot Guide</a><br /><button class="btn btn-primary" ng-click="goToOptions()">Go to the Options Page</button></p>
+
+        <span class="import_note">Note: If you're an existing user, your data might've been wiped from Chrome. If you exported your data, you can import it on the options page!</span>
 
       </div>
     <!--End new user view-->
