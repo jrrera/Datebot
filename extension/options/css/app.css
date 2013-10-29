@@ -67,3 +67,9 @@
   margin: 10px;
   border: 1px solid black;
 }
+
+.imagecredit {
+    font-size:9px;
+    position: absolute;
+    left: 80%;
+}

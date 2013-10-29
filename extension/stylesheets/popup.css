@@ -114,3 +114,10 @@
   .import_note {
     font-size: 12px;
   }
+
+  .imagecredit {
+    font-size:9px;
+    position: absolute;
+    top: 100%;
+    left: 80%;
+  }
