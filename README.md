@@ -17,11 +17,13 @@ To install DateBot, you'll need a Chrome browser, as it's a Chrome extension at 
 
 There are three main portions to DateBot: 
 
-1) The Chrome extension (the 'extension' folder). This is in beta, and ready to be used. 
+1) The Chrome extension (the 'extension' folder). This is in beta, and ready to be used. This can be downloaded <a href="http://bit.ly/datebot">here</a>
 
-2) The Web App (the 'appengine' folder). This is in alpha, and is not quite ready for primetime yet. It uses Google App Engine to pull in OKCupid profiles, for easier message management .
+A demo of how this app works can be found <a href="https://docs.google.com/document/d/1EQIzJzchrmPx05tBrfrFsu3J58TQyW5z7I-imuz7XFc/edit#">here</a>
 
-3) The Web App helper (the 'helper extension' folder). This is a Chrome extension that scrapes HTML (OKCupid doesn't like things like PhantomJS or Mechanize, so we use the Chrome API), and assists with message passing between tabs when you're ready to send a message.
+2) The Web App (the 'appengine' folder). This is in alpha, and is not quite ready for primetime yet. It uses  Google App Engine to store OKCupid profiles (scraped using the Web App Helper, mentioned below), for easier message management.
+
+3) The Web App Helper (the 'helper extension' folder). This is a Chrome extension that scrapes HTML (OKCupid doesn't like things like PhantomJS or Mechanize, so we use the Chrome API), and assists with message passing between tabs when you're ready to send a message from the Web App.
 
 
 Test & Debug
