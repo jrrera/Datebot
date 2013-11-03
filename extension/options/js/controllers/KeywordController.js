@@ -13,8 +13,10 @@ keywordsApp.controller('KeywordController',
 			$scope.loading = false; //Turns off loading notifications
 			$scope.completed = true; //Turns on successful load notif
 
-			//Generates the URL for exporting your keyword JSON to a .txt file
+			//Generates the URL for exporting your keyword JSON to a .txt file and interaction data as JSON too
 			$scope.exportUrl = keywordData.generateExport($scope.keyword);
+			$scope.interactionExportUrl = keywordData.generateInteractionExport();
+
 			$scope.exportTurnOn = true; //Makes the button clickable once exporting is done.
 			// keywordData.generateExport($scope.keyword).then(function(url){
 			// 	$scope.exportUrl = url;

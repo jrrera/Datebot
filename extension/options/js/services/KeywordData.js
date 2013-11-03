@@ -78,6 +78,14 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 			return url;	
 		},
 
+		generateInteractionExport: function() {
+			//HTML5 filesystem using this: http://stackoverflow.com/questions/16329293/save-json-string-to-client-pc-using-html5-api
+			var json = localStorage["dbotInteractions"];
+			var blob = new Blob([json], {type: "application/json"});
+			var url  = URL.createObjectURL(blob);
+			return url;
+		},
+
 		checkForExistingKeywords: function(keyword, pairs) {
 		  pattern = new RegExp("^" + keyword + "$", "i"),
 		  match = false;

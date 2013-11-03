@@ -64,7 +64,6 @@
           <p ng-bind-html-unsafe="profile.matches.closer"></p>
         </div>
 
-        <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.customEditorActive" ng-click="sendToTab()">Send the message!</button>
         
         <!--Custom Editor functionality-->
         <div class="customized_finalmessage" ng-show="saveCustomized && !profile.customEditorActive" ng-bind-html-unsafe="$parent.customMessage | replaceLineBreaks"></div>
@@ -74,8 +73,9 @@
         
         <div id="{{profile.okcUsername}}_customized_alert" class="alert" ng-show="saveCustomized">Note: This is a customized message. Adjusting your keyword choices will reset the message to your defaults!</div>
         <!--End Custom Edtior functionality-->
+        <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.customEditorActive" ng-click="sendToTab(profile)">Send the message!</button>
 
-        <div id="{{profile.okcUsername}}_data" ng-hide="true">{{profile.matches | filterForDatabase}}</div><!--This div preps the data for the database if we choose to send the msg-->
+        <div id="{{profile.okcUsername}}_data" ng-hide="true">{{profile.matches | filterForDatabase:saveCustomized:profile.okcUsername}}</div><!--This div preps the data for the database if we choose to send the msg-->
 
       </td>
     </tr>

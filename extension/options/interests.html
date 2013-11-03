@@ -31,6 +31,9 @@
 		  		<p><strong>Remember</strong>: Your data is stored locally, so don't forget to download your keyword data every so often with the 'Export' button! :)
 			</div>		
 		</div>	
+		<br />
+		<h3>Message Templating</h3>
+		<h5>This is where you set up the template for your messages. This allows Datebot to suggest messages for you.</h5>
 		<br />			
 		<div class="row">
 			<div class="span5">
@@ -57,8 +60,23 @@
 		</div>		
 
 		<hr />
-
-		<h3>Interests and Templates</h3>
+		<h3>Data Import / Export</h3>
+		<h5>Here, you can download a history of past interactions for analysis, and export/import your interests and associated messages.</h5>
+		<br />
+		<div class="row">
+			<div class="span3">
+				<a style="color:white;" href="{{interactionExportUrl}}" download="dbot_history_export"><button ng-disabled="!exportTurnOn" id="history_exporter" class="btn btn-primary">Export Past Interactions</button></a>
+			</div>
+			<div class="span2">
+				<a style="color:white;" href="{{exportUrl}}" download="dbot_export"><button ng-disabled="!exportTurnOn" id="exporter" class="btn btn-primary">Export Interests</button></a>
+			</div>
+			<div class="span2">	
+				<button class="btn" ng-click="importOn = !importOn">Import Interests</button>
+			</div>
+		</div>
+		<br />
+		<hr />
+		<h3>Interests and Talking Points</h3>
 
 		<h5>You have {{keyword.pairs.length}} interests in the database. Only {{100 - keyword.pairs.length}} to go before you hit the goal of 100!</h5>
 		<div class="progress progress-striped active">
@@ -68,12 +86,6 @@
 			<div class="span1">	
 				<button class="btn btn-primary" ng-click="save()">Save</button>
 			</div>	
-			<div class="span1">
-				<a style="color:white;" href="{{exportUrl}}" download="dbot_export"><button ng-disabled="!exportTurnOn" id="exporter" class="btn btn-primary">Export</button></a>
-			</div>
-			<div class="span1">	
-				<button class="btn" ng-click="importOn = !importOn">Import</button>
-			</div>
 			<div class="span1">
 				<button class="btn" ng-click="addRow()"> Add </button>
 			</div>

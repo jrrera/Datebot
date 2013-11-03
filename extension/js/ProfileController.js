@@ -13,8 +13,28 @@ dbotExtApp.controller('ProfileController',
 		    return final;
 		}
 
+		function recordInteraction(interactionObj) {
+			var records = localStorage["dbotInteractions"], //storage object containing username as key and interaction as value
+			user = interactionObj.username;
+
+			if (records) {
+				//Parse JSON string and store this data if this user hasn't been recorded yet
+				console.log('Found records. Parsing...');
+				records = JSON.parse(records);
+				if (!records[user]) records[user] = interactionObj;
+				localStorage["dbotInteractions"] = JSON.stringify(records);
+			} else {
+				//If no records object found, intialize object, store data, and stringify
+				console.log('no record found, adding...')
+				records = {};
+				records[user] = interactionObj;
+				localStorage["dbotInteractions"] = JSON.stringify(records);
+			}
+			console.log(JSON.stringify(records, null, 4));
+		}
+
 		$scope.loading = true; //Shows the AJAX loader graphic, and hides the results table. Will flip after AJAX call comes back
-		$scope.foundKeywords = false; //Will flip to true upon locating stored keywords in localstorage
+		$scope.foundKeywords = false; //Will flip to true upon locating stored keywords in Chrome's storage
 		$scope.profiles = []; //Profile objects will be pushed here after processing.
 		$scope.toggleMessaged = false; //Shows already-messaged results. Turned off by default
 		$scope.customized = false; //Becomes true when you modify the textarea for custom messages
@@ -107,21 +127,23 @@ dbotExtApp.controller('ProfileController',
 			matchesArr[thisPosition+1] = thisObject;
 		};
 
-		$scope.sendToTab = function(){
-			var message, user, databaseData;
+		$scope.sendToTab = function(profile){
+			var message, interactionData;
 			
 			//If customized, $scope.customMessage from textarea is what's sent. Else, the standard .finalmessage div's contents are used
 			message = $scope.saveCustomized ? $scope.customMessage : processLineBreaks($('.finalmessage').html());
-
-			//$scope.testmessage = message; //for testing
-			//console.log('processLinebreaks message after processing is', message);
 
 			var portObj = {
 			  message: message
 			};
 
-			//Send the message to the background script
-			chrome.runtime.sendMessage({portover3: portObj}, function(response) {});
+			//Send the message to the background script, and record the interaction if successful
+			chrome.runtime.sendMessage({portover3: portObj}, function(response) {
+				if (response.status === 'message_sent') {
+					interactionData = document.getElementById(profile.okcUsername + '_data').textContent;
+					recordInteraction(JSON.parse(interactionData));
+				}
+			});
 
 
 		};

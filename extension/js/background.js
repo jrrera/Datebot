@@ -82,7 +82,14 @@
         var tabId = tabs[0].id;
                   
         //Send a request to the content script on the OKCupid page to scrape the HTML
-        chrome.tabs.sendMessage(tabId, {finalmessage: messageToPort},function(response){});
+        chrome.tabs.sendMessage(tabId, {finalmessage: messageToPort},function(response){
+            //Upon response from content script, if it was a success, pass this info back to popup.
+            if (response.status === 'success') {
+                console.log('Received success response from tab after message sent. Passing to popup...');
+                sendResponse({status:'message_sent'});
+                //return true; //Required by Chrome framework after acting on a listener response
+            }
+        });
       });         
     }
 
@@ -95,7 +102,7 @@
         //Send a request to the content script on the OKCupid page to scrape the HTML
         chrome.tabs.sendMessage(tabId, {action:"scrape"},function(response){
           var html = response;
-          console.log("Sent a message off to the content script and receive a response! It was: ", html);
+          //console.log("Sent a message off to the content script and receive a response! It was: ", html);
           
           //Send the response, which is the HTML payload, back to the Angular front-end in the pop
           chrome.runtime.sendMessage({html: html},function(response){});
@@ -190,4 +197,5 @@
         });
       }); 
     }
+    return true; //Required by Chrome framework after acting on a listener response
   });

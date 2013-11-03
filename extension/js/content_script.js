@@ -36,8 +36,11 @@
           //2 seconds after opening the message window, we populate the container and send the message
           setTimeout(function(){
             $('#message_text').val(msg.finalmessage.message);
-            createScript('sendMessage'); 
+            //createScript('sendMessage'); 
           }, 2000);
+
+          sendResponse({status:'success'});
+          //return true; //Required by chrome framework after sending a response
         }
 
         //This is the listener for the command to scrape received messages from the OKC inbox, and send back as an array
