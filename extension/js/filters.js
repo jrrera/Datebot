@@ -6,9 +6,13 @@ dbotExtApp.filter('filterForDatabase', function() {
 		function produceKeywordObj(matchArr) {
 			//Takes in the 'matched' array and returns it in the required format (keyword and position in message, i.e. {'running': 1})
 			var keywordObj = {}, counter = 0;
-			angular.forEach(matchArr, function(match){
-				if (match.checked) keywordObj[match.keyword] = counter++ + 1; //Add one to index to signify position of keyword used when messaging, assuming it was used in the message, and then increments the counter
-			}); 
+			if (matchArr) {
+				angular.forEach(matchArr, function(match){
+					if (match.checked) keywordObj[match.keyword] = ++counter; //Add one to index to signify position of keyword used when messaging
+				}); 
+			} else {
+				keywordObj['genericQuestion'] = ++counter; //If no matches found, record a generic message
+			}
 			return keywordObj;
 		}
 
