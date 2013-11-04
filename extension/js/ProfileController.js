@@ -3,6 +3,8 @@
 dbotExtApp.controller('ProfileController', 
 	function ProfileController($scope, $timeout, $filter, $log, ScraperData) {
 
+		var dayOfWeek = new Date().getDay();
+
 		function processLineBreaks(text) {
 			//console.log('text prior to processing', text);
 		    var final = text.replace(/\s*<p[^>]+">\s*/gi,""); //Filters out all P tags
@@ -40,8 +42,9 @@ dbotExtApp.controller('ProfileController',
 		$scope.customized = false; //Becomes true when you modify the textarea for custom messages
 		$scope.saveCustomized = false; //Becomes true if $scope.customized is true AND you save
 		$scope.customMessage = ""; //This part of the model will eventually contain the customized message
-		//genericQuestion changes slightly depending on if it's a weekend or weekday, and is used if no interests are matched
-		$scope.genericQuestion = (new Date().getDay()) === 0 || (new Date().getDay()) === 6 ? "How's your weekend going?" : "How's your week going?";
+		
+		//genericQuestion changes slightly depending on if it's a weekend (value of 0 or 6) or weekday (1-5), and is used if no interests are matched
+		$scope.genericQuestion = (dayOfWeek === 0 || dayOfWeek === 6) ? "How's your weekend going?" : "How's your week going?";
 
 		//Begin cascade of async calls for username, keywords, and profile
 		$scope.initialize = function() {

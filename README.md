@@ -20,7 +20,7 @@ To install Datebot, you'll need a Chrome browser, as it's a Chrome extension at 
 
 There are three main portions to Datebot: 
 
-1) The Chrome extension (the 'extension' folder). This is in beta, and ready to be used. This can be downloaded <a href="http://bit.ly/Datebot" target="_blank">here</a>.
+1) The Chrome extension (the 'extension' folder). This is in beta, and ready to be used. This can be downloaded <a href="http://bit.ly/datebot" target="_blank">here</a>.
 
 A demo of how this app works can be found <a href="https://docs.google.com/document/d/1EQIzJzchrmPx05tBrfrFsu3J58TQyW5z7I-imuz7XFc/edit#" target="_blank">here</a>.
 
