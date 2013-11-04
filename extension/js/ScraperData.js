@@ -125,23 +125,23 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
 	        			"pairs": [
 	        				{
 	        					"keyword": "cooking",
-	        					"message": "I'm really into cooking too. Do you have a specialty dish? Mine's {{INSERT DISH NAME HERE}}."
+	        					"message": "I'm really into cooking too. Do you have a specialty dish? Mine's |INSERT DISH NAME HERE|."
 	        				},
 	        				{
 	        					"keyword": "travel",
-	        					"message": "How was traveling in {{COUNTRY/STATE/PLACE}}? I've been to {{COUNTRY/STATE/PLACE}} and had an amazing time."
+	        					"message": "How was traveling in |COUNTRY/STATE/PLACE|? I've been to |COUNTRY/STATE/PLACE| and had an amazing time."
 	        				},
 	        				{
 	        					"keyword": "foodie",
-	        					"message": "I'm a total foodie too. Have you ever been to {{PLACE}} in {{NEIGHBORHOOD}}? It's unbelievable."
+	        					"message": "I'm a total foodie too. Have you ever been to |PLACE| in |NEIGHBORHOOD|? It's unbelievable."
 	        				},
 	        				{
 	        					"keyword": "thai",
-	        					"message": "Thai food is my absolutely favorite right now. Have you been to {{PLACE}} in {{NEIGHBORHOOD}}? It's fantastic."
+	        					"message": "Thai food is my absolutely favorite right now. Have you been to |PLACE| in |NEIGHBORHOOD|? It's fantastic."
 	        				},
 	        				{
 	        					"keyword": "barhopping",
-	        					"message": "Since moving here, I've been loving the bar scene. What's your favorite bar? I'm pretty fond of {{BAR}}."
+	        					"message": "Since moving here, I've been loving the bar scene. What's your favorite bar? I'm pretty fond of |BAR|."
 	        				},
 	        				{
 	        					"keyword": "game of thrones",
