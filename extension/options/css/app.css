@@ -73,3 +73,9 @@
     position: absolute;
     left: 80%;
 }
+
+.keyword_priority {
+  width: 20px;
+  text-align: center;
+  margin-left: 10px;
+}

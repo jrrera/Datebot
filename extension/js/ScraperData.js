@@ -125,28 +125,34 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
 	        			"pairs": [
 	        				{
 	        					"keyword": "cooking",
-	        					"message": "I'm really into cooking too. Do you have a specialty dish? Mine's |INSERT DISH NAME HERE|."
+	        					"message": "I'm really into cooking too. Do you have a specialty dish? Mine's {{INSERT DISH NAME HERE}}.",
+	        					"priority": 2
 	        				},
 	        				{
 	        					"keyword": "travel",
-	        					"message": "How was traveling in |COUNTRY/STATE/PLACE|? I've been to |COUNTRY/STATE/PLACE| and had an amazing time."
+	        					"message": "How was traveling in {{COUNTRY/STATE/PLACE}}? I've been to {{COUNTRY/STATE/PLACE}} and had an amazing time.",
+	        					"priority": 2
 	        				},
 	        				{
 	        					"keyword": "foodie",
-	        					"message": "I'm a total foodie too. Have you ever been to |PLACE| in |NEIGHBORHOOD|? It's unbelievable."
+	        					"message": "I'm a total foodie too. Have you ever been to {{PLACE}} in {{NEIGHBORHOOD}}? It's unbelievable.",
+	        					"priority": 2
 	        				},
 	        				{
 	        					"keyword": "thai",
-	        					"message": "Thai food is my absolutely favorite right now. Have you been to |PLACE| in |NEIGHBORHOOD|? It's fantastic."
+	        					"message": "Thai food is my absolutely favorite right now. Have you been to {{PLACE}} in {{NEIGHBORHOOD}}? It's fantastic.",
+	        					"priority": 2
 	        				},
 	        				{
 	        					"keyword": "barhopping",
-	        					"message": "Since moving here, I've been loving the bar scene. What's your favorite bar? I'm pretty fond of |BAR|."
+	        					"message": "Since moving here, I've been loving the bar scene. What's your favorite bar? I'm pretty fond of {{BAR}}.",
+	        					"priority": 2
 	        				},
 	        				{
 	        					"keyword": "game of thrones",
-	        					"message": "I definitely share your love for Game of Thrones. Who's your favorite character? I'd have to give it to Jon Snow on that one."
-	        				},
+	        					"message": "I definitely share your love for Game of Thrones. Who's your favorite character? I'd have to give it to Jon Snow on that one.",
+	        					"priority": 2
+	        				}
 	        			]
 	        		};
 	        		deferred.resolve(angular.fromJson(defaultKeywords))
@@ -204,6 +210,7 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
         	    findKeyword = new RegExp('[^a-zA-Z]' + keywords[i] + '[^a-zA-Z]', 'g');
         	    if (response.search(findKeyword) != -1) {
         	      matchedKeywords.push(keywords[i]);
+        	      finalKeywordPriority.push(desiredPriority[i]);
         	    }
         	  } 
         	  return matchedKeywords;
@@ -215,16 +222,17 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
 				return context = context.replace(keywordReg, '<span class="bluekeywords">' + keywordReg.exec(context) + '</span>'); //Replace the keyword in the context with the keyword wrapped in span tags 
         	}
         	
-        	var desiredKeywords = [], desiredMessage = [], finalMessage = [];
+        	var desiredKeywords = [], desiredMessage = [], desiredPriority =[], finalKeywordPriority = [], finalMessage = [];
 
         	//Put the desiredKeywords in one array, and the related message in another array.
         	for (var i = 0; i < keywords.pairs.length; i++) {
         	  desiredKeywords.push(keywords.pairs[i].keyword);
         	  desiredMessage.push(keywords.pairs[i].message);
+        	  desiredPriority.push(keywords.pairs[i].priority);
         	}
 
-        	var finalKeywords = extractMatchedKeywords(profile, desiredKeywords);
-        	var finalContext = extractContext(profile, desiredKeywords, context);
+        	var finalKeywords = extractMatchedKeywords(profile, desiredKeywords),
+        		finalContext = extractContext(profile, desiredKeywords, context);
 
         	for (var i = 0; i < finalKeywords.length; i++) {
         	  if (desiredKeywords.indexOf(finalKeywords[i]) != -1) {
@@ -248,6 +256,7 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
         		oneMatchObj.keyword = finalKeywords[i];
         		oneMatchObj.context = highlightMatches(finalKeywords[i], finalContext[i]); //highlightMatches will turn the matched keyword blue, and receives the keyword and the context as the arguments, and will return the higlhighted context
         		oneMatchObj.message = finalMessage[i];
+        		oneMatchObj.priority = finalKeywordPriority[i];
 
         		if (i == 0 || i == 1) {
         			oneMatchObj.checked = true;

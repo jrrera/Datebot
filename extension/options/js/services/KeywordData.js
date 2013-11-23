@@ -19,28 +19,34 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 	        			"pairs": [
 	        				{
 	        					"keyword": "cooking",
-	        					"message": "I'm really into cooking too. Do you have a specialty dish? Mine's {{INSERT DISH NAME HERE}}."
+	        					"message": "I'm really into cooking too. Do you have a specialty dish? Mine's {{INSERT DISH NAME HERE}}.",
+	        					"priority": 2
 	        				},
 	        				{
 	        					"keyword": "travel",
-	        					"message": "How was traveling in {{COUNTRY/STATE/PLACE}}? I've been to {{COUNTRY/STATE/PLACE}} and had an amazing time."
+	        					"message": "How was traveling in {{COUNTRY/STATE/PLACE}}? I've been to {{COUNTRY/STATE/PLACE}} and had an amazing time.",
+	        					"priority": 2
 	        				},
 	        				{
 	        					"keyword": "foodie",
-	        					"message": "I'm a total foodie too. Have you ever been to {{PLACE}} in {{NEIGHBORHOOD}}? It's unbelievable."
+	        					"message": "I'm a total foodie too. Have you ever been to {{PLACE}} in {{NEIGHBORHOOD}}? It's unbelievable.",
+	        					"priority": 2
 	        				},
 	        				{
 	        					"keyword": "thai",
-	        					"message": "Thai food is my absolutely favorite right now. Have you been to {{PLACE}} in {{NEIGHBORHOOD}}? It's fantastic."
+	        					"message": "Thai food is my absolutely favorite right now. Have you been to {{PLACE}} in {{NEIGHBORHOOD}}? It's fantastic.",
+	        					"priority": 2
 	        				},
 	        				{
 	        					"keyword": "barhopping",
-	        					"message": "Since moving here, I've been loving the bar scene. What's your favorite bar? I'm pretty fond of {{BAR}}."
+	        					"message": "Since moving here, I've been loving the bar scene. What's your favorite bar? I'm pretty fond of {{BAR}}.",
+	        					"priority": 2
 	        				},
 	        				{
 	        					"keyword": "game of thrones",
-	        					"message": "I definitely share your love for Game of Thrones. Who's your favorite character? I'd have to give it to Jon Snow on that one."
-	        				},
+	        					"message": "I definitely share your love for Game of Thrones. Who's your favorite character? I'd have to give it to Jon Snow on that one.",
+	        					"priority": 2
+	        				}
 	        			]
 	        		};
 	        		$scope.$apply(function(){

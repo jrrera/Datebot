@@ -113,12 +113,15 @@
 
 		<br />
 
+		<!--Begin keyword list-->
 		<ul class="thumbnails">
 			<li ng-repeat="pair in keyword.pairs | orderBy: sortorder">
 				<div class="row session">
 					<div class="span3">
 						<!-- <i class="icon-exclamation-sign" ng-show="recommendation()"></i> -->
-						<input type="text" name="{{pair.keyword}}" ng-model="pair.keyword" placeholder="Interest/keyword goes here" required />
+						<input type="text" name="{{pair.keyword}}" ng-model="pair.keyword" placeholder="Interest/keyword goes here" required /><br />
+						<span style="display:inline; margin-left:25%;">Priority (1-3):</span> <input class="keyword_priority" ng-model="pair.priority" placeholder="?" />
+
 					</div>
 					<div class="span7">
 						<textarea class="message" ng-model="pair.message" placeholder="Message goes here" required></textarea>
@@ -127,9 +130,10 @@
 						<button class="btn btn-small" ng-click="deleteRow($index)">Delete</button>
 					</div>
 				</div>
-
 			</li>
 		</ul>
+		<!--End keyword list-->
+
 	</div>
 </div>
 <div class="imagecredit">

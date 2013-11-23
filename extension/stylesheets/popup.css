@@ -127,3 +127,20 @@
     margin-left: auto;
     margin-right: auto 
   }
+
+  .score {
+    text-align: center;
+  }
+
+  .recommendation {
+    text-align: right;
+    float: right;
+    margin-right: 50px;
+    margin-bottom: -10px;
+  }
+
+  .title {
+    display:inline; 
+    font-weight: bold;
+    margin: 5px;
+  }

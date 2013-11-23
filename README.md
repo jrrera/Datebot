@@ -29,10 +29,6 @@ A demo of how this app works can be found <a href="https://docs.google.com/docum
 3) The Web App Helper (the 'helper extension' folder). This is a Chrome extension that scrapes HTML (OKCupid doesn't like things like PhantomJS or Mechanize, so we use the Chrome API), and assists with message passing between tabs when you're ready to send a message from the Web App.
 
 
-Test & Debug
----------------
-
-
 License
 ---------------
 MIT

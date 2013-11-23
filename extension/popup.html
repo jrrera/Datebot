@@ -7,7 +7,7 @@
   </head>
   <body>
   <div ng-controller="ProfileController">
-      <h2>Datebot Beta</h2>
+      <p class="lead title">Datebot Beta</p>
 
     <!--Begin new user view-->
       <div ng-show="!foundKeywords">
@@ -20,6 +20,12 @@
     <!--End new user view-->
 
   <div class="alert" ng-show="!profiles.length && !loading">Nothing found. Are you sure you're on an OKCupid profile? If so, refreshing the page should do the trick.</div>
+  <div class="recommendation" ng-show="recommendation">        
+    <p class="lead">
+      Datebot says: <br />
+          <strong>"{{recommendation}}"</strong>
+    </p>
+  </div>
    <table class="table table-bordered" ng-show="profiles.length">
     <thead>
       <tr>
@@ -33,7 +39,11 @@
     <tr ng-repeat="profile in profiles">
       <td id="matchinfo">
         <a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>  
-        <img src="{{profile.okcPicture}}" /><br /><br />
+        <img src="{{profile.okcPicture}}" /><br />
+        <p class="score lead">
+          Score:<br />
+          <strong>{{calculateScore(profile)}}</strong>
+        </p>
       </td>
       <td id="similarities">
         <div ng-repeat="match in profile.matches.matched" ng-hide="profile.messaged">
@@ -82,10 +92,10 @@
   </tbody>
   </table>  
   
-  <div ng-show="!profiles.length && !loading"><img class="centered" src="img/Thomas-Hello128.png"></div>
-  
-  <div class="imagecredit">
-    <p>Image Credit: <a href="http://www.iconarchive.com/show/daft-punks-icons-by-tsukasa-tux.html" target="_blank">Tsukasa-Tux</a>.</p>
+  <div ng-show="!profiles.length && !loading"><img class="centered" src="img/Thomas-Hello128.png">  
+    <div class="imagecredit">
+      <p>Image Credit: <a href="http://www.iconarchive.com/show/daft-punks-icons-by-tsukasa-tux.html" target="_blank">Tsukasa-Tux</a>.</p>
+    </div>
   </div>
   
   </div>

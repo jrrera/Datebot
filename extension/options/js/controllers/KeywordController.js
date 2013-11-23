@@ -102,7 +102,6 @@ keywordsApp.controller('KeywordController',
 			$scope.keyword.pairs.splice(index, 1);
 		};
 		
-
 		$scope.recommendation = function(text) {
 			//Coming soon
 		};

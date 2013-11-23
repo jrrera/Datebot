@@ -42,6 +42,7 @@ dbotExtApp.controller('ProfileController',
 		$scope.customized = false; //Becomes true when you modify the textarea for custom messages
 		$scope.saveCustomized = false; //Becomes true if $scope.customized is true AND you save
 		$scope.customMessage = ""; //This part of the model will eventually contain the customized message
+		$scope.recommendation = ""; //This will contain a recommendation based on calculate score
 		
 		//genericQuestion changes slightly depending on if it's a weekend (value of 0 or 6) or weekday (1-5), and is used if no interests are matched
 		$scope.genericQuestion = (dayOfWeek === 0 || dayOfWeek === 6) ? "How's your weekend going?" : "How's your week going?";
@@ -96,6 +97,37 @@ dbotExtApp.controller('ProfileController',
 		};
 
 		$scope.initialize(); //Initalizes the app
+
+		//For the profile we're analyzing, this function calculates a score based on the priority rating of each matched keyword
+		//A priority of 1 equates to 5 points; priority of 2 = 3 points; priority of 1 = 1 point. A score of 5 or higher is a winner.
+		$scope.calculateScore = function(profile) {
+			var score = 0;
+			console.log('profile!!!!!', profile);
+
+			angular.forEach(profile.matches.matched, function(keyword, i){
+				console.log('keyword.priority is defined as', keyword.priority);
+				if (keyword.priority === "1") {
+					score += 5;
+				} else if (keyword.priority === "2") {
+					score += 3;
+				} else if (keyword.priority === "3") {
+					score += 1;
+				} else { //If no priority has been assigned, or it's the wrong data type, we give it a score of 1.
+					score += 1;
+				}				
+			});
+			
+			//Now, we write out a custom recommendation message based on the calculated score.
+			if (score > 10) {
+				$scope.recommendation = "Damn. She's a winner!";
+			} else if (score > 4) {
+				$scope.recommendation = "A good match!";
+			} else {
+				$scope.recommendation = 'Meh.';
+			}
+
+ 			return score;
+		}
 
 		//When the profiles model is updated by adjusting keyword choices, customized becomes false again and we keep the message model in sync.
 		$scope.keywordClick = function(){
