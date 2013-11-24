@@ -3,8 +3,10 @@
 dbotExtApp.controller('ProfileController', 
 	function ProfileController($scope, $timeout, $filter, $log, ScraperData) {
 
+		//Private variables
 		var dayOfWeek = new Date().getDay();
 
+		//Private functions within controller
 		function processLineBreaks(text) {
 			//console.log('text prior to processing', text);
 		    var final = text.replace(/\s*<p[^>]+">\s*/gi,""); //Filters out all P tags
@@ -35,6 +37,7 @@ dbotExtApp.controller('ProfileController',
 			console.log(JSON.stringify(records, null, 4));
 		}
 
+		//Begin properties and methods available on scope
 		$scope.loading = true; //Shows the AJAX loader graphic, and hides the results table. Will flip after AJAX call comes back
 		$scope.foundKeywords = false; //Will flip to true upon locating stored keywords in Chrome's storage
 		$scope.profiles = []; //Profile objects will be pushed here after processing.
