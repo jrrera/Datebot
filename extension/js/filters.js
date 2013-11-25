@@ -37,3 +37,9 @@ dbotExtApp.filter('replaceLineBreaks', function() {
 		return message.replace(/\n/g, "<br />");
 	}
 });
+
+dbotExtApp.filter('unsafe', function($sce) {
+    return function(val) {
+        return $sce.trustAsHtml(val);
+    };
+});

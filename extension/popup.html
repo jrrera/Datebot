@@ -55,7 +55,7 @@
         </div>
       </td>
       <td id="match_context">
-        <p ng-repeat="match in profile.matches.matched" ng-bind-html-unsafe="match.context" ng-hide="profile.messaged"></p>
+        <p ng-repeat="match in profile.matches.matched" ng-bind-html="match.context | unsafe" ng-hide="profile.messaged"></p>
       </td>
       <td id="full_profile" ng-show="false">
         <div ng-repeat="section in profile.okcContext">
@@ -68,15 +68,15 @@
 <!-- 
           <td colspan="4" ng-repeat="profile in profiles" ng-hide="profile.matches.matched.length"><span class="alert">Bummer, couldn't find anything in common here. Want to send a generic message?</span></td> -->
         <div class="finalmessage" id="{{profile.okcUsername}}_message" ng-hide="profile.customEditorActive || saveCustomized">
-          <p ng-bind-html-unsafe="profile.matches.opener"></p>
+          <p ng-bind-html="profile.matches.opener | unsafe"></p>
           <p ng-hide="!((profile.matches.matched | filter:{checked: true}).length)" ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
           <p ng-if="!((profile.matches.matched | filter:{checked: true}).length)">{{genericQuestion}}</p>
-          <p ng-bind-html-unsafe="profile.matches.closer"></p>
+          <p ng-bind-html="profile.matches.closer | unsafe"></p>
         </div>
 
         
         <!--Custom Editor functionality-->
-        <div class="customized_finalmessage" ng-show="saveCustomized && !profile.customEditorActive" ng-bind-html-unsafe="$parent.customMessage | replaceLineBreaks"></div>
+        <div class="customized_finalmessage" ng-show="saveCustomized && !profile.customEditorActive" ng-bind-html="$parent.customMessage | replaceLineBreaks | unsafe"></div>
         <textarea class="custom_editor" ng-model="$parent.customMessage" ng-show="profile.customEditorActive" ng-change="markAsCustomized(profile)"></textarea>
         <button id="{{profile.okcUsername}}_customize" ng-hide="profile.customEditorActive" ng-click="showCustomEditor(profile)">Customize</button>
         <button id="{{profile.okcUsername}}_customsave" ng-show="profile.customEditorActive" ng-click="saveCustomEdit(profile)">Save</button>
@@ -101,6 +101,7 @@
   </div>
     <script src="lib/bootstrap.min.js"></script>
     <script src="lib/angular.min.js"></script>
+    <script src="lib/angular-sanitize.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/ScraperData.js"></script>
     <script src="js/ProfileController.js"></script>

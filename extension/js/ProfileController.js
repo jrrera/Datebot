@@ -8,9 +8,8 @@ dbotExtApp.controller('ProfileController',
 
 		//Private functions within controller
 		function processLineBreaks(text) {
-			//console.log('text prior to processing', text);
 		    var final = text.replace(/\s*<p[^>]+">\s*/gi,""); //Filters out all P tags
-		    final = final.replace(/\n*\s*<!--.*-->\s*\n*/gi, ""); //Removes commented out HTML from Angular
+		    final = final.replace(/\n*\s*<!--.*?-->\s*\n*/gi, ""); //Removes commented out HTML from Angular, in a nongreedy fashion
 		    final = final.replace(/\s*<br\s?\/?>\s*\n*<\/p>\n*\s*/gi, "\n\n");
 		    final = final.replace(/\s*<br\s?\/?>\s*/gi,"\n"); //Puts a line break for any <br> tag
 		    final = final.replace(/\s*<\/p>\s*/gi,"\n\n"); //Adds two lines breaks for any closing p tags
