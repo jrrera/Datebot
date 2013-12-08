@@ -102,7 +102,7 @@
         <br />
         <input type="checkbox" ng-model="testingMode" /> Preview message?
         <br />
-        <div id="html_preview" ng-show="testingMode">{{testMessage()}}</div>
+        <div id="html_preview" ng-if="testingMode" ng-bind-html="testMessage() | unsafe"></div>
 
       </td>
     </tr>

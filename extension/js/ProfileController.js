@@ -198,9 +198,12 @@ dbotExtApp.controller('ProfileController',
             return;
 		};
 
-        //Used to see how message will render after all HTML processing occurs. 
+        // This function is used for debugging purposes
+        // In particular, to see how message will render after all HTML processing occurs. 
         $scope.testMessage = function() {
-            return $scope.saveCustomized ? $scope.customMessage : processLineBreaks($('.finalmessage').html());
+        	// Either return customized message with linebreaks turned into <br> tags, if customization had been used
+        	// or process the keyword generated message and replace linebreaks similarly
+            return $scope.saveCustomized ? $scope.customMessage.replace(/\n/g, '<br />') : processLineBreaks($('.finalmessage').html()).replace(/\n/g, '<br />');
         }
 
 		$scope.showCustomEditor = function(profile) {

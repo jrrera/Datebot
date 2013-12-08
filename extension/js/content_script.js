@@ -44,12 +44,15 @@
 
         //This is the listener for the command to scrape received messages from the OKC inbox, and send back as an array
         if (msg.action == "scrapeMessages") {
-            var namesArr = [];
+            var namesArr = [],
+                pattern = /(We chose each other!|It's a match!)/i;
+            
             console.log("The content_script has been injected!");
 
             $('.unreadMessage, .readMessage, .repliedMessage, .filteredReadMessage').each(function(){
-                if ($(this).text().search(new RegExp("We chose each other!", "i")) === -1) {
-                    console.log ($(this).find('.subject').text());
+                var text = $(this).text();
+                if (text.search(pattern) === -1) {
+                    //console.log ('Found a true reponse!');
                     namesArr.push(($(this).find('.subject').text()));
                 }
             });
