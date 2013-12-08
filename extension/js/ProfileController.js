@@ -9,10 +9,12 @@ dbotExtApp.controller('ProfileController',
 		//Private functions within controller
 		function processLineBreaks(text) {
 		    var final = text.replace(/\s*<p[^>]+">\s*/gi,""); //Filters out all P tags
-		    final = final.replace(/\n*\s*<!--.*?-->\s*\n*/gi, ""); //Removes commented out HTML from Angular, in a nongreedy fashion
+		    final = final.replace(/<\/?span[^>]*?"?>/gi,""); //Filters out all span tags
+            final = final.replace(/\n*\s*<!--.*?-->\s*\n*/gi, ""); //Removes commented out HTML from Angular, in a nongreedy fashion
 		    final = final.replace(/\s*<br\s?\/?>\s*\n*<\/p>\n*\s*/gi, "\n\n");
 		    final = final.replace(/\s*<br\s?\/?>\s*/gi,"\n"); //Puts a line break for any <br> tag
 		    final = final.replace(/\s*<\/p>\s*/gi,"\n\n"); //Adds two lines breaks for any closing p tags
+
 		    return final;
 		}
 
@@ -37,7 +39,7 @@ dbotExtApp.controller('ProfileController',
 		}
 
 		//Begin properties and methods available on scope
-		$scope.loading = true; //Shows the AJAX loader graphic, and hides the results table. Will flip after AJAX call comes back
+        $scope.loading = true; //Shows the AJAX loader graphic, and hides the results table. Will flip after AJAX call comes back
 		$scope.foundKeywords = false; //Will flip to true upon locating stored keywords in Chrome's storage
 		$scope.profiles = []; //Profile objects will be pushed here after processing.
 		$scope.toggleMessaged = false; //Shows already-messaged results. Turned off by default
@@ -104,10 +106,8 @@ dbotExtApp.controller('ProfileController',
 		//A priority of 1 equates to 5 points; priority of 2 = 3 points; priority of 1 = 1 point. A score of 5 or higher is a winner.
 		$scope.calculateScore = function(profile) {
 			var score = 0;
-			console.log('profile!!!!!', profile);
 
 			angular.forEach(profile.matches.matched, function(keyword, i){
-				console.log('keyword.priority is defined as', keyword.priority);
 				if (keyword.priority === "1") {
 					score += 5;
 				} else if (keyword.priority === "2") {
@@ -186,6 +186,22 @@ dbotExtApp.controller('ProfileController',
 
 
 		};
+
+        //
+		$scope.addTransitionText = function(index) {
+            if (index === 1) {
+                console.log($scope.keywords.first_transition + " ");
+				return $scope.keywords.first_transition + " ";
+			} else if (index > 1) {
+                return $scope.keywords.second_transition + " ";			
+			}
+            return;
+		};
+
+        //Used to see how message will render after all HTML processing occurs. 
+        $scope.testMessage = function() {
+            return $scope.saveCustomized ? $scope.customMessage : processLineBreaks($('.finalmessage').html());
+        }
 
 		$scope.showCustomEditor = function(profile) {
 			$scope.customMessage = processLineBreaks($('.finalmessage').html()); 

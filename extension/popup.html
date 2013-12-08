@@ -14,18 +14,21 @@
         <div style="position:absolute; left:75%;"><img src="img/Thomas-Hello128.png" alt="Welcome!" /></div><br />  
         <p class="lead">Welcome to Datebot! It looks like you're a new user. <br />To get started, visit the Options page or read the <a href="https://docs.google.com/document/d/1EQIzJzchrmPx05tBrfrFsu3J58TQyW5z7I-imuz7XFc" target="_blank">Datebot Guide</a><br /><button class="btn btn-primary" ng-click="goToOptions()">Go to the Options Page</button></p>
 
-        <span class="import_note">Note: If you're an existing user, your data might've been wiped from Chrome. If you exported your data, you can import it on the options page!</span>
+        <span class="import_note">Note: If you're an existing user, your data might've been wiped from Chrome. If you exported your data, you can go import it on the options page! (See link above.)</span>
 
       </div>
     <!--End new user view-->
 
   <div class="alert" ng-show="!profiles.length && !loading">Nothing found. Are you sure you're on an OKCupid profile? If so, refreshing the page should do the trick.</div>
+  
+  <!--This is where Datebot will give you a recommendation based on how important the matched keywords are to you-->
   <div class="recommendation" ng-show="recommendation">        
     <p class="lead">
       Datebot says: <br />
-          <strong>"{{recommendation}}"</strong>
+      <strong>"{{recommendation}}"</strong>
     </p>
   </div>
+
    <table class="table table-bordered" ng-show="profiles.length">
     <thead>
       <tr>
@@ -63,14 +66,23 @@
           <p>{{section.essay}}</p>
         </div>
       </td>
+
+      <!--This TD tag contains the processed message, including in-place editing functionality-->
       <td id="the_message">
         <div class="alert" ng-hide="profile.matches.matched.length">Bummer, couldn't find anything in common here. Want to send a generic message?</div>
-<!-- 
-          <td colspan="4" ng-repeat="profile in profiles" ng-hide="profile.matches.matched.length"><span class="alert">Bummer, couldn't find anything in common here. Want to send a generic message?</span></td> -->
+
         <div class="finalmessage" id="{{profile.okcUsername}}_message" ng-hide="profile.customEditorActive || saveCustomized">
+          <!--Open the message with the chosen opener-->
           <p ng-bind-html="profile.matches.opener | unsafe"></p>
-          <p ng-hide="!((profile.matches.matched | filter:{checked: true}).length)" ng-repeat="match in profile.matches.matched | filter:{checked: true}">{{match.message}}</p>
+
+          <!--Loop through the profile.matches.matched array to display the message associated with the keywords-->
+          <!--Also contains transition text span, which is determined in your options area. Only part of DOM when $index > 0-->
+          <p ng-hide="!((profile.matches.matched | filter:{checked: true}).length)" ng-repeat="match in profile.matches.matched | filter:{checked: true}"><span ng-if="$index > 0" class="transition_text">{{ addTransitionText($index) }}</span>{{match.message | adjustCapitalLetters : $index : keywords}}</p>
+          
+          <!--If there are no matches after all filters are applied, replace body text with a generic question-->
           <p ng-if="!((profile.matches.matched | filter:{checked: true}).length)">{{genericQuestion}}</p>
+          
+          <!--Close the message with the closing text-->
           <p ng-bind-html="profile.matches.closer | unsafe"></p>
         </div>
 
@@ -86,6 +98,11 @@
         <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.customEditorActive" ng-click="sendToTab(profile)">Send the message!</button>
 
         <div id="{{profile.okcUsername}}_data" ng-hide="true">{{profile.matches | filterForDatabase:saveCustomized:profile.okcUsername}}</div><!--This div preps the data for the database if we choose to send the msg-->
+
+        <br />
+        <input type="checkbox" ng-model="testingMode" /> Preview message?
+        <br />
+        <div id="html_preview" ng-show="testingMode">{{testMessage()}}</div>
 
       </td>
     </tr>
