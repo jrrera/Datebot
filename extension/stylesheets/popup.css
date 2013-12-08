@@ -144,3 +144,7 @@
     font-weight: bold;
     margin: 5px;
   }
+
+  .debug_mode_label {
+    padding: 4px;
+  }

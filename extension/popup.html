@@ -29,6 +29,8 @@
     </p>
   </div>
 
+  <div><input style="margin-bottom: 4px;" type="checkbox" ng-model="debug" /><span class="debug_mode_label">Debug mode?</span></div>
+
    <table class="table table-bordered" ng-show="profiles.length">
     <thead>
       <tr>
@@ -100,9 +102,13 @@
         <div id="{{profile.okcUsername}}_data" ng-hide="true">{{profile.matches | filterForDatabase:saveCustomized:profile.okcUsername}}</div><!--This div preps the data for the database if we choose to send the msg-->
 
         <br />
-        <input type="checkbox" ng-model="testingMode" /> Preview message?
-        <br />
-        <div id="html_preview" ng-if="testingMode" ng-bind-html="testMessage() | unsafe"></div>
+
+        <!--This div contains some debug features around previewing post-processed plain text message, etc.-->
+        <div ng-if="debug">
+          <input type="checkbox"ng-model="testingMode" /> Preview processed, plain-text message?
+          <br />
+          <div id="html_preview" ng-if="testingMode" ng-bind-html="testMessage() | unsafe"></div>
+        </div>
 
       </td>
     </tr>

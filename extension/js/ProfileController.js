@@ -207,8 +207,11 @@ dbotExtApp.controller('ProfileController',
         }
 
 		$scope.showCustomEditor = function(profile) {
-			$scope.customMessage = processLineBreaks($('.finalmessage').html()); 
-			var username = profile.okcUsername;
+			//If there is no customized message already, grab the keyword-driven message and convert
+			//If we've already customized, this just pulls it as it is without overwriting
+			if (!$scope.saveCustomized) {
+				$scope.customMessage = processLineBreaks($('.finalmessage').html()); 	
+			}
 			profile.customEditorActive = true; //adds custom editor property to the profile model
 		};
 
