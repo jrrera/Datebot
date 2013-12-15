@@ -93,11 +93,22 @@ dbotExtApp.controller('ProfileController',
 					$scope.loading = false;
 					console.log('Profile returned:', $scope.profiles);
 
+					// Before the initialization ends, we check if there is any custom message data to pull in: 
+					// If the last customized user matches who we just scraped, AND we find a customMessage along with it,
+					// set the appropriate flags to restore the custom message
+					if (localStorage["dbotCustomUser"] === $scope.profiles[0].okcUsername && localStorage["dbotCustomMessage"]) {
+						console.log('Found a custom message! Restoring...');
+						$scope.customized = true; //Adds customized flag to the model
+						$scope.customMessage = localStorage["dbotCustomMessage"];
+						$scope.saveCustomized = true;
+					}
+
 				}, function(e){
 					console.log(e);
 					$scope.loading = false;
 				});
 			});
+
 		};
 
 		$scope.initialize(); //Initalizes the app
@@ -137,9 +148,12 @@ dbotExtApp.controller('ProfileController',
 			$scope.customized = false;
 			$scope.saveCustomized = false;
 
+			//Reset localStorage for custom messages
+			localStorage["dbotCustomMessage"] = null;
+			localStorage["dbotCustomUser"] = null;
+
 			//Update the textarea message model
 			$scope.customMessage = processLineBreaks($('.finalmessage').html());
-			//console.log('customMessage model is now', $scope.customMessage);
 		};
 
 		$scope.raiseKeywordPosition = function(clickedMatch, matchesArr) {
@@ -220,9 +234,18 @@ dbotExtApp.controller('ProfileController',
 			$scope.customized = true; //Adds customized flag to the model
 		};
 
-		$scope.saveCustomEdit = function(profile) {
+		$scope.saveCustomEdit = function(profile) {			
 			profile.customEditorActive = false; //Turns off the custom editor
-			if ($scope.customized) $scope.saveCustomized = true; //Becomes true if $scope.customized is true AND you save. This determines which div gets grabbed for sending the final message to the girl
+			if ($scope.customized) {
+				// This flag becomes true if $scope.customized is true AND you save. 
+				// This determines which div gets grabbed for sending the final message to the girl
+				$scope.saveCustomized = true; 
+
+				// Next, we save to localStorage, that way if you leave the app temporarily,
+				// And rescan the same girl, the custom message will be there waiting for you
+				localStorage["dbotCustomUser"] = profile.okcUsername;
+				localStorage["dbotCustomMessage"] = $scope.customMessage;
+			} 
 		};
 
 		$scope.goToOptions = function() {
