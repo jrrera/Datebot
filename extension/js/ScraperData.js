@@ -164,10 +164,11 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
 
         findSimilarities: function(profile, keywords, context) {
 
-        	//console.log('Arguments entering findSimilarities:', profile, keywords, context);
-
+        	//Begin utility functions for processing text
         	function extractContext(response, keywords, essays) {
-        	  //receives a list of keywords and essays, and pulls a snippet of text from each essay surrounding the matched keyword. Returns an array containing the snippets of context
+        	  // Receives a list of keywords and essays, and pulls a snippet of text from 
+        	  // each essay surrounding the matched keyword. 
+        	  // Returns an array containing the snippets of context
         	  var contextArr = [], findKeyword, essayTitle, final;
         	  
         	  for (var i = 0; i < keywords.length; i++) {
@@ -198,8 +199,7 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
         	      return final;
         	    } 
         	  }
-
-        	  return "<strong>Unknown</strong><br />";
+        	  return "<strong>Unknown</strong><br />"; //If all else fails, return this
         	}
 
         	function extractMatchedKeywords(response, keywords) {
@@ -221,6 +221,64 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
 				var keywordReg = new RegExp('[^a-zA-Z]' + keyword + '[^a-zA-Z]', 'g'); //The RegEx that looks for the keyword with a non-letter char on either side.
 				return context = context.replace(keywordReg, '<span class="bluekeywords">' + keywordReg.exec(context) + '</span>'); //Replace the keyword in the context with the keyword wrapped in span tags 
         	}
+
+        	function determineTopKeywords(matchObj) {
+        		var checkedCount = 0, //Keeps track of checked keyword count
+        			prioritiesObj = {
+        				'priorityTwo' : [],
+        				'priorityThree' : []
+        			}; //Container for priority sorting if we didn't find enough top priority keywords (i.e. priority of 1)
+
+        		console.log('matchObj', matchObj.matched);
+        		//Put each match in the appropriate category
+        		$.each(matchObj.matched, function(i, match){
+        			if (checkedCount < 2) {
+        				if (parseInt(match.priority) === 1) {
+        					//console.log('Found a top keyword! Checked it off. Details:', match);
+        					match.checked = true; //If it's a top priority, just mark it as checked right away
+        					checkedCount++; //Increment the tracker
+        				} else if (parseInt(match.priority) === 2) {
+        					prioritiesObj.priorityTwo.push(match);
+        				} else {
+        					prioritiesObj.priorityThree.push(match);
+        				}
+        			} else {
+        				return false; //If we found out two checked keywords, break out of the loop
+        			}
+        		});
+
+        		if (checkedCount >= 2) return matchObj;  //If we met our quota, return
+
+
+        		//If we processed all keywords and still haven't found two top priority keywords, run through priority 2 and 3 list
+        		if (prioritiesObj.priorityTwo) {
+        			$.each(prioritiesObj.priorityTwo, function(i, match){
+        				if (checkedCount < 2) {
+        					match.checked = true;
+        					checkedCount++;	
+        				} else {
+        					return false; //Break when we hit the quota
+        				}
+        			});
+        			//If we met our quota, return
+        			if (checkedCount >= 2) return matchObj;
+        		}
+
+        		if (prioritiesObj.priorityThree) {
+        			$.each(prioritiesObj.priorityThree, function(i, match){
+        				if (checkedCount < 2) {
+        					match.checked = true;
+        					checkedCount++;	
+        				} else {
+        					return false; //Break when we hit the quota
+        				}
+        			});
+        			//If we met our quota, return
+        			if (checkedCount >= 2) return matchObj;
+        		}
+        	}
+
+        	//Begin processing the data by sorting in the appropriate array
         	
         	var desiredKeywords = [], desiredMessage = [], desiredPriority =[], finalKeywordPriority = [], finalMessage = [];
 
@@ -258,16 +316,20 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
         		oneMatchObj.message = finalMessage[i];
         		oneMatchObj.priority = finalKeywordPriority[i];
 
-        		if (i == 0 || i == 1) {
-        			oneMatchObj.checked = true;
-        	    } else {
-        	    	oneMatchObj.checked = false;
-        	    }
+        		// if (i == 0 || i == 1) {
+        		// 	oneMatchObj.checked = true;
+        	 //    } else {
+        	 //    	oneMatchObj.checked = false;
+        	 //    }
 
         	    finalResult.matched.push(oneMatchObj);
         	}
         	
-        	//console.log('finalResult', finalResult);
+        	console.log('finalResult', finalResult);
+
+        	// Before returning, we run the finalResult through a function that checks the highest priority 
+        	// keywords and adds flips on the checked attribute flag if it's a high priority keyword
+        	determineTopKeywords(finalResult); 
         	return finalResult;
         }
 	};
