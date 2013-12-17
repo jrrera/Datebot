@@ -30,12 +30,12 @@ dbotExtApp.controller('ProfileController',
 				localStorage["dbotInteractions"] = JSON.stringify(records);
 			} else {
 				//If no records object found, intialize object, store data, and stringify
-				console.log('no record found, adding...')
+				console.log('No interaction record found, adding...');
 				records = {};
 				records[user] = interactionObj;
 				localStorage["dbotInteractions"] = JSON.stringify(records);
 			}
-			console.log(JSON.stringify(records, null, 4));
+			//console.log(JSON.stringify(records, null, 4));
 		}
 
 		//Begin properties and methods available on scope

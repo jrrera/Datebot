@@ -2,6 +2,7 @@
 
 dbotExtApp.filter('filterForDatabase', function() {
 	return function (profileObj, customizedBool, username) {
+		var babeObj = {};
 
 		function produceKeywordArr(matchArr) {
 			//Takes in the 'matched' array and returns an array of keywords used, in the order of their use
@@ -18,16 +19,13 @@ dbotExtApp.filter('filterForDatabase', function() {
 			return keywordArr;
 		}
 
-		var babeObj = {}, d = new Date, curr_date = d.getDate(), curr_month = d.getMonth() + 1, //Months are zero based
-		curr_year = d.getFullYear(), dateFormatted = curr_year + "-" + curr_month + "-" + curr_date;
-
 		babeObj.keywords = produceKeywordArr(profileObj.matched);
 		babeObj.username = username;
-		babeObj.date_messaged = dateFormatted;
+		babeObj.date_messaged = new Date;
 		babeObj.customized = customizedBool; 
+		babeObj.response = false;
 		babeObj.opener = profileObj.opener.replace(/(?:\n|<br\s?\/?>)/gi, ""); //Removes line breaks and br tags from record
 		babeObj.closer = profileObj.closer.replace(/(<br\s?\/?>)/gi, "\n");
-		
 		return babeObj;
 	}
 });

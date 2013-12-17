@@ -39,6 +39,18 @@
     });
   }
 
+  function updateInteractionRecords(interactionsObj, messageArr) {
+    for(var i = 0; i < messageArr.length; i++) {
+      // Is there a matching record in the interaction object when we pass in 
+      // an okcupid username?
+      if (interactionsObj[messageArr[i]]) {
+        //If so, add a respnse = true attribute
+        interactionsObj[messageArr[i]].response = true;
+      }
+    }
+    return JSON.stringify(interactionsObj); //Return the stringified object
+  }
+
   //Creates the context menu, and runs the sendKeyword function once a keyword has been selected
   chrome.contextMenus.create({
       title: "Add to DBot Database: %s", 
@@ -110,70 +122,27 @@
       });         
     }
 
-    if(msg.database) {
-        var babeObj = msg.database;
-        console.log(babeObj);
-        sendResponse("background.js successfully received babeObj!");
 
-        $.post("http://dbotapp.appspot.com/int", {"interaction": babeObj, "username": "jrrera"}, function(result){
-          console.log("Posted the interaction to the App Engine server. The server wrote back: ", result);
-        });
-    }
-
-    if (msg.databaseKeywords) {
-      var keywordObj = msg.databaseKeywords;
-      console.log(keywordObj);
-      
-      sendResponse("background.js successfully received keywordObj!");
-
-      $.ajax({
-          type: 'POST',
-          url: 'http://dbotapp.appspot.com/keywords',
-          data: JSON.stringify({
-            "username":"jrrera",
-            "keywords": keywordObj,
-           }),
-          contentType: 'application/json',
-          success: function(data,textStatus, jqXHR) {
-              console.log('POST response: ');
-              console.log(data);
-          }
-      });  
-    }
-
-    if (msg.request == "appengine_keywords") {
-      $.get("http://dbotapp.appspot.com/keywords", function(result){
-        
-        try {
-          var aeJson = JSON.parse(result);
-          sendResponse(aeJson);  
-        } catch (e) {
-          console.log('Warning! Could not parse App Engine\'s JSON! The error:', e);
-          sendResponse('Warning! Could not parse App Engine\'s JSON! The error:', e);
-        }
-      }); 
-      return true;
-    }
-
-    //This listener is triggered when a list of messages in your inbox is sent from the content script to background.js
+    // This listener is triggered when a list of messages in your inbox is sent from 
+    // the content script to background.js
     if(msg.messages) {
-      var names = msg.messages;
-      console.log(msg.messages);
-
-      //Check to see if any messages were found. If yes, send a post request to server. 
-      if (msg.messages == "Couldn't find any messages") {
-        console.log(msg.messages)
+      //Check to see if any messages were found. If yes, update interactions object in localStorage
+      if (msg.messages === "Couldn't find any messages") {
+        console.log(msg.messages);
+        return;
       } else {
-        // $.post("http://localhost:3000/messages", {"names": names}, function(result){
-        //   console.log("Posted the list of names to the server. The result: ", result);
-        // });        
-        $.post("http://dbotapp.appspot.com/messages", {"names": names, "username": "jrrera"}, function(result){
-          console.log("Posted the list of names to the server. The result: ", result);
-        });        
+        //Grab interaction history object from localStorage
+        var dbotInteractions = JSON.parse(localStorage["dbotInteractions"]);
+
+        // Run the interactions object through updateInteractionRecords, which updates the response
+        // attribute on each interaction and returns the updated objected, stringified
+        localStorage["dbotInteractions"] = updateInteractionRecords(dbotInteractions, msg.messages);
+        return true;
       }
     }
 
-    //Listener to grab current tab to make sure we don't do multiple rescans when one has already been done on the same profile
+    // Listener to grab current tab to make sure we don't do multiple rescans when 
+    // one has already been done on the same profile
     if (msg.url) {
       console.log('msg.url listener has been initiated. Begin searching for current tab');
       chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
