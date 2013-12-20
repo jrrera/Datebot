@@ -200,18 +200,7 @@ dbotExtApp.controller('ProfileController',
 
 
 		};
-
-        //
-		$scope.addTransitionText = function(index) {
-            if (index === 1) {
-                console.log($scope.keywords.first_transition + " ");
-				return $scope.keywords.first_transition + " ";
-			} else if (index > 1) {
-                return $scope.keywords.second_transition + " ";			
-			}
-            return;
-		};
-
+		
         // This function is used for debugging purposes
         // In particular, to see how message will render after all HTML processing occurs. 
         $scope.testMessage = function() {
