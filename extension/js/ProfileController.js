@@ -164,19 +164,25 @@ dbotExtApp.controller('ProfileController',
 			$scope.customMessage = processLineBreaks($('.finalmessage').html());
 		};
 
-		$scope.raiseKeywordPosition = function(clickedMatch, matchesArr) {
+		$scope.raiseKeywordPosition = function(clickedMatch, matchesArr, top) {
 			//This function moves a particular keyword one slot higher for arranging your message. 
 			var thisPosition, thisObject, prevObject;
-			
 			thisPosition = matchesArr.indexOf(clickedMatch);
 			thisObject = clickedMatch;
 			prevObject = matchesArr[thisPosition-1];
 
-			matchesArr[thisPosition] = prevObject;
-			matchesArr[thisPosition-1] = thisObject;
+			//If we want to move to top, execute differently vs. moving up one position
+			if (top) {
+				matchesArr.splice(thisPosition,1); //Remove from current position
+				matchesArr.unshift(thisObject); //Moves item to top of array
+			} else {
+				matchesArr[thisPosition] = prevObject;
+				matchesArr[thisPosition-1] = thisObject;				
+			}
+
 		};
 
-		$scope.lowerKeywordPosition = function(clickedMatch, matchesArr) {
+		$scope.lowerKeywordPosition = function(clickedMatch, matchesArr, bottom) {
 			//This function moves a particular keyword one slot higher for arranging your message. 
 			var thisPosition, thisObject, nextObject;
 			
@@ -184,8 +190,14 @@ dbotExtApp.controller('ProfileController',
 			thisObject = clickedMatch;
 			nextObject = matchesArr[thisPosition+1];
 
-			matchesArr[thisPosition] = nextObject;
-			matchesArr[thisPosition+1] = thisObject;
+			//If we want to move to bottom, execute differently vs. moving down one position
+			if (bottom) {
+				matchesArr.splice(thisPosition, 1);
+				matchesArr.push(thisObject);
+			} else {
+				matchesArr[thisPosition] = nextObject;
+				matchesArr[thisPosition+1] = thisObject;
+			}
 		};
 
 		$scope.sendToTab = function(profile){

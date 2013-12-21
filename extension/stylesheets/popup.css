@@ -152,3 +152,8 @@
   .moveit:hover{
     cursor: pointer;
   }
+
+  .moveit-container {
+    border: dotted black 1px;
+    text-align: center;
+  }

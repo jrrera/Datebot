@@ -57,8 +57,14 @@
       <td id="similarities">
         <div ng-repeat="match in profile.matches.matched" ng-hide="profile.messaged">
           <input type="checkbox" ng-model="match.checked" ng-checked="match.checked" ng-click="keywordClick()"/> {{match.keyword}}
-          <span class="moveit" ng-click="raiseKeywordPosition(match, profile.matches.matched)" ng-hide="$first">&uarr;</span>
-          <span class="moveit" ng-click="lowerKeywordPosition(match, profile.matches.matched)" ng-hide="$last">&darr;</span>
+          <div class="moveit-container">
+            <span class="moveit" ng-click="raiseKeywordPosition(match, profile.matches.matched, 'top')" ng-hide="$first">[&uarr;]</span>
+            <span class="moveit" ng-click="lowerKeywordPosition(match, profile.matches.matched, 'last')" ng-hide="$last">[&darr;]</span>
+            <span class="moveit" ng-click="raiseKeywordPosition(match, profile.matches.matched)" ng-hide="$first">[&uarr;<small>1</small>]</span>
+            <!-- <span class="moveit" ng-click="lowerKeywordPosition(match, profile.matches.matched)" ng-hide="$last">D</span> -->
+            
+          </div>
+          <hr />
 
 
         </div>
