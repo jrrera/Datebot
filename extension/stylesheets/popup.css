@@ -148,3 +148,7 @@
   .toggle_label {
     padding: 4px;
   }
+
+  .moveit:hover{
+    cursor: pointer;
+  }
