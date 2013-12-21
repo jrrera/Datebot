@@ -4,7 +4,8 @@ dbotExtApp.controller('ProfileController',
 	function ProfileController($scope, $timeout, $filter, $log, ScraperData) {
 
 		//Private variables
-		var dayOfWeek = new Date().getDay();
+		var dayOfWeek = new Date().getDay(),
+			babeObj = babeObj || {}; 
 
 		//Private functions within controller
 		function processLineBreaks(text) {
@@ -24,8 +25,9 @@ dbotExtApp.controller('ProfileController',
 		    return final;
 		}
 
-		function recordInteraction(interactionObj) {
+		function recordInteraction() {
 			var records = localStorage["dbotInteractions"], //storage object containing username as key and interaction as value
+			interactionObj = babeObj, //grabs the variable off the controller
 			user = interactionObj.username;
 
 			if (records) {
@@ -199,8 +201,8 @@ dbotExtApp.controller('ProfileController',
 			//Send the message to the background script, and record the interaction if successful
 			chrome.runtime.sendMessage({portover3: portObj}, function(response) {
 				if (response.status === 'message_sent') {
-					interactionData = document.getElementById(profile.okcUsername + '_data').textContent;
-					recordInteraction(JSON.parse(interactionData));
+					// interactionData = document.getElementById(profile.okcUsername + '_data').textContent;
+					recordInteraction();
 				}
 			});
 
@@ -250,6 +252,36 @@ dbotExtApp.controller('ProfileController',
 			    active: true
 			});
 		};
+
+		// This function on the scope updates the babeObj in place withour returning a new object
+		// babeObj is a private var in the controller, to allow it to maintain state between function calls
+		// By updating the object in place, we avoid infinite digest loops by returning new object in each call
+		$scope.updateDatabaseObj = function (profileObj, customizedBool, username) {
+			function produceKeywordArr(matchArr) {
+				//Takes in the 'matched' array and returns an array of keywords used, in the order of their use
+				var keywordArr = [];
+				if (matchArr.length) {
+					angular.forEach(matchArr, function(match){
+						if (match.checked) keywordArr.push(match.keyword); 
+					}); 
+				} else {
+					keywordArr.push('genericQuestion'); //If no matches found in the matchArr, record a generic message
+				}
+
+				if (!keywordArr.length) keywordArr.push('genericQuestion'); //If matchArr has interests, but none were checked when messsage was sent, record as generic message
+				return keywordArr;
+			}
+
+			babeObj.keywords = produceKeywordArr(profileObj.matched);
+			babeObj.username = username;
+			babeObj.date_messaged = new Date;
+			babeObj.customized = customizedBool; 
+			babeObj.response = false;
+			babeObj.opener = profileObj.opener.replace(/(?:\n|<br\s?\/?>)/gi, ""); //Removes line breaks and br tags from record
+			babeObj.closer = profileObj.closer.replace(/(<br\s?\/?>)/gi, "\n");
+
+			return babeObj;
+		}
 
 	}
 );

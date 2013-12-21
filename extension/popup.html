@@ -29,20 +29,24 @@
     </p>
   </div>
 
-  <div><input style="margin-bottom: 4px;" type="checkbox" ng-model="debug" /><span class="debug_mode_label">Debug mode?</span></div>
+  <div id="toggle-options">
+    <input style="margin-bottom: 4px;" type="checkbox" ng-model="hidePicture" /><small class="toggle_label">Hide Picture?</small>
+    <input style="margin-bottom: 4px;" type="checkbox" ng-model="hideContext" /><small class="toggle_label">Hide Context?</small>
+    <input style="margin-bottom: 4px;" type="checkbox" ng-model="debug" /><small class="toggle_label">Debug mode?</small>    
+  </div>
 
    <table class="table table-bordered" ng-show="profiles.length">
     <thead>
       <tr>
-        <th class="columntitle">Match</th>
+          <th ng-hide="hidePicture" class="columntitle">Match</th>
           <th class="columntitle">Similarities</th>
-          <th class="columntitle">Context</th>
+          <th ng-hide="hideContext" class="columntitle">Context </th>
           <th class="columntitle">The Message</th>
       </tr>
     </thead>
     <tbody>
     <tr ng-repeat="profile in profiles">
-      <td id="matchinfo">
+      <td ng-hide="hidePicture" id="matchinfo">
         <a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>  
         <img src="{{profile.okcPicture}}" /><br />
         <p class="score lead">
@@ -59,7 +63,7 @@
 
         </div>
       </td>
-      <td id="match_context">
+      <td  ng-hide="hideContext" id="match_context">
         <p ng-repeat="match in profile.matches.matched" ng-bind-html="match.context | unsafe" ng-hide="profile.messaged"></p>
       </td>
       <td id="full_profile" ng-show="false">
@@ -99,9 +103,12 @@
         <!--End Custom Edtior functionality-->
         <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.customEditorActive" ng-click="sendToTab(profile)">Send the message!</button>
 
-        <div id="{{profile.okcUsername}}_data" ng-hide="true">{{profile.matches | filterForDatabase:saveCustomized:profile.okcUsername}}</div><!--This div preps the data for the database if we choose to send the msg-->
-
-        <br />
+        <div id="{{profile.okcUsername}}_data" ng-show="debug">
+          <hr />
+          <strong>Database Object:</strong><br />
+          {{ updateDatabaseObj(profile.matches, saveCustomized, profile.okcUsername) }}
+          <br /><hr />
+        </div><!--This div preps the data for the database if we choose to send the msg, and is viewable in debug mode-->
 
         <!--This div contains some debug features around previewing post-processed plain text message, etc.-->
         <div ng-if="debug">
