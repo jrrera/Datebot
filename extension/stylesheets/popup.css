@@ -154,6 +154,14 @@
   }
 
   .moveit-container {
-    border: dotted black 1px;
+    border: solid rgb(240, 235, 235) 1px;
+    padding: 1px 1px 1px 1px;
     text-align: center;
+    border-radius: 9px;
+    margin-top: 5px;
+    margin-bottom: -5px;
+  }
+
+  .match-entry {
+    margin-top: -5px;
   }
