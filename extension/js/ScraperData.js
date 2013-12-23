@@ -1,25 +1,5 @@
 dbotExtApp.factory('ScraperData', function($http, $log, $q){
 	return {
-		getUsername: function($scope) {
-			var username, deferred = $q.defer();
-		
-			chrome.storage.local.get('dbotUser', function(result) {
-				username = result.dbotUser;
-
-				if (username) {
-					$scope.$apply(function() {
-						deferred.resolve(username);
-					});
-				} else {
-					console.log('No username found.');
-					$scope.$apply(function() {
-						deferred.resolve(null);
-					});
-				}
-			});
-			return deferred.promise;
-		},
-
 		getProfile: function($scope) {
 			console.log('Initalizing profile grab...');
 
@@ -279,8 +259,11 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
         	}
 
         	//Begin processing the data by sorting in the appropriate array
-        	
-        	var desiredKeywords = [], desiredMessage = [], desiredPriority =[], finalKeywordPriority = [], finalMessage = [];
+        	var desiredKeywords = [], 
+                desiredMessage = [], 
+                desiredPriority =[], 
+                finalKeywordPriority = [], 
+                finalMessage = [];
 
         	//Put the desiredKeywords in one array, and the related message in another array.
         	for (var i = 0; i < keywords.pairs.length; i++) {
@@ -316,19 +299,13 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
         		oneMatchObj.message = finalMessage[i];
         		oneMatchObj.priority = finalKeywordPriority[i];
 
-        		// if (i == 0 || i == 1) {
-        		// 	oneMatchObj.checked = true;
-        	 //    } else {
-        	 //    	oneMatchObj.checked = false;
-        	 //    }
-
         	    finalResult.matched.push(oneMatchObj);
         	}
         	
         	console.log('finalResult', finalResult);
 
         	// Before returning, we run the finalResult through a function that checks the highest priority 
-        	// keywords and adds flips on the checked attribute flag if it's a high priority keyword
+        	// keywords and flips on the checked attribute flag if it's a high priority keyword
         	determineTopKeywords(finalResult); 
         	return finalResult;
         }

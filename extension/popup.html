@@ -19,6 +19,7 @@
       </div>
     <!--End new user view-->
 
+  <!--This div appears if Datebot was unable to find a profile on the page-->
   <div class="alert" ng-show="!profiles.length && !loading">Nothing found. Are you sure you're on an OKCupid profile? If so, refreshing the page should do the trick.</div>
   
   <!--This is where Datebot will give you a recommendation based on how important the matched keywords are to you-->
@@ -29,12 +30,14 @@
     </p>
   </div>
 
+  <!--This area contains checkboxes for different options while analyzing a match, including debugging-->
   <div id="toggle-options" ng-hide="!profiles.length">
     <input style="margin-bottom: 4px;" type="checkbox" ng-model="hidePicture" /><small class="toggle_label">Hide Picture?</small>
     <input style="margin-bottom: 4px;" type="checkbox" ng-model="hideContext" /><small class="toggle_label">Hide Context?</small>
     <input style="margin-bottom: 4px;" type="checkbox" ng-model="debug" /><small class="toggle_label">Debug mode?</small>    
   </div>
 
+   <!--This table contains the match information, and is where most of the workflow takes place-->
    <table class="table table-bordered" ng-show="profiles.length">
     <thead>
       <tr>
@@ -107,16 +110,18 @@
         
         <div id="{{profile.okcUsername}}_customized_alert" class="alert" ng-show="saveCustomized">Note: This is a customized message. Adjusting your keyword choices will reset the message to your defaults!</div>
         <!--End Custom Edtior functionality-->
+
         <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.customEditorActive" ng-click="sendToTab(profile)">Send the message!</button>
 
+        <!--This div preps the data for the database if we choose to send the msg, and is viewable in debug mode-->
         <div id="{{profile.okcUsername}}_data" ng-show="debug">
           <hr />
           <strong>Database Object:</strong><br />
           {{ updateDatabaseObj(profile.matches, saveCustomized, profile.okcUsername, profile.matchScore) }}
           <br /><hr />
-        </div><!--This div preps the data for the database if we choose to send the msg, and is viewable in debug mode-->
+        </div>
 
-        <!--This div contains some debug features around previewing post-processed plain text message, etc.-->
+        <!--Debug feature for previewing the plain text message to ensure no HTML stuck around after processing-->
         <div ng-if="debug">
           <input type="checkbox"ng-model="testingMode" /> Preview processed, plain-text message?
           <br />
@@ -128,6 +133,7 @@
   </tbody>
   </table>  
   
+  <!--Show the Datebot logo if no matches were found, as a placeholder-->
   <div ng-show="!profiles.length && !loading"><img class="centered" src="img/Thomas-Hello128.png">  
     <div class="imagecredit">
       <p>Image Credit: <a href="http://www.iconarchive.com/show/daft-punks-icons-by-tsukasa-tux.html" target="_blank">Tsukasa-Tux</a>.</p>
