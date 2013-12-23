@@ -130,6 +130,9 @@ dbotExtApp.controller('ProfileController',
 					score += 1;
 				}				
 			});
+
+			//Add the score to the model so that we can track it in the database
+			profile.matchScore = score;
 			
 			//Now, we write out a custom recommendation message based on the calculated score.
 			if (score > 10) {
@@ -261,7 +264,7 @@ dbotExtApp.controller('ProfileController',
 		// This function on the scope updates the babeObj in place withour returning a new object
 		// babeObj is a private var in the controller, to allow it to maintain state between function calls
 		// By updating the object in place, we avoid infinite digest loops by returning new object in each call
-		$scope.updateDatabaseObj = function (profileObj, customizedBool, username) {
+		$scope.updateDatabaseObj = function (profileObj, customizedBool, username, matchScore) {
 			function produceKeywordArr(matchArr) {
 				//Takes in the 'matched' array and returns an array of keywords used, in the order of their use
 				var keywordArr = [];
@@ -284,6 +287,7 @@ dbotExtApp.controller('ProfileController',
 			babeObj.response = false;
 			babeObj.opener = profileObj.opener.replace(/(?:\n|<br\s?\/?>)/gi, ""); //Removes line breaks and br tags from record
 			babeObj.closer = profileObj.closer.replace(/(<br\s?\/?>)/gi, "\n");
+			babeObj.matchScore = matchScore;
 
 			return babeObj;
 		}
