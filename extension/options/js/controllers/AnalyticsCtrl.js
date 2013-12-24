@@ -124,8 +124,7 @@ keywordsApp.controller('AnalyticsCtrl',
                 $scope.responseByDayTable.dataTable.addRow([dayOfWeekNames[i], parseFloat($scope.dataByDayOfWeek[dayOfWeekNames[i]].responseRate)]);    
             }
         }
-
-
+     
         //Grab data from localStorage
         $scope.data = angular.fromJson(localStorage["dbotInteractions"]);
         

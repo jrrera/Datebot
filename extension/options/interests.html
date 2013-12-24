@@ -22,8 +22,20 @@
 	<link rel="stylesheet" href="/options/css/app.css">
 	<link rel="stylesheet" type="text/css" href="/options/css/angular-csp.css">
 </head>
-<body> <!--<body ng-cloak>-->
+<body>
+<div class="container">
+  <div class="navbar">
+  	<a style="margin-left:0px;" class="brand">Datebot</a>
+  	<div class="navbar-inner">
+  		<ul class="nav">
+  			<li ng-class="{active : interestsPage}" ng-click="interestsPage = true; analyticsPage = false;"><a href="#/">Interests</a></li>
+  			<li ng-class="{active : analyticsPage}" ng-click="analyticsPage = true; interestsPage = false;"><a href="#/analytics">Analytics</a></li>
+  		</ul>
+  	</div>
+  </div>	
+
   <ng-view></ng-view>
+</div>
 
 </body>
 </html>

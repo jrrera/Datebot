@@ -3,6 +3,7 @@
 keywordsApp.controller('KeywordController', 
 	function KeywordController($scope, $timeout, $filter, keywordData) {
 		console.log('keyword controller initiated');
+		$scope.interestsPage = true;
 		$scope.loading = true;
 		$scope.missingField = false;
 		$scope.added = false; //Indicates if there is a keyword waiting to be added to the list from ContextMenu.
@@ -126,7 +127,7 @@ keywordsApp.controller('KeywordController',
 		    	
 		    	} else {	    		
 			    	console.log('Keywords not loaded yet. Making $scope.added true!');
-			    	
+
 			    	//Run $scope.$apply because this data change happens in the chrome API callback
 			    	$scope.$apply(function(){
 						$scope.added = true; //Queues up this keyword to get added along with AJAX call still in progress
