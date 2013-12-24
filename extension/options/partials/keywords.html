@@ -1,0 +1,131 @@
+<div class="container">
+	<div class="navbar">
+		<div class="navbar-inner">
+			<ul class="nav">
+			</ul>
+		</div>
+	</div>
+	<div>
+		<h1>Interest Management</h1><br />
+	</div>
+	<div style="padding-left: 20px; padding-right: 20px;">
+		<div class="row">
+			<div class="alert alert-info" ng-show="loading">
+		  		Loading your account data...
+			</div>		
+			<div class="alert alert-success" ng-show="completed">
+		  		Settings loaded successfully!
+			</div>
+			<div class="alert alert-success" ng-show="saved">
+		  		<p>Everything was saved successfully!</p>
+		  		<p><strong>Remember</strong>: Your data is stored locally, so don't forget to download your keyword data every so often with the 'Export' button! :)
+			</div>		
+		</div>	
+		<br />
+		<h3>Message Templating</h3>
+		<h5>This is where you set up the template for your messages. This allows Datebot to suggest messages for you.</h5>
+		<br />
+		<button class="btn btn-primary" ng-click="save()">Save</button>
+		<button class="btn" ng-click="cancelEdit()">Undo</button>
+		<br /><br />			
+		<div class="row">
+			<div class="span5">
+				<strong>Opener:</strong><br />
+				<textarea class="openclose" placeholder="Write your opener here" ng-model="keyword.opener"></textarea>
+			</div>
+			<div class="span5">
+				<strong>Closer:</strong><br />
+				<textarea class="openclose" placeholder="Write your closer here" ng-model="keyword.closer"></textarea>
+			</div>
+			<div style="position:absolute; left:75%;">
+				<img src="http://iconhaze.com/wp-content/uploads/2009/09/Thomas-Hello.png" width="150px" />
+			</div>
+		</div>
+		<div class="row">
+			<div class="span5">
+				<strong>First Transition:</strong> <br />
+				<textarea class="transition" placeholder="Write your first transition here. (ex: 'Also,')" ng-model="keyword.first_transition"></textarea>
+			</div>
+			<div class="span5">
+				<strong>Second Transition:</strong> <br />
+				<textarea class="transition" placeholder="Write your second transition here. (ex: 'Oh, and')" ng-model="keyword.second_transition"></textarea>
+			</div>
+		</div>		
+
+		<hr />
+		<h3>Data Import / Export</h3>
+		<h5>Here, you can download a history of past interactions for analysis, and export/import your interests and associated messages.</h5>
+		<br />
+		<div class="row">
+			<div class="span3">
+				<a style="color:white;" href="{{interactionExportUrl}}" download="dbot_history_export"><button ng-disabled="!exportTurnOn" id="history_exporter" class="btn btn-primary">Export Past Interactions</button></a>
+			</div>
+			<div class="span2">
+				<a style="color:white;" href="{{exportUrl}}" download="dbot_export"><button ng-disabled="!exportTurnOn" id="exporter" class="btn btn-primary">Export Interests</button></a>
+			</div>
+			<div class="span2">	
+				<button class="btn" ng-click="importOn = !importOn">Import Interests</button>
+			</div>
+		</div>
+		<br />
+		<hr />
+		<h3>Interests and Talking Points</h3>
+
+		<h5>You have {{keyword.pairs.length}} interests in the database. Only {{100 - keyword.pairs.length}} to go before you hit the goal of 100!</h5>
+		<div class="progress progress-striped active">
+			<div class="bar" style="width: {{keyword.pairs.length}}%">{{keyword.pairs.length}}%</div>
+		</div>
+		<div class="row">
+			<div class="span1">	
+				<button class="btn btn-primary" ng-click="save()">Save</button>
+			</div>	
+			<div class="span1">
+				<button class="btn" ng-click="addRow()"> Add </button>
+			</div>
+			<div class="span1">	
+				<button class="btn" ng-click="cancelEdit()">Undo</button>
+			</div>
+
+		</div>
+
+		<!-- Begin import options-->
+		<div class="import_options" ng-show="importOn">
+			<input type="file" id="files"/> <br />
+			<button class="btn btn-primary" ng-click="submitImport()">Upload</button>
+		</div>
+		<div ng-show="importSuccess">
+			Import Successful!
+		</div>
+		<div ng-show="importFailure">
+			There was a problem with the import. Make sure the file is valid JSON, por favor. :)
+		</div>
+		<!-- End import options-->
+
+		<br />
+
+		<!--Begin keyword list-->
+		<ul class="thumbnails">
+			<li ng-repeat="pair in keyword.pairs | orderBy: sortorder">
+				<div class="row session">
+					<div class="span3">
+						<!-- <i class="icon-exclamation-sign" ng-show="recommendation()"></i> -->
+						<input type="text" name="{{pair.keyword}}" ng-model="pair.keyword" placeholder="Interest/keyword goes here" required /><br />
+						<span style="display:inline; margin-left:25%;">Priority (1-3):</span> <input class="keyword_priority" ng-model="pair.priority" placeholder="?" />
+
+					</div>
+					<div class="span7">
+						<textarea class="message" ng-model="pair.message" placeholder="Message goes here" required></textarea>
+					</div>
+					<div class="deletekeyword">
+						<button class="btn btn-small" ng-click="deleteRow($index)">Delete</button>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<!--End keyword list-->
+
+	</div>
+</div>
+<div class="imagecredit">
+	<p>Image Credit: <a href="http://www.iconarchive.com/show/daft-punks-icons-by-tsukasa-tux.html" target="_blank">Tsukasa-Tux</a>.</p>
+</div>

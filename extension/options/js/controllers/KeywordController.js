@@ -2,6 +2,7 @@
 
 keywordsApp.controller('KeywordController', 
 	function KeywordController($scope, $timeout, $filter, keywordData) {
+		console.log('keyword controller initiated');
 		$scope.loading = true;
 		$scope.missingField = false;
 		$scope.added = false; //Indicates if there is a keyword waiting to be added to the list from ContextMenu.
@@ -9,6 +10,7 @@ keywordsApp.controller('KeywordController',
 		$scope.exportTurnOn = false; //Disables export button until file is ready
 
 		keywordData.getKeywords($scope).then(function(data) {
+			console.log('initiating keyword grab');
 			$scope.keyword = angular.fromJson(data);
 			$scope.loading = false; //Turns off loading notifications
 			$scope.completed = true; //Turns on successful load notif
@@ -18,10 +20,6 @@ keywordsApp.controller('KeywordController',
 			$scope.interactionExportUrl = keywordData.generateInteractionExport();
 
 			$scope.exportTurnOn = true; //Makes the button clickable once exporting is done.
-			// keywordData.generateExport($scope.keyword).then(function(url){
-			// 	$scope.exportUrl = url;
-			// 	$scope.exportTurnOn = true; //Makes the button clickable once exporting is done.
-			// }); 
 
 			$timeout(function(){
 				$scope.completed = false;	//Turns off loading notification 5 seconds later
