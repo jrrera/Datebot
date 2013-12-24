@@ -14,6 +14,7 @@ keywordsApp.controller('KeywordController',
 			$scope.keyword = angular.fromJson(data);
 			$scope.loading = false; //Turns off loading notifications
 			$scope.completed = true; //Turns on successful load notif
+			$scope.keywordLength = $scope.keyword.pairs.length;
 
 			//Generates the URL for exporting your keyword JSON to a .txt file and interaction data as JSON too
 			$scope.exportUrl = keywordData.generateExport($scope.keyword);
