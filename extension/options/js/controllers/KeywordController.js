@@ -116,14 +116,23 @@ keywordsApp.controller('KeywordController',
 		    	if (!$scope.loading) { //Checks to see if the AJAX call has completed for the keywords yet. If loading = false, the process is complete, so we move forward as planned
 			      
 			      if (keywordData.checkForExistingKeywords(newKeyword, $scope.keyword.pairs) === false){ //If no matching keywords were found, create it.
-					$scope.keyword.pairs.unshift({'keyword':newKeyword, 'message':'[[Requires a related message]]'}); //Add to top of keywords list
-					$scope.save(); //Save the data
+					
+					//Run $scope.$apply because this data change happens in the chrome API callback
+					$scope.$apply(function(){
+						$scope.keyword.pairs.unshift({'keyword':newKeyword, 'message':'[[Requires a related message]]'}); //Add to top of keywords list
+						$scope.save(); //Save the data	
+					});
 			      }		    		
 		    	
 		    	} else {	    		
 			    	console.log('Keywords not loaded yet. Making $scope.added true!');
-			    	$scope.added = true; //Queues up this keyword to get added along with AJAX call still in progress
-			    	$scope.newKeyword = newKeyword; //This is where the new keyword is held until the AJAX call finishes (See code above for how this gets handled)
+			    	
+			    	//Run $scope.$apply because this data change happens in the chrome API callback
+			    	$scope.$apply(function(){
+						$scope.added = true; //Queues up this keyword to get added along with AJAX call still in progress
+						$scope.newKeyword = newKeyword; //This is where the new keyword is held until the AJAX call finishes (See code above for how this gets handled)			    		
+			    	});
+			    	
 		    	}
 		    }
 		    sendResponse('Received!');
