@@ -75,3 +75,29 @@
   text-align: center;
   margin-left: 10px;
 }
+
+.bigGraph {
+  width:800px;
+  height:500px;
+  margin: 0px auto;
+}
+
+.mediumGraph {
+  width:400px;
+  height:400px;
+  float:left;
+}
+
+.smallGraph {
+  width:200px;
+  height:200px;
+  float:left;
+}
+
+
+
+
+
+
+
+

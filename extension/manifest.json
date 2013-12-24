@@ -15,7 +15,7 @@
     "48":"img/Thomas-Hello48.png",
     "128":"img/Thomas-Hello128.png"
   },
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://www.google.com; object-src 'self'",
   "description": "People write long profiles. Don't spend a long time reading them.",
   "background": {"scripts":["js/background.js"]},
   "options_page": "options/interests.html",

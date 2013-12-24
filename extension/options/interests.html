@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" ng-app="keywordsApp" ng-csp>
+<html lang="en" ng-csp>
 <head>
 	<meta charset="utf-8">
 	<title>Interest Management</title>
@@ -8,17 +8,21 @@
 	<script src="/options/lib/bootstrap.min.js"></script>
 	<script src="/options/lib/angular/angular.min.js"></script>
 	<script src="/options/lib/angular/angular-route.js"></script>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+
 	<script src="/options/js/app.js"></script>
 	<script src="/options/js/filters.js"></script>
 	<script src="/options/js/controllers/KeywordController.js"></script>
 	<script src="/options/js/services/KeywordData.js"></script>
 	<script src="/options/js/controllers/AnalyticsCtrl.js"></script>
+	<script type="text/javascript" src="/options/js/ngGoogleCharts.js"></script>
+
 	<link rel="stylesheet" href="/options/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/options/css/app.css">
 	<link rel="stylesheet" type="text/css" href="/options/css/angular-csp.css">
 </head>
 <body> <!--<body ng-cloak>-->
-
   <ng-view></ng-view>
 
 </body>
