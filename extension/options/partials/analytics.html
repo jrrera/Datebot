@@ -16,23 +16,27 @@
 	<p style="font-size:10px; margin-top:5px;">Image Credit: <a href="http://www.iconarchive.com/show/daft-punks-icons-by-tsukasa-tux.html" target="_blank">Tsukasa-Tux</a>.</p>
 </div>
 
-<div id="interaction-summary">
-	<h2>Summary</h2>
-	<p class="lead">You have sent <strong>{{ dataLength }}</strong> messages since {{ earliestInteraction }}. <br /></p>
-	<p class="lead"> At a rate of <strong>{{ ratePerWeek }}</strong> messages per week.</p>
-	<p class="lead"> With an average response rate of <strong>{{ responseRate | convertToPercent }}%</strong>.</p>
-	<hr />
-</div>
+<p class="lead" style="width: 90%;" ng-hide="dataFound">Sorry, there's not enough data to build on. Try messaging a few more people using the 'Send Message' feature of Datebot to add more to your interactions database!</p>
 
-<div class="visualization">
-	<h2>Visualization</h2> 
-	<div id="keyword-analysis" class="chart">
-		<div google-chart="ColumnChart" ng-model="responseByKeywordTable" max="0.5" max2="4" min="0" format="percent" dual-y="true" class="biggerGraph"></div>
+<div id="dbot-data" ng-if="dataFound">
+	<div id="interaction-summary">
+		<h2>Summary</h2>
+		<p class="lead">You have sent <strong>{{ dataLength }}</strong> messages since {{ earliestInteraction }}. <br /></p>
+		<p class="lead"> At a rate of <strong>{{ ratePerWeek }}</strong> messages per week.</p>
+		<p class="lead"> With an average response rate of <strong>{{ responseRate | convertToPercent }}%</strong>.</p>
+		<hr />
 	</div>
 
-	<div id="time_analysis">
-		<div google-chart="ColumnChart" ng-model="responseByDayTable" max="0.5" min="0" format="percent" class="bigGraph"></div>
-	    <div google-chart="ColumnChart" ng-model="responseByMonthTable" max="0.5" min="0" format="percent" class="bigGraph"></div>
-	    <div google-chart="ColumnChart" ng-model="responseByTimeTable" max="0.5" min="0" format="percent" class="bigGraph"></div>
+	<div class="visualization">
+		<h2>Visualization</h2> 
+		<div id="keyword-analysis" class="chart">
+			<div google-chart="ColumnChart" ng-model="responseByKeywordTable" max="0.5" max2="4" min="0" format="percent" dual-y="true" class="biggerGraph"></div>
+		</div>
+
+		<div id="time_analysis">
+			<div google-chart="ColumnChart" ng-model="responseByDayTable" max="0.5" min="0" format="percent" class="bigGraph"></div>
+		    <div google-chart="ColumnChart" ng-model="responseByMonthTable" max="0.5" min="0" format="percent" class="bigGraph"></div>
+		    <div google-chart="ColumnChart" ng-model="responseByTimeTable" max="0.5" min="0" format="percent" class="bigGraph"></div>
+		</div>
 	</div>
 </div>

@@ -244,23 +244,31 @@ keywordsApp.controller('AnalyticsCtrl',
             console.log('Google charts constructed');
         }
 
-        //Grab data from localStorage
+        // Grab data from localStorage
         $scope.data = angular.fromJson(localStorage["dbotInteractions"]);
         
-        //Calculate summary data
-        $scope.dataLength = Object.keys($scope.data).length;
-        $scope.responseRate = getResponseRate($scope.data, $scope.dataLength);
-        $scope.earliestInteraction = determineEarliestInt($scope.data);
-        $scope.daysSinceStarting = determineDaysElapsed($scope.earliestInteraction);
-        $scope.ratePerWeek = (($scope.dataLength / $scope.daysSinceStarting) * 7).toFixed(0); //Rate of messages per week, rounded
+        // If we were able to pull the data
+        if ($scope.data) {
+            $scope.dataFound = true;
 
-        //Break out the data by month and day of week. Time of day coming soon!
-        $scope.dataByMonth = getInteractionsByMonth($scope.data, $scope.dataLength);
-        $scope.dataByDayOfWeek = getInteractionsByDayOfWeek($scope.data, $scope.dataLength);
-        $scope.dataByKeyword = getInteractionsByKeyword($scope.data, $scope.dataLength);
-        $scope.dataByTimeOfDay = getInteractionsByTimeOfDay($scope.data, $scope.dataLength);
+            //Calculate summary data
+            $scope.dataLength = Object.keys($scope.data).length;
+            $scope.responseRate = getResponseRate($scope.data, $scope.dataLength);
+            $scope.earliestInteraction = determineEarliestInt($scope.data);
+            $scope.daysSinceStarting = determineDaysElapsed($scope.earliestInteraction);
+            $scope.ratePerWeek = (($scope.dataLength / $scope.daysSinceStarting) * 7).toFixed(0); //Rate of messages per week, rounded
 
-        buildGoogleCharts(); //Now that data is compiled, put it in charts
+            //Break out the data by month and day of week. Time of day coming soon!
+            $scope.dataByMonth = getInteractionsByMonth($scope.data, $scope.dataLength);
+            $scope.dataByDayOfWeek = getInteractionsByDayOfWeek($scope.data, $scope.dataLength);
+            $scope.dataByKeyword = getInteractionsByKeyword($scope.data, $scope.dataLength);
+            $scope.dataByTimeOfDay = getInteractionsByTimeOfDay($scope.data, $scope.dataLength);
+
+            buildGoogleCharts(); //Now that data is compiled, put it in charts
+        } else {
+            $scope.dataFound = false;
+        }
+
 
 
     }
