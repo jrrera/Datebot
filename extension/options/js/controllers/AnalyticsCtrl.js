@@ -6,7 +6,7 @@ keywordsApp.controller('AnalyticsCtrl',
         console.log('initiating AnalyticsCtrl!');
 
         /* 
-        * This file opens with utility functions that will be used while
+        * This file starts with utility functions that will be used while
         * creating the scope and setting up the charts / data
         */
 
@@ -29,6 +29,17 @@ keywordsApp.controller('AnalyticsCtrl',
                 if (date < earliestDate) earliestDate = date;
             }
             return new Date(earliestDate).toDateString();
+        }
+
+        function getAveragePosition(positionArray) {
+            var sum = 0,
+                avg;
+            
+            for(var i = 0; i < positionArray.length; i++) {
+                sum += positionArray[i];
+            }
+
+            return (avg = sum / positionArray.length).toFixed(1);
         }
 
         //Utility function to generate analytics by month
@@ -86,6 +97,84 @@ keywordsApp.controller('AnalyticsCtrl',
             return intsByDayOfWeek;
         };
 
+        //Utility function to generate analytics by time of day message was sent
+        function getInteractionsByTimeOfDay(data, total) {
+            var timeOfDay, 
+                date,
+                intsByTimeOfDay = {};  
+
+            angular.forEach(data, function(interaction, key){
+                date = new Date(data[key].date_messaged);
+                timeOfDay = date.getHours();
+
+                //Initialize an empty array if one doesn't exist yet on that key
+                intsByTimeOfDay[timeOfDay] = intsByTimeOfDay[timeOfDay] || []; 
+                intsByTimeOfDay[timeOfDay].push(interaction);
+            });
+
+            // Now, we run each month through the getResponseRate function
+            // and attach the response rate
+            angular.forEach(intsByTimeOfDay, function(hour, key){
+                hour.responseRate = getResponseRate(hour, hour.length);              
+            });
+
+            console.log('intsByTimeOfDay', intsByTimeOfDay);
+            return intsByTimeOfDay;
+        };
+
+        //Utility function to generate analytics by keyword used, including avg position
+        function getInteractionsByKeyword(data, total) {
+
+            console.log('data', data);
+            var keyword, 
+                intsByKeyword = {};
+
+            /* This code cycles through each interaction, extracts each of the keywords within
+             * and builds an object containing arrays of interactions, and an avg position for
+             * that keyword. Note: Interactions can appear in multiple places on this object
+             */
+            angular.forEach(data, function(interaction, key){
+                angular.forEach(interaction.keywords, function (val, i) {
+                    
+                    // Some older interactions have the position as the value, and keyword as the 
+                    // key / index, rather than vice versa. This if statement properly distinguishes 
+                    // between the two by testing of the value is a number.
+
+                    if (isNaN(parseInt(val))) {
+                        keyword = val;    
+                    } else {
+                        keyword = i;
+                    }
+                    
+                    // Initialize an empty array if one doesn't exist yet on that key
+                    intsByKeyword[keyword] = intsByKeyword[keyword] || []; 
+                    intsByKeyword[keyword].push(interaction);
+
+                    // Creates an attribute on the keyword array to hold the position of said keyword
+                    // This will be used to calculate average position of the keyword
+                    intsByKeyword[keyword].positionArr = intsByKeyword[keyword].positionArr || [];
+                    
+                    if (isNaN(parseInt(val))) {
+                        intsByKeyword[keyword].positionArr.push(i + 1); // Add +1 to normalize to 1-based index vs. 0-based
+                    } else {
+                        intsByKeyword[keyword].positionArr.push(parseInt(val)); // If using old data model, push the value without incrementing
+                    }
+
+                });
+            });
+
+            // Now, we run each month through the getResponseRate function
+            // and attach the response rate
+            angular.forEach(intsByKeyword, function(keyword, key){
+                keyword.responseRate = getResponseRate(keyword, keyword.length);
+                keyword.avgPosition = getAveragePosition(keyword.positionArr);
+                delete keyword.positionArr; //Now that we have the full avg on a new property, remove the array             
+            });
+
+            console.log('intsByKeyword', intsByKeyword);
+            return intsByKeyword;
+        };
+
         function determineDaysElapsed(firstInteraction) {
             var thisTime = new Date(),
                 originalTime = new Date(firstInteraction);
@@ -123,8 +212,38 @@ keywordsApp.controller('AnalyticsCtrl',
             for(var i = 0; i < dayOfWeekNames.length; i++) {
                 $scope.responseByDayTable.dataTable.addRow([dayOfWeekNames[i], parseFloat($scope.dataByDayOfWeek[dayOfWeekNames[i]].responseRate)]);    
             }
+
+            //Response rate by time of day, visualized
+            $scope.responseByTimeTable = {};
+            $scope.responseByTimeTable.dataTable = new google.visualization.DataTable();
+            $scope.responseByTimeTable.dataTable.addColumn("string","Time of Day");
+            $scope.responseByTimeTable.dataTable.addColumn("number","Response Rate");
+            $scope.responseByTimeTable.title = "Response Rate by Time of Day Message was Sent";
+
+            for(var i = 0; i < 25; i++) {
+                if ($scope.dataByTimeOfDay[i]) {
+                    $scope.responseByTimeTable.dataTable.addRow([i.toString(), parseFloat($scope.dataByTimeOfDay[i].responseRate)]);    
+                }
+            }
+
+            //Response rate by keywords used, measured against avg position
+            $scope.responseByKeywordTable = {};
+            $scope.responseByKeywordTable.dataTable = new google.visualization.DataTable();
+            $scope.responseByKeywordTable.dataTable.addColumn("string","Keyword");
+            $scope.responseByKeywordTable.dataTable.addColumn("number","Response Rate");
+            $scope.responseByKeywordTable.dataTable.addColumn("number","Avg Position in Message");
+            $scope.responseByKeywordTable.title = "Response Rate by Top Keywords (Used 3+ times)";
+
+            angular.forEach($scope.dataByKeyword, function(val, key){
+                if (val.length > 2) {
+                    console.log(key, 'was used', val.length, 'times');
+                    $scope.responseByKeywordTable.dataTable.addRow([key, parseFloat(val.responseRate), parseFloat(val.avgPosition)]);
+                }
+            });
+                
+            console.log('Google charts constructed');
         }
-     
+
         //Grab data from localStorage
         $scope.data = angular.fromJson(localStorage["dbotInteractions"]);
         
@@ -138,6 +257,8 @@ keywordsApp.controller('AnalyticsCtrl',
         //Break out the data by month and day of week. Time of day coming soon!
         $scope.dataByMonth = getInteractionsByMonth($scope.data, $scope.dataLength);
         $scope.dataByDayOfWeek = getInteractionsByDayOfWeek($scope.data, $scope.dataLength);
+        $scope.dataByKeyword = getInteractionsByKeyword($scope.data, $scope.dataLength);
+        $scope.dataByTimeOfDay = getInteractionsByTimeOfDay($scope.data, $scope.dataLength);
 
         buildGoogleCharts(); //Now that data is compiled, put it in charts
 

@@ -1,4 +1,12 @@
-
+<div class="navbar">
+	<a style="margin-left:0px;" class="brand">Datebot</a>
+	<div class="navbar-inner">
+		<ul class="nav">
+			<li><a href="#/">Interests</a></li>
+			<li class="active"><a href="#/analytics">Analytics</a></li>
+		</ul>
+	</div>
+</div>
 
 <h1>Analytics</h1>
 <hr />
@@ -12,18 +20,19 @@
 	<h2>Summary</h2>
 	<p class="lead">You have sent <strong>{{ dataLength }}</strong> messages since {{ earliestInteraction }}. <br /></p>
 	<p class="lead"> At a rate of <strong>{{ ratePerWeek }}</strong> messages per week.</p>
-	<p class="lead"> And a response rate of <strong>{{ responseRate | convertToPercent }}%</strong>.</p>
+	<p class="lead"> With an average response rate of <strong>{{ responseRate | convertToPercent }}%</strong>.</p>
 	<hr />
 </div>
 
 <div class="visualization">
 	<h2>Visualization</h2> 
 	<div id="keyword-analysis" class="chart">
-		<!--stuff goes here-->
+		<div google-chart="ColumnChart" ng-model="responseByKeywordTable" max="0.5" max2="4" min="0" format="percent" dual-y="true" class="biggerGraph"></div>
 	</div>
 
-	<div id="month_analysis">
+	<div id="time_analysis">
 		<div google-chart="ColumnChart" ng-model="responseByDayTable" max="0.5" min="0" format="percent" class="bigGraph"></div>
 	    <div google-chart="ColumnChart" ng-model="responseByMonthTable" max="0.5" min="0" format="percent" class="bigGraph"></div>
+	    <div google-chart="ColumnChart" ng-model="responseByTimeTable" max="0.5" min="0" format="percent" class="bigGraph"></div>
 	</div>
 </div>
