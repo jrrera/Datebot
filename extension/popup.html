@@ -103,13 +103,18 @@
         <!--Custom Editor functionality-->
         <div class="customized_finalmessage" ng-show="saveCustomized && !profile.customEditorActive" ng-bind-html="$parent.customMessage | replaceLineBreaks | unsafe"></div>
         <textarea class="custom_editor" ng-model="$parent.customMessage" ng-show="profile.customEditorActive" ng-change="markAsCustomized(profile)"></textarea>
-        <button id="{{profile.okcUsername}}_customize" ng-hide="profile.customEditorActive" ng-click="showCustomEditor(profile)">Customize</button>
-        <button id="{{profile.okcUsername}}_customsave" ng-show="profile.customEditorActive" ng-click="saveCustomEdit(profile)">Save</button>
+        <button id="{{profile.okcUsername}}_customize" class="btn" ng-hide="profile.customEditorActive" ng-click="showCustomEditor(profile)">Customize</button>
+        <button id="{{profile.okcUsername}}_customsave" class="btn" ng-show="profile.customEditorActive" ng-click="saveCustomEdit(profile)">Save</button>
         
         <div id="{{profile.okcUsername}}_customized_alert" class="alert" ng-show="saveCustomized">Note: This is a customized message. Adjusting your keyword choices will reset the message to your defaults!</div>
         <!--End Custom Edtior functionality-->
 
         <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.customEditorActive" ng-click="sendToTab(profile)">Send the message!</button>
+        
+        <hr />
+        
+        <button class="btn btn-small" ng-click="goToOptions()">Options Page</button>
+        
 
         <!--This div preps the data for the database if we choose to send the msg, and is viewable in debug mode-->
         <div id="{{profile.okcUsername}}_data" ng-show="debug">
@@ -136,8 +141,11 @@
     <div class="imagecredit">
       <p>Image Credit: <a href="http://www.iconarchive.com/show/daft-punks-icons-by-tsukasa-tux.html" target="_blank">Tsukasa-Tux</a>.</p>
     </div>
+    <br />
+    <div style="margin: 0px auto;width: 12%;display: block;"><button class="btn btn-small" ng-click="goToOptions()">Options Page</button></div>
+
   </div>
-  
+
   </div>
     <script src="lib/bootstrap.min.js"></script>
     <script src="lib/angular.min.js"></script>
