@@ -189,7 +189,7 @@ keywordsApp.controller('AnalyticsCtrl',
              */
 
             var dayOfWeekNames = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", 
-                "Friday", "Saturday" ];
+                "Friday", "Saturday", "Blargon" ];
 
             //Response rate by month, visualized      
             $scope.responseByMonthTable = {};
@@ -210,7 +210,10 @@ keywordsApp.controller('AnalyticsCtrl',
             $scope.responseByDayTable.title = "Response Rate by Day Message was Sent";
 
             for(var i = 0; i < dayOfWeekNames.length; i++) {
-                $scope.responseByDayTable.dataTable.addRow([dayOfWeekNames[i], parseFloat($scope.dataByDayOfWeek[dayOfWeekNames[i]].responseRate)]);    
+                //If we have data on that day of the week, parse the response rate
+                if ($scope.dataByDayOfWeek[dayOfWeekNames[i]]) {
+                    $scope.responseByDayTable.dataTable.addRow([dayOfWeekNames[i], parseFloat($scope.dataByDayOfWeek[dayOfWeekNames[i]].responseRate)]);        
+                }                
             }
 
             //Response rate by time of day, visualized
