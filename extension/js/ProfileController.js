@@ -46,6 +46,7 @@ dbotExtApp.controller('ProfileController',
 		$scope.toggleMessaged = false; //Shows already-messaged results. Turned off by default
 		$scope.customized = false; //Becomes true when you modify the textarea for custom messages
 		$scope.saveCustomized = false; //Becomes true if $scope.customized is true AND you save
+		$scope.noTracking = false;
 		$scope.customMessage = ""; //This part of the model will eventually contain the customized message
 		$scope.recommendation = ""; //This will contain a recommendation based on calculate score
 		
@@ -208,8 +209,8 @@ dbotExtApp.controller('ProfileController',
 
 			//Send the message to the background script, and record the interaction if successful
 			chrome.runtime.sendMessage({portover3: portObj}, function(response) {
-				if (response.status === 'message_sent') {
-					// interactionData = document.getElementById(profile.okcUsername + '_data').textContent;
+				if (response.status === 'message_sent' && !$scope.noTracking) {
+					console.log('Recording interaction!');
 					recordInteraction();
 				}
 			});

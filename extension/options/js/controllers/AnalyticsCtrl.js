@@ -189,7 +189,7 @@ keywordsApp.controller('AnalyticsCtrl',
              */
 
             var dayOfWeekNames = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", 
-                "Friday", "Saturday", "Blargon" ];
+                "Friday", "Saturday" ];
 
             //Response rate by month, visualized      
             $scope.responseByMonthTable = {};

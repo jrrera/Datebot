@@ -6,7 +6,7 @@
 (function(){
     console.log('Datebot Extension script injected!');
 
-    function createScript(action, composer) {
+    function createScript(action) {
       //This function injects scripts into the OKC dom through the Content Script
       var scriptNode;
 
@@ -14,22 +14,14 @@
         scriptNode = document.createElement('script');
 
         // Open the composer window for main composer and action composer
-        scriptNode.textContent = "Profile.focusMessageCompose(); Profile.toggleActionCompose('on');";
-
-        // Inject script
+        scriptNode.textContent = "ProfileMessage.focusCompose();";
         document.body.appendChild(scriptNode);
 
       } else if (action === "sendMessage") {
         scriptNode = document.createElement('script');
-        
-        // Trigger the appropriate window on the page based on which message composer is open
-        if (composer === 'action_message') {
-          scriptNode.textContent = "Profile.actionSendMessage(); console.log('Message sent');";  
-        } else {
-          scriptNode.textContent = "Profile.sendMessage(); console.log('Message sent');";  
-        }
-        
-        // Inject the script into the page
+
+        // Activate the method on the page for sending messages
+        scriptNode.textContent = "ProfileMessage.send('window'); console.log('Message sent');";  
         document.body.appendChild(scriptNode);
       }
     }
@@ -44,27 +36,21 @@
 
         //This indicates that we've clicked 'Send the Message' in the Chrome extension and received the final draft of the message, so we place the message in the appropriate divs, and execute a script to run the send message functionality
         if (msg.finalmessage) {
-          // Declare offset from top of page, and a container for which message composer to work with
-          var scrollTop = $(window).scrollTop(),
-              messageWindow; //Used to tell the script which message composer to trigger
+          
+          // Because of new OKC dom updates, need to scroll to top of page before sending the message
+          window.scrollTo(0,0);
 
-          //Open the window composer on OKC
-          createScript('openWindow');
-           
-          //2 seconds after opening the message window, we populate the container and send the message
+          // Open the window composer on OKC page
           setTimeout(function(){
-            if (scrollTop > 486) {
-              // If we're too far down the page, we need to use the action_message container instead
-              $('#action_message').val(msg.finalmessage.message);
-              messageWindow = 'action_message';
-              console.log('sending via action_message window');  
-            } else {
-              $('#message_text').val(msg.finalmessage.message);  
-              messageWindow = 'message_text';
-              console.log('sending via standard message_text window');
-            }
-            createScript('sendMessage', messageWindow); 
-          }, 2000);
+            createScript('openWindow');
+          }, 500);
+
+          // Next, we populate the container and send the message
+          setTimeout(function(){
+            $('#action_message').val(msg.finalmessage.message);
+            $('#message_text').val(msg.finalmessage.message);  
+            createScript('sendMessage');
+          }, 1500);
 
           sendResponse({status:'success'});
         }
