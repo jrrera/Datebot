@@ -63,7 +63,7 @@
     console.log("Tab has changed!");
     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
       console.log(tabs[0]);
-      if (tabs[0].url == "http://www.okcupid.com/messages") {
+      if (tabs[0].url == "http://www.okcupid.com/messages" || tabs[0].url == "http://www.okcupid.com/mailbox?folder=1") {
         console.log("This URL is the messages page!");
         var tabId = tabs[0].id;
 

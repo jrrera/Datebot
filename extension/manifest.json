@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Datebot Beta",
-  "version": "2.61",
+  "version": "2.70",
   "permissions": [
     "tabs",
     "background",
