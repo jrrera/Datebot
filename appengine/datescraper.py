@@ -119,7 +119,7 @@ class ScrapeOkc2(webapp2.RequestHandler):
             return
 
         username = 'kr7l3g3nd'
-        password = 'mewtwo'
+        password = 'test123'
 
         self.response.write("Scrape request received!")            
 
