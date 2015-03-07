@@ -74,9 +74,9 @@
         <div ng-repeat="match in profile.matches.matched" ng-hide="profile.messaged" class="match-entry">
           <input type="checkbox" ng-model="match.checked" ng-checked="match.checked" ng-click="profileCtrl.keywordClick()"/> {{match.keyword}}
           <div class="moveit-container" ng-hide="profile.matches.matched.length === 1">
-            <span class="moveit" ng-click="profileCtrl.raiseKeywordPosition(match, profile.matches.matched, 'top')" ng-hide="$first">[&uarr;]</span>
-            <span class="moveit" ng-click="profileCtrl.lowerKeywordPosition(match, profile.matches.matched, 'last')" ng-hide="$last">[&darr;]</span>
-            <span class="moveit" ng-click="profileCtrl.raiseKeywordPosition(match, profile.matches.matched)" ng-hide="$first">[&uarr;<small>1</small>]</span>
+            <span class="moveit glyphicon glyphicon-arrow-up" ng-click="profileCtrl.raiseKeywordPosition(match, profile.matches.matched, 'top')" ng-hide="$first"></span>
+            <span class="moveit glyphicon glyphicon-arrow-down" ng-click="profileCtrl.lowerKeywordPosition(match, profile.matches.matched, 'last')" ng-hide="$last"></span>
+            <span class="moveit glyphicon glyphicon-arrow-up" ng-click="profileCtrl.raiseKeywordPosition(match, profile.matches.matched)" ng-hide="$first"><small>1</small></span>
             <!-- <span class="moveit" ng-click="lowerKeywordPosition(match, profile.matches.matched)" ng-hide="$last">D</span> -->
             
           </div>
