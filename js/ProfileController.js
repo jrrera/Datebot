@@ -11,7 +11,7 @@ angular.module('dbotExtApp').controller('ProfileController',
 		function processLineBreaks(text) {
 		    var final = text.replace(/\s*<p[^>]+">\s*/gi,""); //Filters out all P tags
 		    final = final.replace(/<\/?span[^>]*?"?>/gi,""); //Filters out all span tags
-        final = final.replace(/\n*(?:\s{2,})?<!--.*?-->\s*\n*/gi, ""); //Removes commented out HTML and arbitrary spacing from Angular, in a nongreedy fashion
+        final = final.replace(/\n*(?:\s{2,})?<!--(.|\n)*?-->\s*\n*/gi, ""); //Removes commented out HTML and arbitrary spacing from Angular, in a nongreedy fashion
 		    final = final.replace(/\s*<br\s?\/?>\s*\n*<\/p>\n*\s*/gi, "\n\n");
 		    final = final.replace(/\s*<br\s?\/?>\s*/gi,"\n"); //Puts a line break for any <br> tag
 		    final = final.replace(/\s*<\/p>\s*/gi,"\n\n"); //Adds two lines breaks for any closing p tags
@@ -155,7 +155,8 @@ angular.module('dbotExtApp').controller('ProfileController',
  			return score;
 		}
 
-		//When the profiles model is updated by adjusting keyword choices, customized becomes false again and we keep the message model in sync.
+		// When the profiles model is updated by adjusting keyword choices, 
+		// customized becomes false again and we keep the message model in sync.
 		this.keywordClick = function(){
 			//Reset the customized message flags
 			this.customized = false;

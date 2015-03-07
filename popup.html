@@ -13,12 +13,14 @@
     <div ng-show="!profileCtrl.foundKeywords">
       <div style="float: right;">
         <img src="img/Thomas-Hello128.png" alt="Welcome!" /></div><br />  
-        <p class="lead">Welcome to Datebot, the online dating assistant. It looks
-         like you're a new user. <br />To get started, visit the Options page or 
-         read the <a href="https://docs.google.com/document/d/1EQIzJzchrmPx05tBrf
-         rFsu3J58TQyW5z7I-imuz7XFc" target="_blank">Datebot Guide</a><br />
+        <p class="lead">Welcome to Datebot, the online dating assistant. Seems
+         like you're a new user.<br />To get started, visit the Options page or 
+         read the <a href="https://docs.google.com/document/d/1EQIzJzchrmPx05tB
+         rfrFsu3J58TQyW5z7I-imuz7XFc" target="_blank">Datebot Guide</a><br />
+         
          <button class="btn btn-primary" ng-click="profileCtrl.goToOptions()">
-          Go to the Options Page</button></p>
+          Go to the Options Page</button>
+        </p>
 
       <span class="import_note">Note: If you're an existing user, your data 
         might've been wiped from Chrome. If you exported your data, you can go 
@@ -34,7 +36,8 @@
      refreshing the page should do the trick.
    </div>
   
-  <!--This is where Datebot will give you a recommendation based on how important the matched keywords are to you-->
+  <!--This is where Datebot will give you a recommendation based on how 
+      important the matched keywords are to you-->
   <div class="recommendation" ng-show="profileCtrl.recommendation">        
     <p class="lead">
       Datebot says: <br />
@@ -42,28 +45,44 @@
     </p>
   </div>
 
-  <!--This area contains checkboxes for different options while analyzing a match, including debugging-->
+  <!--This area contains checkboxes for different options while analyzing a 
+      match, including debugging-->
   <div id="toggle-options" ng-hide="!profileCtrl.profiles.length">
-    <input style="margin-bottom: 4px;" type="checkbox" ng-model="profileCtrl.hidePicture" /><small class="toggle_label">Hide Picture?</small>
-    <input style="margin-bottom: 4px;" type="checkbox" ng-model="profileCtrl.hideContext" /><small class="toggle_label">Hide Context?</small>
-    <input style="margin-bottom: 4px;" type="checkbox" ng-model="profileCtrl.debug" /><small class="toggle_label">Debug mode?</small>
-    <input style="margin-bottom: 4px;" type="checkbox" ng-model="profileCtrl.noTracking" /><small class="toggle_label">Don't record messages?</small>      
+    <input style="margin-bottom: 4px;" 
+           type="checkbox" 
+           ng-model="profileCtrl.hidePicture" />
+    <small class="toggle_label">Hide Picture?</small>
+
+    <input style="margin-bottom: 4px;" 
+           type="checkbox" 
+           ng-model="profileCtrl.hideContext" />
+    <small class="toggle_label">Hide Context?</small>
+
+    <input style="margin-bottom: 4px;" 
+           type="checkbox" 
+           ng-model="profileCtrl.debug" />
+    <small class="toggle_label">Debug mode?</small>
+    <input style="margin-bottom: 4px;" 
+           type="checkbox" 
+           ng-model="profileCtrl.noTracking" />
+    <small class="toggle_label">Don't record messages?</small>      
   </div>
 
-   <!--This table contains the match information, and is where most of the workflow takes place-->
+   <!--This contains match info (where most of the workflow takes place)-->
    <table class="table table-bordered" ng-show="profileCtrl.profiles.length">
     <thead>
       <tr>
-          <th ng-hide="profileCtrl.hidePicture" class="columntitle">Match</th>
-          <th class="columntitle">Similarities</th>
-          <th ng-hide="profileCtrl.hideContext" class="columntitle">Context </th>
-          <th class="columntitle">The Message</th>
+        <th ng-hide="profileCtrl.hidePicture" class="columntitle">Match</th>
+        <th class="columntitle">Similarities</th>
+        <th ng-hide="profileCtrl.hideContext" class="columntitle">Context</th>
+        <th class="columntitle">The Message</th>
       </tr>
     </thead>
     <tbody>
     <tr ng-repeat="profile in profileCtrl.profiles">
       <td ng-hide="profileCtrl.hidePicture" id="matchinfo">
-        <a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" target="_blank">{{profile.okcUsername}}</a>  
+        <a href="http://www.okcupid.com/profile/{{profile.okcUsername}}" 
+           target="_blank">{{profile.okcUsername}}</a>  
         <img src="{{profile.okcPicture}}" /><br />
         <p class="score lead">
           Score:<br />
@@ -71,20 +90,44 @@
         </p>
       </td>
       <td id="similarities">
-        <div ng-repeat="match in profile.matches.matched" ng-hide="profile.messaged" class="match-entry">
-          <input type="checkbox" ng-model="match.checked" ng-checked="match.checked" ng-click="profileCtrl.keywordClick()"/> {{match.keyword}}
-          <div class="moveit-container" ng-hide="profile.matches.matched.length === 1">
-            <span class="moveit glyphicon glyphicon-arrow-up" ng-click="profileCtrl.raiseKeywordPosition(match, profile.matches.matched, 'top')" ng-hide="$first"></span>
-            <span class="moveit glyphicon glyphicon-arrow-down" ng-click="profileCtrl.lowerKeywordPosition(match, profile.matches.matched, 'last')" ng-hide="$last"></span>
-            <span class="moveit glyphicon glyphicon-arrow-up" ng-click="profileCtrl.raiseKeywordPosition(match, profile.matches.matched)" ng-hide="$first"><small>1</small></span>
-            <!-- <span class="moveit" ng-click="lowerKeywordPosition(match, profile.matches.matched)" ng-hide="$last">D</span> -->
+        <div ng-repeat="match in profile.matches.matched" 
+             ng-hide="profile.messaged" 
+             class="match-entry">
+          <input type="checkbox" 
+                 ng-model="match.checked" 
+                 ng-checked="match.checked" 
+                 ng-click="profileCtrl.keywordClick()"/> {{match.keyword}}
+          <div class="moveit-container" 
+               ng-hide="profile.matches.matched.length === 1">
+
+            <span class="moveit glyphicon glyphicon-arrow-up" 
+                  ng-click="profileCtrl.raiseKeywordPosition(
+                                match, profile.matches.matched, 'top')" 
+                  ng-hide="$first"></span>
+
+            <span class="moveit glyphicon glyphicon-arrow-down" 
+                  ng-click="profileCtrl.lowerKeywordPosition(
+                                match, profile.matches.matched, 'last')" 
+                  ng-hide="$last"></span>
+
+            <span class="moveit glyphicon glyphicon-arrow-up" 
+                  ng-click="profileCtrl.raiseKeywordPosition(
+                                match, profile.matches.matched)" 
+                  ng-hide="$first">
+                  <small>1</small></span>
+            <!-- <span class="moveit" 
+                      ng-click="lowerKeywordPosition(
+                          match, profile.matches.matched)" 
+                      ng-hide="$last">D</span> -->
             
           </div>
           <hr ng-hide="profile.matches.matched.length === 1" />
         </div>
       </td>
-      <td  ng-hide="profileCtrl.hideContext" id="match_context">
-        <p ng-repeat="match in profile.matches.matched" ng-bind-html="match.context | unsafe" ng-hide="profile.messaged"></p>
+      <td ng-hide="profileCtrl.hideContext" id="match_context">
+        <p ng-repeat="match in profile.matches.matched" 
+           ng-bind-html="match.context | unsafe" 
+           ng-hide="profile.messaged"></p>
       </td>
       <td id="full_profile" ng-show="false">
         <div ng-repeat="section in profile.okcContext">
@@ -93,20 +136,40 @@
         </div>
       </td>
 
-      <!--This TD tag contains the processed message, including in-place editing functionality-->
+      <!--Holds the processed message and in-place editing functionality-->
       <td id="the_message" style="min-width: 225px;">
-        <div class="alert" ng-hide="profile.matches.matched.length">Bummer, couldn't find anything in common here. Want to send a generic message?</div>
+        <div class="alert" ng-hide="profile.matches.matched.length">
+          Bummer, couldn't find anything in common here. Want to send a 
+          generic message?
+        </div>
 
-        <div class="finalmessage" id="{{profile.okcUsername}}_message" ng-hide="profile.customEditorActive || profileCtrl.saveCustomized">
+        <div class="finalmessage" 
+             id="{{profile.okcUsername}}_message" 
+             ng-hide="profile.customEditorActive || 
+                          profileCtrl.saveCustomized">
+
           <!--Open the message with the chosen opener-->
           <p ng-bind-html="profile.matches.opener | unsafe"></p>
 
-          <!--Loop through the profile.matches.matched array to display the message associated with the keywords-->
-          <!--Also contains transition text span, which is determined in your options area. Only part of DOM when $index > 0-->
-          <p ng-hide="!((profile.matches.matched | filter:{checked: true}).length)" ng-repeat="match in profile.matches.matched | filter:{checked: true}"><span ng-if="$index != 0" class="transition_text">{{ $index === 1 ? keywords.first_transition + ' ' : keywords.second_transition + ' ' }}</span>{{match.message | adjustCapitalLetters : $index : keywords}}</p>
+          <!--Loop through the profile.matches.matched array to display the 
+              message associated with the keywords-->
+          <!--Also contains transition text span, which is determined in your 
+              options area. Only part of DOM when $index > 0-->
+          <p ng-hide="!((profile.matches.matched | filter:{checked: true}).length)" 
+             ng-repeat="match in profile.matches.matched | filter:{checked: true}">
+
+            <span ng-if="$index != 0" class="transition_text">
+              {{ $index === 1 
+                  ? profileCtrl.keywords.first_transition + ' ' 
+                  : profileCtrl.keywords.second_transition + ' ' }}
+            </span>{{match.message | adjustCapitalLetters : $index : profileCtrl.keywords}}
+          </p>
           
-          <!--If there are no matches after all filters are applied, replace body text with a generic question-->
-          <p ng-if="!((profile.matches.matched | filter:{checked: true}).length)">{{genericQuestion}}</p>
+          <!--If there are no matches after all filters are applied, 
+              replace body text with a generic question-->
+          <p ng-if="!((profile.matches.matched | filter:{checked: true}).length)">
+            {{genericQuestion}}
+          </p>
           
           <!--Close the message with the closing text-->
           <p ng-bind-html="profile.matches.closer | unsafe"></p>
@@ -114,22 +177,48 @@
 
         
         <!--Custom Editor functionality-->
-        <div class="customized_finalmessage" ng-show="profileCtrl.saveCustomized && !profile.customEditorActive" ng-bind-html="profileCtrl.customMessage | replaceLineBreaks | unsafe"></div>
-        <textarea class="custom_editor" ng-model="profileCtrl.customMessage" ng-show="profile.customEditorActive" ng-change="profileCtrl.markAsCustomized(profile)"></textarea>
-        <button id="{{profile.okcUsername}}_customize" class="btn" ng-hide="profile.customEditorActive" ng-click="profileCtrl.showCustomEditor(profile)">Customize</button>
-        <button id="{{profile.okcUsername}}_customsave" class="btn" ng-show="profile.customEditorActive" ng-click="profileCtrl.saveCustomEdit(profile)">Save</button>
+        <div class="customized_finalmessage" 
+             ng-show="profileCtrl.saveCustomized && !profile.customEditorActive" 
+             ng-bind-html="profileCtrl.customMessage | replaceLineBreaks | unsafe">
+        </div>
+        <textarea class="custom_editor" 
+                  ng-model="profileCtrl.customMessage" 
+                  ng-show="profile.customEditorActive" 
+                  ng-change="profileCtrl.markAsCustomized(profile)"></textarea>
+        <button id="{{profile.okcUsername}}_customize" 
+                class="btn" 
+                ng-hide="profile.customEditorActive" 
+                ng-click="profileCtrl.showCustomEditor(profile)">
+            Customize
+        </button>
+        <button id="{{profile.okcUsername}}_customsave" 
+                class="btn" ng-show="profile.customEditorActive" 
+                ng-click="profileCtrl.saveCustomEdit(profile)">Save</button>
         
-        <div id="{{profile.okcUsername}}_customized_alert" class="alert" ng-show="profileCtrl.saveCustomized">Note: This is a customized message. Adjusting your keyword choices will reset the message to your defaults!</div>
+        <div id="{{profile.okcUsername}}_customized_alert" 
+             class="alert" 
+             ng-show="profileCtrl.saveCustomized">
+             Note: This is a customized message. Adjusting your keyword choices
+              will reset the message to your defaults!
+        </div>
         <!--End Custom Edtior functionality-->
 
-        <button id="{{profile.okcUsername}}" class="btn btn-primary sendmessage" ng-hide="profile.customEditorActive" ng-click="profileCtrl.sendToTab(profile)">Send the message!</button>
+        <button id="{{profile.okcUsername}}" 
+                class="btn btn-primary sendmessage" 
+                ng-hide="profile.customEditorActive" 
+                ng-click="profileCtrl.sendToTab(profile)">
+                Send the message!
+        </button>
         
         <hr />
         
-        <button class="btn btn-small" ng-click="profileCtrl.goToOptions()">Options Page</button>
+        <button class="btn btn-small" ng-click="profileCtrl.goToOptions()">
+          Options Page
+        </button>
         
 
-        <!--This div preps the data for the database if we choose to send the msg, and is viewable in debug mode-->
+        <!--This div preps the data for the database if we choose to send the
+            msg, and is viewable in debug mode-->
         <div id="{{profile.okcUsername}}_data" ng-show="profileCtrl.debug">
           <hr />
           <strong>Database Object:</strong><br />
@@ -137,11 +226,16 @@
           <br /><hr />
         </div>
 
-        <!--Debug feature for previewing the plain text message to ensure no HTML stuck around after processing-->
+        <!--Debug feature for previewing the plain text message to ensure no 
+            HTML stuck around after processing-->
         <div ng-if="debug">
-          <input type="checkbox"ng-model="profileCtrl.testingMode" /> Preview processed, plain-text message?
+          <input type="checkbox"ng-model="profileCtrl.testingMode" /> 
+          Preview processed, plain-text message?
           <br />
-          <div id="html_preview" ng-if="profileCtrl.testingMode" ng-bind-html="profileCtrl.testMessage()"></div>
+          <div id="html_preview" 
+               ng-if="profileCtrl.testingMode" 
+               ng-bind-html="profileCtrl.testMessage()">
+          </div>
         </div>
 
       </td>
@@ -153,11 +247,17 @@
   <div ng-show="!profileCtrl.profiles.length && !profileCtrl.loading">
     <img class="centered" src="img/Thomas-Hello128.png">  
     <div class="imagecredit">
-      <p>Image Credit: <a href="http://www.iconarchive.com/show/daft-punks-icons-by-tsukasa-tux.html" target="_blank">Tsukasa-Tux</a>.</p>
+      <p>Image Credit: 
+        <a href="http://www.iconarchive.com/show/daft-punks-icons-by-tsukasa-tux.html" 
+           target="_blank">Tsukasa-Tux</a>.</p>
     </div>
     <br />
-    <div style="margin: 0px auto;width: 12%;display: block;"><button class="btn btn-small" ng-click="profileCtrl.goToOptions()">Options Page</button></div>
-
+    <div style="margin: 0px auto;width: 12%;display: block;">
+      <button class="btn btn-small" 
+              ng-click="profileCtrl.goToOptions()">
+              Options Page
+      </button>
+    </div>
   </div>
 
   </div>
