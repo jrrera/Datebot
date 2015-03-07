@@ -1,22 +1,11 @@
 'use strict';
 
-angular.module('dbotExtApp').controller('ProfileController', 
-	function ProfileController($scope, $timeout, $filter, $log, ScraperData) {
+angular.module('datebot').controller('ProfileController', 
+	function ProfileController(ScraperService, TextProcessorService) {
 
 		//Private variables
 		var dayOfWeek = new Date().getDay(),
 			babeObj = babeObj || {}; 
-
-		//Private functions within controller
-		function processLineBreaks(text) {
-		    var final = text.replace(/\s*<p[^>]+">\s*/gi,""); //Filters out all P tags
-		    final = final.replace(/<\/?span[^>]*?"?>/gi,""); //Filters out all span tags
-        final = final.replace(/\n*(?:\s{2,})?<!--(.|\n)*?-->\s*\n*/gi, ""); //Removes commented out HTML and arbitrary spacing from Angular, in a nongreedy fashion
-		    final = final.replace(/\s*<br\s?\/?>\s*\n*<\/p>\n*\s*/gi, "\n\n");
-		    final = final.replace(/\s*<br\s?\/?>\s*/gi,"\n"); //Puts a line break for any <br> tag
-		    final = final.replace(/\s*<\/p>\s*/gi,"\n\n"); //Adds two lines breaks for any closing p tags
-		    return final;
-		}
 
 		function recordInteraction() {
 			var records = localStorage["dbotInteractions"], //storage object containing username as key and interaction as value
@@ -39,7 +28,7 @@ angular.module('dbotExtApp').controller('ProfileController',
 			//console.log(JSON.stringify(records, null, 4));
 		}
 
-		//Begin properties and methods available on scope
+		//Begin properties and methods available on controller
     this.loading = true; //Shows the AJAX loader graphic, and hides the results table. Will flip after AJAX call comes back
 		this.foundKeywords = false; //Will flip to true upon locating stored keywords in Chrome's storage
 		this.profiles = []; //Profile objects will be pushed here after processing.
@@ -55,33 +44,32 @@ angular.module('dbotExtApp').controller('ProfileController',
 
 		//Begin cascade of async calls for username, keywords, and profile
 		this.initialize = function() {
-			ScraperData.getKeywords().then(angular.bind(this, function(data) {
+			ScraperService.getKeywords().then(angular.bind(this, function(data) {
 
 				this.keywords = data;
 
-				if (ScraperData.foundKeywordsLocally) {
+				if (ScraperService.foundKeywordsLocally) {
 					this.foundKeywords = true;
 				}
 
 				//Now that keywords have been returned, time to get the profile
-				//We pass in the scope since we need to run $scope.$apply in order for Angular to see that the response came back
-				ScraperData.getProfile().then(angular.bind(this, function(data){
+				ScraperService.getProfile().then(angular.bind(this, function(data){
 					var html, jqueryArr, okcContext, profileObj;
 
 					html = data.html;
 					//console.log('The HTML is in the controller! Lets move on', html);
 					
 					//Returns an array of - in order - okcText, okcContext (for matched interests), the picture URL, and the jquery object
-					jqueryArr = ScraperData.turnIntoJquery(html);
+					jqueryArr = ScraperService.turnIntoJquery(html);
 					
 
 					//Now, we test to see if the OKCText and username were found in the HTML. If not, we're not on a profile page. If yes, continue on
 					if (jqueryArr[0] && jqueryArr[1]) {
 						//Returns an array of objects (the essays scraped from the profile)
-						okcContext = ScraperData.processContext(jqueryArr[3]);
+						okcContext = TextProcessorService.processContext(jqueryArr[3]);
 
 						//Processes the profile text with find-and-replace
-						jqueryArr[0] = ScraperData.processProfileText(jqueryArr[0]); 
+						jqueryArr[0] = TextProcessorService.processProfileText(jqueryArr[0]); 
 
 						//Adds the okcContext as the fifth item in the jqueryArr array
 						jqueryArr.push(okcContext);
@@ -92,7 +80,7 @@ angular.module('dbotExtApp').controller('ProfileController',
 							okcUsername: jqueryArr[1],
 							okcPicture: jqueryArr[2],
 							okcContext: jqueryArr[4],
-							matches: ScraperData.findSimilarities(jqueryArr[0], this.keywords, jqueryArr[4]) //Generates the object that the Chrome extension front end looks for
+							matches: ScraperService.findSimilarities(jqueryArr[0], this.keywords, jqueryArr[4]) //Generates the object that the Chrome extension front end looks for
 						}
 						
 						this.profiles.push(profileObj);
@@ -167,7 +155,8 @@ angular.module('dbotExtApp').controller('ProfileController',
 			localStorage["dbotCustomUser"] = null;
 
 			//Update the textarea message model
-			this.customMessage = processLineBreaks($('.finalmessage').html());
+			this.customMessage = TextProcessorService.processLineBreaks(
+					$('.finalmessage').html());
 		};
 
 		this.raiseKeywordPosition = function(clickedMatch, matchesArr, top) {
@@ -209,16 +198,20 @@ angular.module('dbotExtApp').controller('ProfileController',
 		this.sendToTab = function(profile){
 			var message, interactionData;
 			
-			//If customized, this.customMessage from textarea is what's sent. Else, the standard .finalmessage div's contents are used
-			message = this.saveCustomized ? this.customMessage : processLineBreaks($('.finalmessage').html());
+			//If customized, this.customMessage from textarea is what's sent. 
+			// Else, the standard .finalmessage div's contents are used
+			message = this.saveCustomized 
+										? this.customMessage 
+										: TextProcessorService.processLineBreaks(
+													$('.finalmessage').html());
 
-			console.log(ScraperData.userId);
+			console.log(ScraperService.userId);
 			var portObj = {
 			  message: message,
-			  userId: ScraperData.userId
+			  userId: ScraperService.userId
 			};
 
-			//Send the message to the background script, and record the interaction if successful
+			//Send the message to the background script & record the interaction
 			chrome.runtime.sendMessage({portover3: portObj}, function(response) {
 				if (response.status === 'message_sent' && !this.noTracking) {
 					console.log('Recording interaction!');
@@ -234,14 +227,14 @@ angular.module('dbotExtApp').controller('ProfileController',
         this.testMessage = function() {
         	// Either return customized message with linebreaks turned into <br> tags, if customization had been used
         	// or process the keyword generated message and replace linebreaks similarly
-            return this.saveCustomized ? this.customMessage.replace(/\n/g, '<br />') : processLineBreaks($('.finalmessage').html()).replace(/\n/g, '<br />');
+            return this.saveCustomized ? this.customMessage.replace(/\n/g, '<br />') : TextProcessorService.processLineBreaks($('.finalmessage').html()).replace(/\n/g, '<br />');
         }
 
 		this.showCustomEditor = function(profile) {
 			//If there is no customized message already, grab the keyword-driven message and convert
 			//If we've already customized, this just pulls it as it is without overwriting
 			if (!this.saveCustomized) {
-				this.customMessage = processLineBreaks($('.finalmessage').html()); 	
+				this.customMessage = TextProcessorService.processLineBreaks($('.finalmessage').html()); 	
 			}
 			profile.customEditorActive = true; //adds custom editor property to the profile model
 		};
@@ -273,7 +266,7 @@ angular.module('dbotExtApp').controller('ProfileController',
 			});
 		};
 
-		// This function on the scope updates the babeObj in place withour returning a new object
+		// This function on the controller updates the babeObj in place withour returning a new object
 		// babeObj is a private var in the controller, to allow it to maintain state between function calls
 		// By updating the object in place, we avoid infinite digest loops by returning new object in each call
 		this.updateDatabaseObj = function (profileObj, customizedBool, username, matchScore) {
