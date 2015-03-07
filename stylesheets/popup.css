@@ -1,0 +1,167 @@
+  body {
+    min-width:800px;
+    min-height:350px; 
+  }
+
+  #robot {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px; 
+  }
+
+  .bluekeywords {
+    color: blue;
+  }
+
+  #the-progress-bar {
+    display: none;
+    margin: 10px;
+    width: 90%;
+  }
+
+  #initiate {
+    outline:none;
+  }
+
+  #gtable {
+    width: 97%;
+  }
+
+  .keywords{
+    width: 15%;
+  }
+
+  .context {
+    width: 50%;
+  }
+
+  .message {
+    width: 35%;
+  }
+
+  #thecheckbox {
+    display: none;
+  }
+
+  .gamify {
+    position: absolute;
+    text-align: center;
+    left: 100%;
+    top: 5px;
+  }
+
+  #level {
+    left: 80%;
+    top: 20px;
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  #xp {
+    left: 90%;
+    top: 20px;
+    font-size: 12px;
+  }
+
+  #levelup {
+    display:none;
+    position:absolute;
+    font-size: 28px;
+    left: 35%;
+    top: 40%;
+    background-color: LightBlue;
+    padding: 50px;
+    border-radius: 10px;
+    font-family: Helvetica, Arial;
+    text-align: center;
+  }
+
+  #levelupp1 {
+    font-weight: bold;
+    font-size: 40px;
+  }
+
+  .changetext {
+    display: none;
+    width: 100%;
+    height: 300px;
+  }
+
+  .save {
+    display: none;
+  }
+
+  #portover {
+    display:none;
+    position:absolute;
+    left: 85%;
+    top: 20%;        
+  }
+
+  #rescan {
+    display:none;
+    position:absolute;
+    left: 72%;
+    top: 20%;        
+  }
+  
+  .custom_editor {
+    width: 350px;
+    height: 300px;
+  }
+
+  .import_note {
+    font-size: 12px;
+  }
+
+  .imagecredit {
+    font-size:9px;
+    position: absolute;
+    top: 90%;
+    left: 80%;
+  }
+
+  img.centered {
+    display: block;
+    margin-left: auto;
+    margin-right: auto 
+  }
+
+  .score {
+    text-align: center;
+  }
+
+  .recommendation {
+    text-align: right;
+    float: right;
+    margin-right: 50px;
+    margin-bottom: -10px;
+  }
+
+  .title {
+    display:inline; 
+    font-weight: bold;
+    margin: 5px;
+  }
+
+  .toggle_label {
+    padding: 4px;
+  }
+
+  .moveit:hover{
+    cursor: pointer;
+  }
+
+  .moveit-container {
+    border: solid rgb(240, 235, 235) 1px;
+    padding: 1px 1px 1px 1px;
+    text-align: center;
+    border-radius: 9px;
+    margin-top: 5px;
+    margin-bottom: -5px;
+  }
+
+  .match-entry {
+    margin-top: -5px;
+  }
