@@ -91,7 +91,7 @@
 
           <!--Loop through the profile.matches.matched array to display the message associated with the keywords-->
           <!--Also contains transition text span, which is determined in your options area. Only part of DOM when $index > 0-->
-          <p ng-hide="!((profile.matches.matched | filter:{checked: true}).length)" ng-repeat="match in profile.matches.matched | filter:{checked: true}"><span ng-if="$index > 0" class="transition_text">{{ $index === 1 ? keywords.first_transition + ' ' : keywords.second_transition + ' ' }}</span>{{match.message | adjustCapitalLetters : $index : keywords}}</p>
+          <p ng-hide="!((profile.matches.matched | filter:{checked: true}).length)" ng-repeat="match in profile.matches.matched | filter:{checked: true}"><span ng-if="$index != 0" class="transition_text">{{ $index === 1 ? keywords.first_transition + ' ' : keywords.second_transition + ' ' }}</span>{{match.message | adjustCapitalLetters : $index : keywords}}</p>
           
           <!--If there are no matches after all filters are applied, replace body text with a generic question-->
           <p ng-if="!((profile.matches.matched | filter:{checked: true}).length)">{{genericQuestion}}</p>

@@ -11,7 +11,7 @@ dbotExtApp.controller('ProfileController',
 		function processLineBreaks(text) {
 		    var final = text.replace(/\s*<p[^>]+">\s*/gi,""); //Filters out all P tags
 		    final = final.replace(/<\/?span[^>]*?"?>/gi,""); //Filters out all span tags
-            final = final.replace(/\n*(?:\s{2,})?<!--.*?-->\s*\n*/gi, ""); //Removes commented out HTML and arbitrary spacing from Angular, in a nongreedy fashion
+        final = final.replace(/\n*(?:\s{2,})?<!--.*?-->\s*\n*/gi, ""); //Removes commented out HTML and arbitrary spacing from Angular, in a nongreedy fashion
 		    final = final.replace(/\s*<br\s?\/?>\s*\n*<\/p>\n*\s*/gi, "\n\n");
 		    final = final.replace(/\s*<br\s?\/?>\s*/gi,"\n"); //Puts a line break for any <br> tag
 		    final = final.replace(/\s*<\/p>\s*/gi,"\n\n"); //Adds two lines breaks for any closing p tags
@@ -68,6 +68,7 @@ dbotExtApp.controller('ProfileController',
 					
 					//Returns an array of - in order - okcText, okcContext (for matched interests), the picture URL, and the jquery object
 					jqueryArr = ScraperData.turnIntoJquery(html);
+					
 
 					//Now, we test to see if the OKCText and username were found in the HTML. If not, we're not on a profile page. If yes, continue on
 					if (jqueryArr[0] && jqueryArr[1]) {
@@ -203,8 +204,10 @@ dbotExtApp.controller('ProfileController',
 			//If customized, $scope.customMessage from textarea is what's sent. Else, the standard .finalmessage div's contents are used
 			message = $scope.saveCustomized ? $scope.customMessage : processLineBreaks($('.finalmessage').html());
 
+			console.log(ScraperData.userId);
 			var portObj = {
-			  message: message
+			  message: message,
+			  userId: ScraperData.userId
 			};
 
 			//Send the message to the background script, and record the interaction if successful

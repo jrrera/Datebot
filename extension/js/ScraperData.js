@@ -1,5 +1,6 @@
 dbotExtApp.factory('ScraperData', function($http, $log, $q){
 	return {
+        userId: null,
 		getProfile: function($scope) {
 			console.log('Initalizing profile grab...');
 
@@ -58,11 +59,20 @@ dbotExtApp.factory('ScraperData', function($http, $log, $q){
 		},
 
 		turnIntoJquery: function(html) {
-			var htmlObj = $(html);
+
+            // jQuery was having errors trying to parse the full page. So we 
+            // extract the core part of the document, where the ID starts using
+            // page as a prefix. We close it off at the final div.
+            var coreDocumentArr = /<div id="page"(.|\n)*<\/div>/gi.exec(html);
+			var htmlObj = $(coreDocumentArr[0]);
 
 			var okcText = htmlObj.find("#main_column").text().toLowerCase();
 			var okcUserName = htmlObj.find('#basic_info_sn').text();
 			var okcPicture = htmlObj.find('#thumb0 img').attr('src');
+
+            // Get user ID and store on service to use for opening chat
+            // panel automatically
+            this.userId = htmlObj.find('#action_bar').data('userid'); 
 			return [okcText, okcUserName, okcPicture, htmlObj];
 		},
 

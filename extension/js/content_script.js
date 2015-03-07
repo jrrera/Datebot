@@ -6,22 +6,23 @@
 (function(){
     console.log('Datebot Extension script injected!');
 
-    function createScript(action) {
+    function createScript(action, userId) {
       //This function injects scripts into the OKC dom through the Content Script
       var scriptNode;
+      console.log('userId in content script', userId);
 
       if (action === "openWindow") {
         scriptNode = document.createElement('script');
 
         // Open the composer window for main composer and action composer
-        scriptNode.textContent = "ProfileMessage.focusCompose();";
+        scriptNode.textContent = "jQuery('#actions a').trigger('click');";
         document.body.appendChild(scriptNode);
 
       } else if (action === "sendMessage") {
         scriptNode = document.createElement('script');
 
         // Activate the method on the page for sending messages
-        scriptNode.textContent = "ProfileMessage.send('window'); console.log('Message sent');";  
+        scriptNode.textContent = "jQuery('.compose button').trigger('click'); console.log('Message sent');";  
         document.body.appendChild(scriptNode);
       }
     }
@@ -42,15 +43,16 @@
 
           // Open the window composer on OKC page
           setTimeout(function(){
-            createScript('openWindow');
+            createScript('openWindow', msg.userId);
           }, 500);
 
           // Next, we populate the container and send the message
           setTimeout(function(){
-            $('#action_message').val(msg.finalmessage.message);
-            $('#message_text').val(msg.finalmessage.message);  
-            createScript('sendMessage');
-          }, 1500);
+            console.log(msg);
+            console.log('the element we need', $('#message_' + msg.userId));
+            $('#message_' + msg.userId).val(msg.finalmessage);
+            createScript('sendMessage', msg.userId);
+          }, 4000);
 
           sendResponse({status:'success'});
         }

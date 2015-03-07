@@ -88,13 +88,18 @@
 
     if (msg.portover3) {
       var messageToPort = msg.portover3;
-      console.log('Processed message received', messageToPort);
+      var userId = msg.userId;
+      console.log('Processed message received', messageToPort.message, 'for user ID', messageToPort.userId);
 
       chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) { 
         var tabId = tabs[0].id;
+        var dataToPass = {
+          finalmessage: messageToPort.message,
+          userId: messageToPort.userId
+        };
                   
         //Send a request to the content script on the OKCupid page to scrape the HTML
-        chrome.tabs.sendMessage(tabId, {finalmessage: messageToPort},function(response){
+        chrome.tabs.sendMessage(tabId, dataToPass, function(response){
             //Upon response from content script, if it was a success, pass this info back to popup.
             if (response.status === 'success') {
                 console.log('Received success response from tab after message sent. Passing to popup...');
