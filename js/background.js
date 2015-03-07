@@ -29,7 +29,7 @@
     }, function(){
         chrome.tabs.query({}, function (tab){ //This is necessary to make sure the page fully loads in the browser before the message is sent
           for(var i =0; i < tab.length; i++) {
-            if (tab[i].url === "chrome-extension://" + extId + "/options/interests.html") {
+            if (tab[i].url === "chrome-extension://" + extId + "/components/options/interests.html") {
               console.log("Looks like the page has loaded. Sending the message!");
               sendKeywordMessage(info.selectionText); //Recursive function that sends the message until response is received
               break;
