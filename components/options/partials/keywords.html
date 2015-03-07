@@ -1,12 +1,9 @@
-<div class="navbar">
-	<a style="margin-left:0px;" class="brand">Datebot</a>
-	<div class="navbar-inner">
-		<ul class="nav">
-			<li class="active"><a href="#/">Interests</a></li>
-			<li><a href="#/analytics">Analytics</a></li>
-		</ul>
-	</div>
-</div>
+<ul class="nav nav-pills">
+	<a class="navbar-brand">Datebot</a>
+  <li class="active"><a href="#/">Interests</a></li>
+	<li><a href="#/analytics">Analytics</a></li>
+
+</ul>
 
 <div>
 <h1>Interest Management</h1><br />
@@ -30,26 +27,27 @@
 <br />
 <button class="btn btn-primary" ng-click="save()">Save</button>
 <button class="btn" ng-click="cancelEdit()">Undo</button>
-<br /><br />			
+<br /><br />		
+
 <div class="row">
-	<div class="span5">
+	<div class="col-md-5">
 		<strong>Opener:</strong><br />
 		<textarea class="openclose" placeholder="Write your opener here" ng-model="keyword.opener"></textarea>
 	</div>
-	<div class="span5">
+	<div class="col-md-5">
 		<strong>Closer:</strong><br />
 		<textarea class="openclose" placeholder="Write your closer here" ng-model="keyword.closer"></textarea>
 	</div>
-	<div style="position:absolute; left:75%;">
+	<div style="float: right;">
 		<img src="../../img/Thomas-Hello128.png" width="150px" />
 	</div>
 </div>
 <div class="row">
-	<div class="span5">
+	<div class="col-md-5">
 		<strong>First Transition:</strong> <br />
 		<textarea class="transition" placeholder="Write your first transition here. (ex: 'Also,')" ng-model="keyword.first_transition"></textarea>
 	</div>
-	<div class="span5">
+	<div class="col-md-5">
 		<strong>Second Transition:</strong> <br />
 		<textarea class="transition" placeholder="Write your second transition here. (ex: 'Oh, and')" ng-model="keyword.second_transition"></textarea>
 	</div>
@@ -60,36 +58,18 @@
 <h5>Here, you can download a history of past interactions for analysis, and export/import your interests and associated messages.</h5>
 <br />
 <div class="row">
-	<div class="span3">
+	<div class="col-md-3">
 		<a style="color:white;" href="{{interactionExportUrl}}" download="dbot_history_export"><button ng-disabled="!exportTurnOn" id="history_exporter" class="btn btn-primary">Export Past Interactions</button></a>
 	</div>
-	<div class="span2">
+	<div class="col-md-2">
 		<a style="color:white;" href="{{exportUrl}}" download="dbot_export"><button ng-disabled="!exportTurnOn" id="exporter" class="btn btn-primary">Export Interests</button></a>
 	</div>
-	<div class="span2">	
+	<div class="col-md-2">	
 		<button class="btn" ng-click="importOn = !importOn">Import Interests</button>
 	</div>
 </div>
+
 <br />
-<hr />
-<h3>Interests and Talking Points</h3>
-
-<h5>You have {{ keywordLength }} interests in the database. Only {{100 - keywordLength}} to go before you hit the goal of 100!</h5>
-<div class="progress progress-striped active">
-	<div class="bar" style="width: {{ keywordLength }}%">{{ keywordLength }}%</div>
-</div>
-<div class="row">
-	<div class="span1">	
-		<button class="btn btn-primary" ng-click="save()">Save</button>
-	</div>	
-	<div class="span1">
-		<button class="btn" ng-click="addRow()"> Add </button>
-	</div>
-	<div class="span1">	
-		<button class="btn" ng-click="cancelEdit()">Undo</button>
-	</div>
-
-</div>
 
 <!-- Begin import options-->
 <div class="import_options" ng-show="importOn">
@@ -104,20 +84,40 @@
 </div>
 <!-- End import options-->
 
+<hr />
+<h3>Interests and Talking Points</h3>
+
+<h5>You have {{ keywordLength }} interests in the database. Only {{100 - keywordLength}} to go before you hit the goal of 100!</h5>
+<div class="progress progress-striped active">
+	<div class="bar" style="width: {{ keywordLength }}%">{{ keywordLength }}%</div>
+</div>
+<div class="row">
+	<div class="col-md-1">	
+		<button class="btn btn-primary" ng-click="save()">Save</button>
+	</div>	
+	<div class="col-md-1">
+		<button class="btn" ng-click="addRow()"> Add </button>
+	</div>
+	<div class="col-md-1">	
+		<button class="btn" ng-click="cancelEdit()">Undo</button>
+	</div>
+
+</div>
+
 <br />
 
 <!--Begin keyword list-->
-<ul class="thumbnails">
-	<li ng-repeat="pair in keyword.pairs | orderBy: sortorder">
-		<div class="row session">
-			<div class="span3">
+<ul class="list-unstyled">
+	<li ng-repeat="pair in keyword.pairs | orderBy: sortorder" style="margin-bottom: 20px;">
+		<div class="row">
+			<div class="col-md-3">
 				<!-- <i class="icon-exclamation-sign" ng-show="recommendation()"></i> -->
-				<input type="text" name="{{pair.keyword}}" ng-model="pair.keyword" placeholder="Interest/keyword goes here" required /><br />
-				<span style="display:inline; margin-left:25%;">Priority (1-3):</span> <input class="keyword_priority" ng-model="pair.priority" placeholder="?" />
+				<input type="text" class="form-control" name="{{pair.keyword}}" ng-model="pair.keyword" placeholder="Interest/keyword goes here" required />
+				<span>Priority <small>(1 is highest, 3 lowest)</small>:</span> <input class="keyword_priority" ng-model="pair.priority" placeholder="?" />
 
 			</div>
-			<div class="span7">
-				<textarea class="message" ng-model="pair.message" placeholder="Message goes here" required></textarea>
+			<div class="col-md-7">
+				<textarea class="message form-control" ng-model="pair.message" placeholder="Message goes here" required></textarea>
 			</div>
 			<div class="deletekeyword">
 				<button class="btn btn-small" ng-click="deleteRow($index)">Delete</button>

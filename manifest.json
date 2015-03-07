@@ -14,7 +14,7 @@
     "128":"img/Thomas-Hello128.png"
   },
   "content_security_policy": "script-src 'self' 'unsafe-eval' https://www.google.com; object-src 'self'",
-  "description": "People write long profiles. Don't spend a long time reading them.",
+  "description": "Reading dozens of profiles is exhausting. Datebot helps you find matches faster.",
   "background": {"scripts":["js/background.js"]},
   "options_page": "components/options/interests.html",
   "browser_action": {
@@ -24,7 +24,7 @@
     "default_popup": "popup.html"
   },
   "content_scripts": [ {
-    "js": [ "js/lib/jquery.min.js", "js/content_script.js" ],
+    "js": [ "bower_components/jquery/dist/jquery.min.js", "js/content_script.js" ],
     "matches": [ "http://www.okcupid.com/*", "https://www.okcupid.com/*"]
   }]
 }
