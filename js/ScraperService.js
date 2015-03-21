@@ -139,7 +139,7 @@ ScraperService.prototype.findSimilarities = function(profile, keywords, context)
 	var finalKeywords = this.textProcessorService.extractMatchedKeywords(
       profile, desiredKeywords, desiredPriority, finalKeywordPriority);
 
-	finalContext = this.textProcessorService.extractContext(
+	var finalContext = this.textProcessorService.extractContext(
         profile, desiredKeywords, context);
 
 	for (var i = 0; i < finalKeywords.length; i++) {

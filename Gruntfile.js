@@ -154,11 +154,12 @@ module.exports = function(grunt) {
       // Grab file references
       tempManifestObj = require('./build/manifest.json');
       contentScripts = tempManifestObj.content_scripts[0];
-      backgroundScripts = tempManifestObj.background.scripts;
+      backgroundObj = tempManifestObj.background;
 
       // Update file references
+      tempManifestObj.name = tempManifestObj.name.replace(/\s*DEBUG\s*/i, '');
       contentScripts.js = ['js/jquery.min.js', 'js/content_script.min.js'];
-      backgroundScripts = ['js/background.min.js'];
+      backgroundObj.scripts = ['js/background.min.js'];
 
       // Write file
       fs.writeFileSync(projectFile, JSON.stringify(tempManifestObj,null,2));
