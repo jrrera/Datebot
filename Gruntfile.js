@@ -22,6 +22,7 @@ module.exports = function(grunt) {
       js: {
         files:{
           '.tmp/concat/js/app.min.js': '.tmp/concat/js/app.min.js',
+          '.tmp/concat/js/options.min.js': '.tmp/concat/js/options.min.js',
         }
       },
     },
@@ -46,6 +47,10 @@ module.exports = function(grunt) {
         src: 'popup.html',
         dest: 'build/',
       },
+      optionsPage: {
+        src: 'components/options/interests.html',
+        dest: 'build/',
+      },
       manifest: {
         src: 'manifest.json',
         dest: 'build/',
@@ -53,14 +58,14 @@ module.exports = function(grunt) {
       contentscripts: {
         cwd: 'bower_components/jquery/dist/',
         expand: true,
-        src: 'jquery.min.js', // for injection.
-        dest: 'build/'
+        src: 'jquery.min.js', // for content script injection.
+        dest: 'build/js'
       }
     },
 
     watch: {
       js: {
-        tasks: ['jshint'], // Eventually, make a debug version for this
+        tasks: ['js-debug'],
         files: ['js/**/*.js']
       },
 
@@ -79,16 +84,31 @@ module.exports = function(grunt) {
 
     // Sets up its own concat and uglify tasks.
     useminPrepare: {
-      html: 'popup.html',
-      options: {
-        dest: 'build'
+      popup: {
+        files: {src: ['popup.html']},
+        options: {
+          dest: 'build',
+          type: 'html'
+        }
+      },
+      optionsPage: {
+        files: {src: ['components/options/interests.html']},
+        options: {
+          dest: 'build/components/options',
+          type: 'html'
+        }
       }
-    },
+    },    
 
     usemin: {
-      html: 'build/popup.html',
+      popup: {
+        files: {src: ['build/popup.html',
+                      'build/components/options/interests.html']},
+        options: {
+          type: 'html'
+        }
+      }
     },
-
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -101,6 +121,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-ng-annotate');
   grunt.loadNpmTasks('grunt-usemin');
 
+  // Custom tasks.
   grunt.registerTask('update-manifest', function (key, value) {
       var projectFile = "./build/manifest.json",
           tempManifestObj,
@@ -118,13 +139,14 @@ module.exports = function(grunt) {
       backgroundScripts = tempManifestObj.background.scripts;
 
       // Update file references
-      contentScripts.js = ['jquery.min.js', 'js/content_script.min.js'];
+      contentScripts.js = ['js/jquery.min.js', 'js/content_script.min.js'];
       backgroundScripts = ['js/background.min.js'];
 
       // Write file
       fs.writeFileSync(projectFile, JSON.stringify(tempManifestObj,null,2));
   });
 
+  // Task workflows.
   grunt.registerTask('js-debug', ['jshint']);
   grunt.registerTask('js-release', ['js-debug', 'concat', 'ngAnnotate', 'uglify']);
 
