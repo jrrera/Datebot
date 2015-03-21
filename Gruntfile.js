@@ -5,16 +5,21 @@ module.exports = function(grunt) {
     jshint: ['Gruntfile.js'],  // Testing out on gruntfile. Replace w/ js folder
 
     sass: {
-      dist: {
+      options: {
+        cacheLocation: 'stylesheets/.sass-cache',
+      },
+      release: {
         files: {
           'build/css/popup.css': 'stylesheets/popup.scss',
           'build/css/style.css': 'stylesheets/style.scss',
-          'stylesheets/popup.css': 'stylesheets/popup.scss', // Delete once fully migrated to build/css/ for deployment
-          'stylesheets/style.css': 'stylesheets/style.scss', // Delete once fully migrated to build/css/ for deployment
-        },
-        options: {
-	        cacheLocation: 'stylesheets/.sass-cache',
-	      }
+        } 
+      },
+      debug: {
+        files: {
+          'temp/popup.css': 'stylesheets/popup.scss',
+          'temp/style.css': 'stylesheets/style.scss',
+          'temp/options.css': 'components/options/css/options.scss',
+        } 
       }
     },
 
@@ -39,7 +44,7 @@ module.exports = function(grunt) {
     clean: {
       build: 'build/',
       temp: 'temp/',
-      css: 'stylesheets/*.css*'  // Can remove once fully migrated over to build/ for deployment.
+      temp2: '.tmp',
     },
 
     copy: {
@@ -47,8 +52,9 @@ module.exports = function(grunt) {
         src: 'popup.html',
         dest: 'build/',
       },
-      optionsPage: {
-        src: 'components/options/interests.html',
+      components: {
+        expand: true,
+        src: ['components/**/*.html'],
         dest: 'build/',
       },
       manifest: {
@@ -60,6 +66,16 @@ module.exports = function(grunt) {
         expand: true,
         src: 'jquery.min.js', // for content script injection.
         dest: 'build/js'
+      }
+    },
+
+    imagemin: {                          
+      imgdir: {                         
+        files: [{
+          expand: true,                 
+          src: ['img/*.{png,jpg,gif}'],   
+          dest: 'build/'                  
+        }]
       }
     },
 
@@ -111,12 +127,14 @@ module.exports = function(grunt) {
     },
   });
 
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-imagemin');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-sass');
-  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-ng-annotate');
   grunt.loadNpmTasks('grunt-usemin');
@@ -150,11 +168,14 @@ module.exports = function(grunt) {
   grunt.registerTask('js-debug', ['jshint']);
   grunt.registerTask('js-release', ['js-debug', 'concat', 'ngAnnotate', 'uglify']);
 
-  grunt.registerTask('css-debug', ['sass']);
+  grunt.registerTask('css-debug', ['sass:debug']);
+  grunt.registerTask('css-release', ['sass:release', 'cssmin']);
 
   grunt.registerTask('build', [ 'clean',
                                 'useminPrepare',
                                 'js-release',
+                                'css-release',
+                                'imagemin',
                                 'copy',
                                 'usemin',
                                 'update-manifest'
