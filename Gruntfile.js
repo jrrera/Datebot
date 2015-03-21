@@ -169,7 +169,7 @@ module.exports = function(grunt) {
   grunt.registerTask('js-release', ['js-debug', 'concat', 'ngAnnotate', 'uglify']);
 
   grunt.registerTask('css-debug', ['sass:debug']);
-  grunt.registerTask('css-release', ['sass:release', 'cssmin']);
+  grunt.registerTask('css-release', ['sass', 'cssmin']);
 
   grunt.registerTask('build', [ 'clean',
                                 'useminPrepare',
