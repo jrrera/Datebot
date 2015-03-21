@@ -93,7 +93,7 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 		},
 
 		checkForExistingKeywords: function(keyword, pairs) {
-		  pattern = new RegExp("^" + keyword + "$", "i"),
+		  var pattern = new RegExp("^" + keyword + "$", "i"),
 		  match = false;
 		
 		  for (var i = 0; i < pairs.length; i++) {

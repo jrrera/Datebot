@@ -149,7 +149,7 @@ ScraperService.prototype.findSimilarities = function(profile, keywords, context)
 	  }
 	}
 
-	finalResult = {
+	var finalResult = {
 		opener: keywords.opener.replace("\n", "<br />"),
 		closer: keywords.closer.replace("\n", "<br />"),
 		first_transition: keywords.first_transition,

@@ -172,7 +172,8 @@ module.exports = function(grunt) {
   grunt.registerTask('css-debug', ['sass:debug']);
   grunt.registerTask('css-release', ['sass', 'cssmin']);
 
-  grunt.registerTask('build', [ 'clean',
+  grunt.registerTask('build', [ 'clean:build',
+                                'clean:temp2',
                                 'useminPrepare',
                                 'js-release',
                                 'css-release',
