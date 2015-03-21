@@ -1,3 +1,4 @@
+fs = require('fs');
 module.exports = function(grunt) {
   grunt.initConfig({
 
@@ -100,19 +101,28 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-ng-annotate');
   grunt.loadNpmTasks('grunt-usemin');
 
-  grunt.registerTask('update-manifest-json', function (key, value) {
-      var projectFile = "build/manifest.json",
-          project;
+  grunt.registerTask('update-manifest', function (key, value) {
+      var projectFile = "./build/manifest.json",
+          tempManifestObj,
+          contentScripts,
+          backgroundScripts;
 
       if (!grunt.file.exists(projectFile)) {
           grunt.log.error("file " + projectFile + " not found");
           return false;  // Abort.
       }
-      project = grunt.file.readJSON(projectFile);
-      project[key]= value;
 
-      // Serialize it back to file.
-      grunt.file.write(projectFile, JSON.stringify(project, null, 2));
+      // Grab file references
+      tempManifestObj = require('./build/manifest.json');
+      contentScripts = tempManifestObj.content_scripts[0];
+      backgroundScripts = tempManifestObj.background.scripts;
+
+      // Update file references
+      contentScripts.js = ['jquery.min.js', 'js/content_script.min.js'];
+      backgroundScripts = ['js/background.min.js'];
+
+      // Write file
+      fs.writeFileSync(projectFile, JSON.stringify(tempManifestObj,null,2));
   });
 
   grunt.registerTask('js-debug', ['jshint']);
@@ -125,7 +135,7 @@ module.exports = function(grunt) {
                                 'js-release',
                                 'copy',
                                 'usemin',
-                                'update-manifest-json':
+                                'update-manifest'
                               ]);
   grunt.registerTask('default', ['build']);
 };

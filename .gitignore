@@ -1,7 +1,7 @@
 bower_components/
 .sass-cache/
+.tmp/
 node_modules/
 build/
-
 .DS_Store
 js/.DS_Store
