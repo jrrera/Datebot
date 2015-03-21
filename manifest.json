@@ -15,7 +15,9 @@
   },
   "content_security_policy": "script-src 'self' 'unsafe-eval' https://www.google.com; object-src 'self'",
   "description": "Reading dozens of profiles is exhausting. Datebot helps you find matches faster.",
-  "background": {"scripts":["js/background.js"]},
+  "background": {
+    "scripts":["js/background.js"]
+  },
   "options_page": "components/options/interests.html",
   "browser_action": {
     "name": "Let's read some profiles",
