@@ -1,3 +1,8 @@
-bower_components/*
+bower_components/
+.sass-cache/
+.tmp/
+temp/
+node_modules/
+build/
 .DS_Store
 js/.DS_Store
