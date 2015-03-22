@@ -7,6 +7,7 @@ function TextProcessorService() {}
 angular.module('datebot').service(
     'TextProcessorService', TextProcessorService);
 
+
 /**
  * Function that runs text through a series of Regex patterns designed to
  * convert HTML and comments into plain text.
@@ -30,6 +31,7 @@ TextProcessorService.prototype.processLineBreaks = function(text) {
   return final;
 };
 
+
 /**
  * @param {string} keyword Keyword to match to in essay.
  * @param {Array.<string>} essays List of essays to process.
@@ -52,11 +54,16 @@ TextProcessorService.prototype.findEssayTitle = function(keyword, essays) {
     return "<strong>Unknown</strong><br />"; //If all else fails, return this
 };
 
+
 /**
-* Removes a series of profile filler text snippets we don't want to analyze.
-*/
+ * Removes a series of profile filler text snippets we don't want to analyze.
+ * In particular, removes the built-in OKC text headers, changes problematic 
+ * double quotation marks to singles, and removes unnecessary spacing. 
+ *
+ * @param {profile} string Raw string of profile HTML to process.
+ * @return {string} textUpdate Profile HTML post-processing.
+ */
 TextProcessorService.prototype.processProfileText = function(profile) {
-  //This function removes the built-in OKC text headers, changes problematic double quotation marks to singles, and removes unnecessary spacing. 
   var replace1 = "my self-summary";
   var replace2 = "what i\u2019m doing with my life";
   var replace3 = "the first things people usually notice about me";
@@ -69,7 +76,8 @@ TextProcessorService.prototype.processProfileText = function(profile) {
   var replace10 = new RegExp('"', "g");
   var replace11 = "            ";
 
-  var findreplace = [replace1,replace2,replace3,replace4,replace5,replace6,replace7,replace8,replace9,replace11];
+  var findreplace = [ replace1,replace2,replace3,replace4,replace5,replace6,
+                      replace7,replace8,replace9,replace11 ];
   
   var textUpdate = profile;
   for (var i = 0; i < findreplace.length; i++) {
@@ -82,19 +90,28 @@ TextProcessorService.prototype.processProfileText = function(profile) {
 };
 
 
+/**
+ * Generates objects that contain the name of the essay and the written text
+ * within that essay based on OKCupid's dom structure.
+ * 
+ * @param {JQuery} htmlObj The jQuery-wrapped HTML from the profile page.
+ * @return {Array.<Object>} contextArr List of objects containing essay info.
+ */
 TextProcessorService.prototype.processContext = function(htmlObj){
-  var contextArr = [], name, essay, finalEssay;
+  var contextArr = [], 
+      contextObj,
+      name, 
+      essay;
   
   for (var i = 0; i < 9; i++) {
-    var contextObj = {};
 
     name = htmlObj.find('#essay_'+i+'> a').text();
     essay = htmlObj.find('#essay_text_'+i).text();
+    essay = essay.replace(/\n/gi," ");
 
-    finalEssay = essay.replace(/\n/gi," ");
-
+    contextObj = {};
     contextObj.name = name;
-    contextObj.essay = finalEssay;
+    contextObj.essay = essay;
 
     contextArr.push(contextObj);
   }
@@ -104,72 +121,92 @@ TextProcessorService.prototype.processContext = function(htmlObj){
 
 
 /**
- * Extracts context snippets from essays for display in front end.
+ * Extracts context snippets from essays for display in front end. 
+ * In particular, receives a list of keywords and essays, and pulls a snippet 
+ * of text from each essay surrounding the matched keyword. 
+ *
+ * @param {string} profile The extracted profile text as a raw string.
+ * @param {!Object} keywords The keywords you and the match have in common.
+ * @param {Array.<Object>} essays Essay titles and descriptions.
+ * @return {Array} contextArr List containing the snippets of context.
  */ 
-TextProcessorService.prototype.extractContext = function(response, keywords, essays) {
-  // Receives a list of keywords and essays, and pulls a snippet of text from 
-  // each essay surrounding the matched keyword. 
-  // Returns an array containing the snippets of context
-  var contextArr = [], findKeyword, essayTitle, final;
+TextProcessorService.prototype.extractContext = function(profile, keywords, essays) {
+  
+  var contextArr = [], 
+      findKeyword, 
+      essayTitle, 
+      contextGrabber,
+      essayTitleWithContext;
   
   for (var i = 0; i < keywords.length; i++) {
     findKeyword = new RegExp('([^a-zA-Z]|\\n|\\r|\\r\\n)' + keywords[i] + '([^a-zA-Z]|\\n|\\r|\\r\\n)', 'g');
 
-    if (response.search(findKeyword) != -1) {
+    if (profile.search(findKeyword) != -1) {
 
       essayTitle = this.findEssayTitle(keywords[i], essays);
-
-      var contextGrabber = response.match(new RegExp('\\S{0,10}(\\n|.){0,50}([^a-zA-Z]|\\n|\\r|\\r\\n)' + keywords[i] + '([^a-zA-Z]|\\n|\\r|\\r\\n)(\\n|.){0,50}\\S{0,10}', 'g')); //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
+      contextGrabber = profile.match(new RegExp('\\S{0,10}(\\n|.){0,50}([^a-zA-Z]|\\n|\\r|\\r\\n)' + keywords[i] + '([^a-zA-Z]|\\n|\\r|\\r\\n)(\\n|.){0,50}\\S{0,10}', 'g')); //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
       
-      final = essayTitle + contextGrabber[0];
-      contextArr.push(final);
+      essayTitleWithContext = essayTitle + contextGrabber[0];
+      contextArr.push(essayTitleWithContext);
     }
   } 
   return contextArr;
 };
 
+
 /**
  * A processor function that highlights the keyword in the context paragraph 
- * for easier reference
+ * blue for easier reference.
+ * @param {string} keyword The topic of interest between you and the match.
+ * @param {string} context The profile snippet containing the keywords.
+ * @param {string} processedContext Same snippet with HTML added for coloring.
  */
 TextProcessorService.prototype.highlightMatches = function(keyword, context) {
   //The RegEx that looks for the keyword with a non-letter char on either side.
   var keywordReg = new RegExp('[^a-zA-Z]' + keyword + '[^a-zA-Z]', 'g'); 
 
   //Replace the keyword in the context with the keyword wrapped in span tags 
-  return context = context.replace(
+  return context.replace(
       keywordReg, 
       '<span class="bluekeywords">' + keywordReg.exec(context) + '</span>'); 
 };
 
 
 /**
- * Returns any array of matched keywords by looking through the HTML of the page
+ * Returns any array of matched keywords by looking through HTML of the page.
  * TODO(jon): This function needs some serious refactoring. It's modifying
  *   arrays from the caller in place. Tsk tsk.
  */
-TextProcessorService.prototype.extractMatchedKeywords = function(response, keywords, desiredPriorityArr, finalKeywordPriorityArr) {
-    var matchedKeywords = [], findKeyword;
-    
-    for (var i = 0; i < keywords.length; i++) {
-      findKeyword = new RegExp('[^a-zA-Z]' + keywords[i] + '[^a-zA-Z]', 'g');
-      if (response.search(findKeyword) != -1) {
-        matchedKeywords.push(keywords[i]);
-        finalKeywordPriorityArr.push(desiredPriorityArr[i]);
-      }
-    } 
-    return matchedKeywords;
+TextProcessorService.prototype.extractMatchedKeywords = 
+    function(response, keywords, desiredPriorityArr, finalKeywordPriorityArr) {
+  var matchedKeywords = [], findKeyword;
+  
+  for (var i = 0; i < keywords.length; i++) {
+    findKeyword = new RegExp('[^a-zA-Z]' + keywords[i] + '[^a-zA-Z]', 'g');
+    if (response.search(findKeyword) != -1) {
+      matchedKeywords.push(keywords[i]);
+      finalKeywordPriorityArr.push(desiredPriorityArr[i]);
+    }
+  } 
+  return matchedKeywords;
 }; 
 
-
+/**
+ * Takes all matched interests and sorts them by your chosen priority to help
+ * better calculate how good of a match the current profile is.
+ */
 TextProcessorService.prototype.determineTopKeywords = function(matchObj) {
-    var checkedCount = 0, //Keeps track of checked keyword count
-      prioritiesObj = {
+    var checkedCount = 0; // Keeps track of checked keyword count.
+
+    // Container for priority sorting if we didn't find enough top priority 
+    // keywords (i.e. priority of 1).
+    var prioritiesObj = {
         'priorityTwo' : [],
         'priorityThree' : []
-      }; //Container for priority sorting if we didn't find enough top priority keywords (i.e. priority of 1)
+      }; 
 
     console.log('matchObj', matchObj.matched);
+
     //Put each match in the appropriate category
     $.each(matchObj.matched, function(i, match){
       if (checkedCount < 2) {
@@ -190,7 +227,8 @@ TextProcessorService.prototype.determineTopKeywords = function(matchObj) {
     if (checkedCount >= 2) return matchObj;  //If we met our quota, return
 
 
-    //If we processed all keywords and still haven't found two top priority keywords, run through priority 2 and 3 list
+    // If we processed all keywords and still haven't found two top priority 
+    // keywords, run through priority 2 and 3 list.
     if (prioritiesObj.priorityTwo) {
       $.each(prioritiesObj.priorityTwo, function(i, match){
         if (checkedCount < 2) {
