@@ -2,30 +2,52 @@
  * @constructor
  * @ngInject
  */ 
-function ScraperService($q, TextProcessorService) {
-    /**
-     * @type {angular.$q}
-     */ 
+function ScraperService($q, $window, TextProcessorService) {
+  /**
+   * @type {angular.$q}
+   */ 
   this.q_ = $q;
+
+  /**
+   * @type {Window}
+   */ 
+  this.window_ = $window;
 
   this.textProcessorService = TextProcessorService;
 
-  /** @type {?string} */
+  /** 
+   * @type {?string=} 
+   */
   this.userId = null;
 }
 
+// Register the service.
 angular.module('datebot').service('ScraperService', ScraperService);  
 
+/**
+ * Kicks off async Chrome background script requests to scape data off the
+ * current OKCupid profile page.
+ * 
+ * @return {Promise.<Object, string>} Returns HTML in an obj if successful, 
+ *     or a string if rejected.
+ */
 ScraperService.prototype.getProfile = function() {
 	console.log('Initalizing profile grab...');
 
 	var deferred = this.q_.defer(); //$q service uses async promises so you're not nesting callbacks on callbacks on callbacks
 
-    //First, we send a runtime message to the background script. Then, we add a listener for the result back the content and background scripts. 
-    window.chrome.runtime.sendMessage({method:"triggerScript"},function(response){});
+    // First, we send a runtime message to the background script. Then, we add
+    // a listener for the result back the content and background scripts. 
+    // We don't do anything with the response, but pass in a function anyway
+    // for the API's requirements.
+    // TODO(jon): Update this code flow to work within the callback.
+    this.window_.chrome.runtime.sendMessage({
+      method:"triggerScript"
+    },function(){});
     
-    //Then, we listen for a response. If the msg object has an HTML property, we're in businesss
-    window.chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {		        
+    // Then, we listen for a response. If the msg object has an HTML property, 
+    // we're in businesss
+    this.window_.chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {		        
       if (msg.html) {
       	if (!msg.html.length) {
     			deferred.reject('Error! There was nothing returned in msg.html!');
@@ -42,12 +64,20 @@ ScraperService.prototype.getProfile = function() {
 	return deferred.promise;			
 };
 
-
+/**
+ * Takes a raw HTML string and parses it to determine:
+ *   a. Profile text
+ *   b. Username
+ *   c. The img src of the profile picture
+ * TODO(jon): Refactor this to return an object.
+ * 
+ * @return {Array.<string>} profileArray Array of profile info,
+ */
 ScraperService.prototype.turnIntoJquery = function(html) {
 
   // jQuery was having errors trying to parse the full page. So we 
   // extract the core part of the document, where the ID starts using
-  // page as a prefix. We close it off at the final div.
+  // "page" as a prefix. We close it off at the final div.
   var coreDocumentArr = /<div id="page"(.|\n)*<\/div>/gi.exec(html);
 	var htmlObj = $(coreDocumentArr[0]);
 
@@ -55,13 +85,18 @@ ScraperService.prototype.turnIntoJquery = function(html) {
 	var okcUserName = htmlObj.find('#basic_info_sn').text();
 	var okcPicture = htmlObj.find('#thumb0 img').attr('src');
 
-  // Get user ID and store on service to use for opening chat
-  // panel automatically
+  // Get user ID and store on service to use for opening chat panel later.
+  // TODO(jon): Consider registering this with a MessageSender service.
   this.userId = htmlObj.find('#action_bar').data('userid'); 
 	return [okcText, okcUserName, okcPicture, htmlObj];
 };
 
-
+/**
+ * Attempts to grab your saved keywords from localStorage. Holds on to defaults 
+ * to give you if no saved data is found. 
+ * 
+ * @return {!Object} dbotKeywords Keywords that datebot uses to suggest msgs.
+ */
 ScraperService.prototype.getKeywords = function() {
 	var deferred = this.q_.defer();
 
@@ -119,7 +154,15 @@ ScraperService.prototype.getKeywords = function() {
 	return deferred.promise;
 };
 
-
+/**
+ * Takes in a profile, your keywords, and the context for the keywords and 
+ * finds similarities between you and the person whose profile you're viewing.
+ * @param {string} profile The extracted profile text as a raw string.
+ * @param {!Object} keywords The keywords Datebot uses to find mutual interests.
+ * @param {JQuery} context A jQuery object of the HTML of the page.
+ * @return {Array.<Object>} finalResult An array of objects representing a
+ *     matched commonality (e.g. fishing).
+ */
 ScraperService.prototype.findSimilarities = function(profile, keywords, context) {
 
 	//Begin processing the data by sorting in the appropriate array
