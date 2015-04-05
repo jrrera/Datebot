@@ -69,8 +69,8 @@ ScraperService.prototype.getProfile = function() {
  *   a. Profile text
  *   b. Username
  *   c. The img src of the profile picture
- * TODO(jon): Refactor this to return an object.
- * 
+ *
+ * @param {string} html  
  * @return {Array.<string>} profileArray Array of profile info,
  */
 ScraperService.prototype.turnIntoJquery = function(html) {
@@ -88,7 +88,13 @@ ScraperService.prototype.turnIntoJquery = function(html) {
   // Get user ID and store on service to use for opening chat panel later.
   // TODO(jon): Consider registering this with a MessageSender service.
   this.userId = htmlObj.find('#action_bar').data('userid'); 
-	return [okcText, okcUserName, okcPicture, htmlObj];
+
+	return { 
+    'profileText': okcText, 
+    'user': okcUserName, 
+    'pictureUrl': okcPicture, 
+    'html': htmlObj 
+  };
 };
 
 /**
@@ -153,76 +159,3 @@ ScraperService.prototype.getKeywords = function() {
 		
 	return deferred.promise;
 };
-
-/**
- * Takes in a profile, your keywords, and the context for the keywords and 
- * finds similarities between you and the person whose profile you're viewing.
- * @param {string} profile The extracted profile text as a raw string.
- * @param {!Object} keywords The keywords Datebot uses to find mutual interests.
- * @param {JQuery} context A jQuery object of the HTML of the page.
- * @return {Array.<Object>} finalResult An array of objects representing a
- *     matched commonality (e.g. fishing).
- */
-ScraperService.prototype.findSimilarities = function(profile, keywords, context) {
-
-	//Begin processing the data by sorting in the appropriate array
-	var desiredKeywords = [], 
-        desiredMessage = [], 
-        desiredPriority =[], 
-        finalKeywordPriority = [], 
-        finalMessage = [];
-
-	//Put the desiredKeywords in one array, and the related message in another array.
-	for (var i = 0; i < keywords.pairs.length; i++) {
-	  desiredKeywords.push(keywords.pairs[i].keyword);
-	  desiredMessage.push(keywords.pairs[i].message);
-	  desiredPriority.push(keywords.pairs[i].priority);
-	}
-
-	var finalKeywords = this.textProcessorService.extractMatchedKeywords(
-      profile, desiredKeywords, desiredPriority, finalKeywordPriority);
-
-	var finalContext = this.textProcessorService.extractContext(
-        profile, desiredKeywords, context);
-
-	for (var i = 0; i < finalKeywords.length; i++) {
-	  if (desiredKeywords.indexOf(finalKeywords[i]) != -1) {
-	    var index = desiredKeywords.indexOf(finalKeywords[i]);
-	    finalMessage.push(desiredMessage[index]);  
-	  }
-	}
-
-	var finalResult = {
-		opener: keywords.opener.replace("\n", "<br />"),
-		closer: keywords.closer.replace("\n", "<br />"),
-		first_transition: keywords.first_transition,
-		second_transition: keywords.second_transition
-	};
-
-	finalResult.matched = [];
-
-	for (var i = 0; i < finalKeywords.length; i++) {
-		var oneMatchObj = {};
-
-		oneMatchObj.keyword = finalKeywords[i];
-
-    // highlightMatches will turn the matched keyword blue
-		oneMatchObj.context = this.textProcessorService.highlightMatches(
-        finalKeywords[i], finalContext[i]); 
-		oneMatchObj.message = finalMessage[i];
-		oneMatchObj.priority = finalKeywordPriority[i];
-
-	  finalResult.matched.push(oneMatchObj);
-	}
-	
-	console.log('finalResult', finalResult);
-
-	// Before returning, we run the finalResult through a function that checks the highest priority 
-	// keywords and flips on the checked attribute flag if it's a high priority keyword
-	this.textProcessorService.determineTopKeywords(finalResult); 
-	return finalResult;
-};
-
-
-
-

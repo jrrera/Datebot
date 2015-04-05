@@ -9,49 +9,78 @@ angular.module('datebot').service(
 
 
 /**
+ * Main function exposed to controller to convert scraped HTML to Datebot
+ * analysis.
+ *
+ * @param {Object} htmlDataObj Data extracted from profile page, preprocessed.
+ * @param {Object} keywordData Local keyword data to match again the profile.
+ * @return {Object} matchObject Object with data to render on the DOM.
+ */ 
+TextProcessorService.prototype.convertHtmlDataToProfile = 
+    function(htmlDataObj, keywordData) {
+  var profileText = this.replaceGenericProfileText(htmlDataObj.profileText), 
+      contextData = this.processContext(htmlDataObj.html),
+      matchData = this.findSimilarities(
+                      htmlDataObj.profileText, keywordData, contextData);
+  
+ return {
+    okcUsername: htmlDataObj.user,
+    metaData: {
+      text: profileText,
+      pictureUrl: htmlDataObj.pictureUrl,
+      context: contextData
+    },
+    matchData: matchData
+  };
+};
+
+
+/**
  * Function that runs text through a series of Regex patterns designed to
  * convert HTML and comments into plain text.
+ *
+ * Note: These regex patterns are ugly, but abstracted solutions such as 
+ *     jQuery.text() yielded terrible results with Angular's HTML syntax. 
  *
  * @param {string} text Text to run through regex.
  * @return {string} final Processed text.
  */ 
 TextProcessorService.prototype.processLineBreaks = function(text) {
-  var final = text.replace(/\s*<p[^>]+">\s*/gi,""); //Filters out all P tags
-  final = final.replace(/<\/?span[^>]*?"?>/gi,""); //Filters out all span tags
-
-  //Removes commented out HTML and arbitrary spacing in a nongreedy fashion
-  final = final.replace(/\n*(?:\s{2,})?<!--(.|\n)*?-->\s*\n*/gi, ""); 
-
-  //Puts a line break for any <br> tag
-  final = final.replace(/\s*<br\s?\/?>\s*\n*<\/p>\n*\s*/gi, "\n\n");
-  final = final.replace(/\s*<br\s?\/?>\s*/gi,"\n"); 
-
-  //Adds two lines breaks for any closing p tags
-  final = final.replace(/\s*<\/p>\s*/gi,"\n\n"); 
-  return final;
+  return text.replace(/\s*<p[^>]+">\s*/gi,'')  // Filters out all P tags.
+             .replace(/<\/?span[^>]*?"?>/gi,'')  // Filters out all span tags.
+             // Removes commented HTML and arbitrary spacing, nongreedy.
+             .replace(/\n*(?:\s{2,})?<!--(.|\n)*?-->\s*\n*/gi, '')
+             // Puts a line break for any <br> tag.
+             .replace(/\s*<br\s?\/?>\s*\n*<\/p>\n*\s*/gi, '\n\n')
+             .replace(/\s*<br\s?\/?>\s*/gi, '\n')
+             // Adds two lines breaks for any closing p tags.
+             .replace(/\s*<\/p>\s*/gi, '\n\n'); 
 };
 
 
 /**
+ * Searches through essays and matches the keyword under analysis to a 
+ * particular essay. If its matched in an essay, return the title.
+ *
+ * TODO(jon): We should separate HTML generation from finding the correct
+ *    essay.
+ *
  * @param {string} keyword Keyword to match to in essay.
  * @param {Array.<string>} essays List of essays to process.
- * @return {string} final String of essays.
+ * @return {string} essayTitleHtml  
  */ 
 TextProcessorService.prototype.findEssayTitle = function(keyword, essays) {
-    // For any bit of context grabbed, will also grab the title of 
-    // that essay for the UI. Returns a string of HTML.
-    var final, keywordRe = new RegExp('[^a-zA-Z]' + keyword + '[^a-zA-Z]', 'i');
+  var keywordRegEx = new RegExp('[^a-zA-Z]' + keyword + '[^a-zA-Z]', 'i'),
+      essayTitleHtml = "<strong>Unknown</strong><br />";
 
-    for (var i = 0; i < essays.length; i++) {
-      var essay = essays[i].essay;
-      //console.log("Now looking through this essay: ", essay);
-      if (essay.search(keywordRe) != -1) {
-        //console.log("Found a match for " + keyword + ": " + essays[i].name);
-        final = '<strong>' + essays[i].name + '</strong><br />';
-        return final;
-      } 
-    }
-    return "<strong>Unknown</strong><br />"; //If all else fails, return this
+  essays.forEach(function(essay) {
+    var essayText = essay.essay;
+    if (essayText.search(keywordRegEx) !== -1) {
+      essayTitleHtml = '<strong>' + essay.title + '</strong><br />';
+    } 
+  });
+  
+  return essayTitleHtml; 
 };
 
 
@@ -63,30 +92,95 @@ TextProcessorService.prototype.findEssayTitle = function(keyword, essays) {
  * @param {profile} string Raw string of profile HTML to process.
  * @return {string} textUpdate Profile HTML post-processing.
  */
-TextProcessorService.prototype.processProfileText = function(profile) {
-  var replace1 = "my self-summary";
-  var replace2 = "what i\u2019m doing with my life";
-  var replace3 = "the first things people usually notice about me";
-  var replace4 = "favorite books, movies, shows, music, and food";
-  var replace5 = "the six things i could never do without";
-  var replace6 = "i spend a lot of time thinking about";
-  var replace7 = "on a typical friday night i am";
-  var replace8 = "the most private thing i\u2019m willing to admit";
-  var replace9 = "i\u2019m looking for";
-  var replace10 = new RegExp('"', "g");
-  var replace11 = "            ";
-
-  var findreplace = [ replace1,replace2,replace3,replace4,replace5,replace6,
-                      replace7,replace8,replace9,replace11 ];
+TextProcessorService.prototype.replaceGenericProfileText = function(profile) {
+  var genericPhrases = [ 
+      "my self-summary",
+      "what i\u2019m doing with my life",
+      "the first things people usually notice about me",
+      "favorite books, movies, shows, music, and food",
+      "the six things i could never do without",
+      "i spend a lot of time thinking about",
+      "on a typical friday night i am",
+      "the most private thing i\u2019m willing to admit",
+      "i\u2019m looking for" 
+  ];
   
-  var textUpdate = profile;
-  for (var i = 0; i < findreplace.length; i++) {
-    textUpdate = textUpdate.replace(findreplace[i],"");
+  genericPhrases.forEach(function(genericPhrase) {
+    profile = profile.replace(genericPhrase, '');
+  });
+  
+  return profile;
+};
+
+
+/**
+ * Takes in a profile, your keywords, and the context for the keywords and 
+ * finds similarities between you and the person whose profile you're viewing.
+ * 
+ * @param {string} profile The extracted profile text as a raw string.
+ * @param {!Object} keywords The keywords Datebot uses to find mutual interests.
+ * @param {JQuery} context A jQuery object of the HTML of the page.
+ * @return {Array.<Object>} finalResult An array of objects representing a
+ *     matched commonality (e.g. fishing).
+ */
+TextProcessorService.prototype.findSimilarities = function(profile, keywords, context) {
+
+  //Begin processing the data by sorting in the appropriate array
+  var desiredKeywords = [], 
+        desiredMessage = [], 
+        desiredPriority =[], 
+        finalKeywordPriority = [], 
+        finalMessage = [];
+
+  //Put the desiredKeywords in one array, and the related message in another array.
+  for (var i = 0; i < keywords.pairs.length; i++) {
+    desiredKeywords.push(keywords.pairs[i].keyword);
+    desiredMessage.push(keywords.pairs[i].message);
+    desiredPriority.push(keywords.pairs[i].priority);
   }
-    textUpdate = textUpdate.replace(replace10, "'");
-    textUpdate = textUpdate.replace(/(\r\n|\n|\r)/gm," ");
-    textUpdate = textUpdate.replace(/\s+/gm, " ");
-  return textUpdate;
+
+  var finalKeywords = this.extractMatchedKeywords(
+      profile, desiredKeywords, desiredPriority, finalKeywordPriority);
+
+  var finalContext = this.extractContext(
+        profile, desiredKeywords, context);
+
+  for (var i = 0; i < finalKeywords.length; i++) {
+    if (desiredKeywords.indexOf(finalKeywords[i]) != -1) {
+      var index = desiredKeywords.indexOf(finalKeywords[i]);
+      finalMessage.push(desiredMessage[index]);  
+    }
+  }
+
+  var finalResult = {
+    opener: keywords.opener.replace("\n", "<br />"),
+    closer: keywords.closer.replace("\n", "<br />"),
+    first_transition: keywords.first_transition,
+    second_transition: keywords.second_transition
+  };
+
+  finalResult.matched = [];
+
+  for (var i = 0; i < finalKeywords.length; i++) {
+    var oneMatchObj = {};
+
+    oneMatchObj.keyword = finalKeywords[i];
+
+    // highlightMatches will turn the matched keyword blue
+    oneMatchObj.context = this.highlightMatches(
+        finalKeywords[i], finalContext[i]); 
+    oneMatchObj.message = finalMessage[i];
+    oneMatchObj.priority = finalKeywordPriority[i];
+
+    finalResult.matched.push(oneMatchObj);
+  }
+  
+  console.log('finalResult', finalResult);
+
+  // Before returning, we run the finalResult through a function that checks the highest priority 
+  // keywords and flips on the checked attribute flag if it's a high priority keyword
+  this.determineTopKeywords(finalResult); 
+  return finalResult;
 };
 
 
@@ -95,28 +189,28 @@ TextProcessorService.prototype.processProfileText = function(profile) {
  * within that essay based on OKCupid's dom structure.
  * 
  * @param {JQuery} htmlObj The jQuery-wrapped HTML from the profile page.
- * @return {Array.<Object>} contextArr List of objects containing essay info.
+ * @return {Array.<Object>} essayContexts List of essay info object.
  */
 TextProcessorService.prototype.processContext = function(htmlObj){
-  var contextArr = [], 
-      contextObj,
-      name, 
-      essay;
+  var essayContexts = [], 
+      essayContext,
+      essayTitle, 
+      essayContent;
   
   for (var i = 0; i < 9; i++) {
+    essayTitle = htmlObj.find('#essay_'+i+'> a').text();
+    essayContent = htmlObj.find('#essay_text_'+i).text();
+    essayContent = essayContent.replace(/\n/gi," ");
 
-    name = htmlObj.find('#essay_'+i+'> a').text();
-    essay = htmlObj.find('#essay_text_'+i).text();
-    essay = essay.replace(/\n/gi," ");
+    essayContext = {
+      'title': essayTitle,
+      'essay': essayContent
+    };
 
-    contextObj = {};
-    contextObj.name = name;
-    contextObj.essay = essay;
-
-    contextArr.push(contextObj);
+    essayContexts.push(essayContext);
   }
 
-  return contextArr;
+  return essayContexts;
 };
 
 
@@ -131,25 +225,32 @@ TextProcessorService.prototype.processContext = function(htmlObj){
  * @return {Array} contextArr List containing the snippets of context.
  */ 
 TextProcessorService.prototype.extractContext = function(profile, keywords, essays) {
-  
   var contextArr = [], 
-      findKeyword, 
+      regExString,
+      keywordRegEx, 
       essayTitle, 
       contextGrabber,
       essayTitleWithContext;
   
-  for (var i = 0; i < keywords.length; i++) {
-    findKeyword = new RegExp('([^a-zA-Z]|\\n|\\r|\\r\\n)' + keywords[i] + '([^a-zA-Z]|\\n|\\r|\\r\\n)', 'g');
+  keywords.forEach(function(keyword) {
+    // Pad the keyword with a non-letter. This way, the keyword
+    // 'food' won't match 'foodie', for example.
+    regExString = '([^a-zA-Z]|\\n)' + keyword + '([^a-zA-Z]|\\n)';
+    keywordRegEx = new RegExp(regExString, 'g');
 
-    if (profile.search(findKeyword) != -1) {
+    if (profile.search(keywordRegEx) !== -1) {
 
-      essayTitle = this.findEssayTitle(keywords[i], essays);
-      contextGrabber = profile.match(new RegExp('\\S{0,10}(\\n|.){0,50}([^a-zA-Z]|\\n|\\r|\\r\\n)' + keywords[i] + '([^a-zA-Z]|\\n|\\r|\\r\\n)(\\n|.){0,50}\\S{0,10}', 'g')); //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
-      
-      essayTitleWithContext = essayTitle + contextGrabber[0];
+      essayTitle = this.findEssayTitle(keyword, essays);
+
+      //This RegEx finds the keyword, and on either side, adds a space (to capture only the whole word), and then captures all line breaks or characters 50 characters in either direction. Then, extends up to another 10 characters to finish at the nearest whole word
+      essayContext = profile.match(new RegExp('\\S{0,10}(\\n|.){0,50}([^a-zA-Z]|\\n|\\r|\\r\\n)' + keyword + '([^a-zA-Z]|\\n|\\r|\\r\\n)(\\n|.){0,50}\\S{0,10}', 'g')); 
+
+      essayTitleWithContext = essayTitle + essayContext[0];
+
       contextArr.push(essayTitleWithContext);
     }
-  } 
+  }.bind(this));
+  
   return contextArr;
 };
 
@@ -157,6 +258,7 @@ TextProcessorService.prototype.extractContext = function(profile, keywords, essa
 /**
  * A processor function that highlights the keyword in the context paragraph 
  * blue for easier reference.
+ *
  * @param {string} keyword The topic of interest between you and the match.
  * @param {string} context The profile snippet containing the keywords.
  * @param {string} processedContext Same snippet with HTML added for coloring.
