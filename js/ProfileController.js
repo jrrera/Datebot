@@ -1,60 +1,23 @@
 'use strict';
 
 angular.module('datebot').controller('ProfileController', 
-	function ProfileController(ScraperService, TextProcessorService, MatchService) {
+	function ProfileController(ScraperService, TextProcessorService, 
+	                           MatchService, LocalDataService) {
 
-		//Private variables
-		var dayOfWeek = new Date().getDay(),
-			  babeObj = babeObj || {}; 
 
-		function recordInteraction() {
-			var records = localStorage["dbotInteractions"], //storage object containing username as key and interaction as value
-			interactionObj = babeObj, //grabs the variable off the controller
-			user = interactionObj.username;
-
-			if (records) {
-				//Parse JSON string and store this data if this user hasn't been recorded yet
-				console.log('Found records. Parsing...');
-				records = JSON.parse(records);
-				if (!records[user]) records[user] = interactionObj;
-				localStorage["dbotInteractions"] = JSON.stringify(records);
-			} else {
-				//If no records object found, intialize object, store data, and stringify
-				console.log('No interaction record found, adding...');
-				records = {};
-				records[user] = interactionObj;
-				localStorage["dbotInteractions"] = JSON.stringify(records);
-			}
-			//console.log(JSON.stringify(records, null, 4));
-		}
-
-		//Begin properties and methods available on controller
-    this.loading = true; //Shows the AJAX loader graphic, and hides the results table. Will flip after AJAX call comes back
-		this.foundKeywords = false; //Will flip to true upon locating stored keywords in Chrome's storage
-		// this.profiles = []; //Profile objects will be pushed here after processing.
-		this.toggleMessaged = false; //Shows already-messaged results. Turned off by default
-		this.customized = false; //Becomes true when you modify the textarea for custom messages
-		this.saveCustomized = false; //Becomes true if this.customized is true AND you save
-		this.noTracking = false;
-		this.customMessage = ""; //This part of the model will eventually contain the customized message
-		this.recommendation = ""; //This will contain a recommendation based on calculate score
-		
-		//genericQuestion changes slightly depending on if it's a weekend (value of 0 or 6) or weekday (1-5), and is used if no interests are matched
-		this.genericQuestion = (dayOfWeek === 0 || dayOfWeek === 6) ? 
-															"How's your weekend going?" : 
-															"How's your week going?";
+		this.customMessage = '';
 
 		//Begin cascade of async calls for username, keywords, and profile
 		this.initialize = function() {
-			ScraperService.getKeywords().then(angular.bind(this, function(data) {
+			this.loading = true; 
 
+			ScraperService.getKeywords().then(angular.bind(this, function(data) {
 				this.keywords = data;
 
 				if (ScraperService.foundKeywordsLocally) {
 					this.foundKeywords = true;
 				}
 
-				//Now that keywords have been returned, time to get the profile
 				ScraperService.getProfile().then(angular.bind(this, function(data) {
 					var htmlDataObj = ScraperService.turnIntoJquery(data.html);
 
@@ -62,16 +25,18 @@ angular.module('datebot').controller('ProfileController',
 					this.profile = TextProcessorService.convertHtmlDataToProfile(
 							htmlDataObj, this.keywords);
 
-					this.profile.matchScore = MatchService.calculateMatchScore(this.profile);
-					this.profile.recommendation = MatchService.getRecommendation(this.profile.matchScore);
+					this.profile.matchScore = MatchService.calculateMatchScore(
+					                              this.profile);
+
+					this.profile.recommendation = MatchService.getRecommendation(
+					                                  this.profile.matchScore);
 
 					this.loading = false;
 
 					// Restore any locally stored data if you viewed this profile last time.
-					if (localStorage["dbotCustomUser"] === this.profile.okcUsername && localStorage["dbotCustomMessage"]) {
-						console.log('Found a custom message! Restoring...');
-						this.customized = true; //Adds customized flag to the model
-						this.customMessage = localStorage["dbotCustomMessage"];
+					if (LocalDataService.cachedProfileDataFound(this.profile.okcUsername)) {
+						this.profile.matchData.customized = true; //Adds customized flag to the model
+						this.customMessage = LocalDataService.getSavedMessage();
 						this.saveCustomized = true;
 					}
 
@@ -80,23 +45,23 @@ angular.module('datebot').controller('ProfileController',
 					console.log(e);
 					this.loading = false;
 				})
-			); // End inner async call
-		})); // End outer async call
+			); // End inner async call.
+		})); // End outer async call.
 	};
 
-	this.initialize(); //Initalizes the app
+	this.initialize();  // Initalizes the app.
 
+	// Expose generic message text for those lacking data to work with.
+	this.genericQuestion = TextProcessorService.getGenericQuestion();
 
 	// When the profiles model is updated by adjusting keyword choices, 
 	// customized becomes false again and we keep the message model in sync.
-	this.keywordClick = function(){
+	this.keywordClick = function() {
 		//Reset the customized message flags
-		this.customized = false;
+		this.profile.matchData.customized = false;
 		this.saveCustomized = false;
 
-		//Reset localStorage for custom messages
-		localStorage["dbotCustomMessage"] = null;
-		localStorage["dbotCustomUser"] = null;
+		LocalDataService.clearCustomMessageData();
 
 		//Update the textarea message model
 		this.customMessage = TextProcessorService.processLineBreaks(
@@ -135,28 +100,28 @@ angular.module('datebot').controller('ProfileController',
 	};
 
 	this.sendToTab = function(profile){
-		var message, interactionData;
+		var message, interactionData, portObj;
 		
-		//If customized, this.customMessage from textarea is what's sent. 
+		// If customized, this.customMessage from textarea is what's sent. 
 		// Else, the standard .finalmessage div's contents are used
 		message = this.saveCustomized 
 									? this.customMessage 
 									: TextProcessorService.processLineBreaks(
 												$('.finalmessage').html());
 
-		console.log(ScraperService.userId);
-		var portObj = {
+		portObj = {
 		  message: message,
 		  userId: ScraperService.userId
 		};
 
-		//Send the message to the background script & record the interaction
+		// Send the message to the background script & record the interaction
+		// TODO(jon): Update the object key to be more descriptive of contents.
 		chrome.runtime.sendMessage({portover3: portObj}, function(response) {
 			if (response.status === 'message_sent' && !this.noTracking) {
-				console.log('Recording interaction!');
-				recordInteraction();
+				console.log('Recording interaction!', this.profile);
+				LocalDataService.recordInteraction(this.profile);
 			}
-		});
+		}.bind(this));
 	};
 	
   // This function is used for debugging purposes
@@ -181,20 +146,22 @@ angular.module('datebot').controller('ProfileController',
 
 	//Function that runs as soon as the custom message textarea is edited
 	this.markAsCustomized = function() {
-		this.customized = true; //Adds customized flag to the model
+		this.profile.matchData.customized = true; //Adds customized flag to the model
 	};
 
 	this.saveCustomEdit = function(profile) {			
-		profile.customEditorActive = false; //Turns off the custom editor
-		if (this.customized) {
-			// This flag becomes true if this.customized is true AND you save. 
-			// This determines which div gets grabbed for sending the final message to the girl
+		
+		profile.customEditorActive = false; 
+		
+		if (profile.matchData.customized) {
+			// This determines which div gets grabbed for sending the 
+			// final message to the recipient.
 			this.saveCustomized = true; 
 
-			// Next, we save to localStorage, that way if you leave the app temporarily,
-			// And rescan the same girl, the custom message will be there waiting for you
-			localStorage["dbotCustomUser"] = profile.okcUsername;
-			localStorage["dbotCustomMessage"] = this.customMessage;
+			// Next, we save locally, so if you leave the app temporarily, and 
+			// view the same profile shortly after, your work will be saved.
+			LocalDataService.saveCustomMessageData(
+					profile.okcUsername, this.customMessage);
 		} 
 	};
 

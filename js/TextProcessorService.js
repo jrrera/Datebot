@@ -359,4 +359,16 @@ TextProcessorService.prototype.determineTopKeywords = function(matchObj) {
 };
 
 
+/**
+ * Returns a generic question asking about the recipient's week.
+ * 
+ * @return {string} genericQuestion
+ */
+TextProcessorService.prototype.getGenericQuestion = function() {
+  var dayOfWeek = new Date().getDay();  
+  
+  return (dayOfWeek === 0 || dayOfWeek === 6) ? 
+              "How's your weekend going?" : 
+              "How's your week going?";
+}; 
 
