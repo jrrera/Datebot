@@ -79,8 +79,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     console.log(okcContext);
   }
 
-  if (msg.portover3) {
-    var messageToPort = msg.portover3;
+  if (msg.datebotMessage) {
+    var messageToPort = msg.datebotMessage;
     var userId = msg.userId;
     console.log('Processed message received', messageToPort.message, 'for user ID', messageToPort.userId);
 

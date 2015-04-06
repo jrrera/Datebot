@@ -10,7 +10,6 @@ angular.module('datebot').service(
 
 /**
  * Parses profile meta data to store key data points in local storage.
- * 
  * TODO(jon): Factor out the data processing for the act of saving locally.
  *
  * @param {Object} profileData Profile object to analyze.
@@ -55,7 +54,7 @@ LocalDataService.prototype.recordInteraction = function(profileData) {
  * @param {string} username
  * @return {boolean} localDataFound
  */ 
-LocalDataService.prototype.cachedProfileDataFound = function(username) {
+LocalDataService.prototype.cachedUserDataFound = function(username) {
   return (localStorage["dbotCustomUser"] === username && 
           localStorage["dbotCustomMessage"]);
 };
@@ -89,6 +88,18 @@ LocalDataService.prototype.clearCustomMessageData = function() {
 LocalDataService.prototype.saveCustomMessageData = function(username, msg) {
   localStorage["dbotCustomUser"] = username;
   localStorage["dbotCustomMessage"] = msg;
+};
+
+
+/**
+ * Opens up your local options page.
+ */ 
+LocalDataService.prototype.openChromeExtensionOptions = function() {
+  var extId = chrome.i18n.getMessage("@@extension_id"); 
+  chrome.tabs.create({ 
+      url: "chrome-extension://" + extId + "/components/options/interests.html",
+      active: true
+  });
 };
 
 

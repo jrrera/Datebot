@@ -103,13 +103,11 @@
                ng-hide="profileCtrl.profile.matchData.matched.length === 1">
 
             <span class="moveit glyphicon glyphicon-arrow-up" 
-                  ng-click="profileCtrl.raiseKeywordPosition(
-                                match, profileCtrl.profile.matchData.matched)" 
+                  ng-click="profileCtrl.adjustKeywordPosition($index, 'up')" 
                   ng-hide="$first"></span>
 
             <span class="moveit glyphicon glyphicon-arrow-down" 
-                  ng-click="profileCtrl.lowerKeywordPosition(
-                                match, profileCtrl.profile.matchData.matched)" 
+                  ng-click="profileCtrl.adjustKeywordPosition($index, 'down')" 
                   ng-hide="$last"></span>
             
           </div>

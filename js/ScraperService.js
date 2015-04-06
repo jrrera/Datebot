@@ -73,7 +73,7 @@ ScraperService.prototype.getProfile = function() {
  * @param {string} html  
  * @return {Array.<string>} profileArray Array of profile info,
  */
-ScraperService.prototype.turnIntoJquery = function(html) {
+ScraperService.prototype.parseRawHtml = function(html) {
 
   // jQuery was having errors trying to parse the full page. So we 
   // extract the core part of the document, where the ID starts using

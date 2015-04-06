@@ -59,6 +59,17 @@ TextProcessorService.prototype.processLineBreaks = function(text) {
 
 
 /**
+ * DOM-based function that grabs a reference to the message in HTML form.
+ * TODO(jon): Convert functionality like this into a directive.
+ *
+ * @return {string} messageAsHtml
+ */ 
+TextProcessorService.prototype.getMessageHtml = function(text) {
+  return jQuery('.finalmessage').html();
+};
+
+
+/**
  * Searches through essays and matches the keyword under analysis to a 
  * particular essay. If its matched in an essay, return the title.
  *

@@ -1,122 +1,121 @@
 'use strict';
 
 angular.module('datebot').controller('ProfileController', 
-	function ProfileController(ScraperService, TextProcessorService, 
-	                           MatchService, LocalDataService) {
+		function ProfileController(ScraperService, TextProcessorService, 
+	                             MatchService, LocalDataService) {
+	this.customMessage = '';
 
+	/**
+	 * Bootstrapping point for the app. This is where we make the necessary
+	 * async calls for keywords and profile data.
+	 */
+	this.initialize = function() {
+		this.loading = true; 
 
-		this.customMessage = '';
+		ScraperService.getKeywords().then(angular.bind(this, function(data) {
+			this.keywords = data;
 
-		//Begin cascade of async calls for username, keywords, and profile
-		this.initialize = function() {
-			this.loading = true; 
+			if (ScraperService.foundKeywordsLocally) {
+				this.foundKeywords = true;
+			}
 
-			ScraperService.getKeywords().then(angular.bind(this, function(data) {
-				this.keywords = data;
+			ScraperService.getProfile().then(angular.bind(this, function(data) {
+				var htmlDataObj = ScraperService.parseRawHtml(data.html);
 
-				if (ScraperService.foundKeywordsLocally) {
-					this.foundKeywords = true;
+				// Object exposed to the front end.  
+				this.profile = TextProcessorService.convertHtmlDataToProfile(
+						htmlDataObj, this.keywords);
+
+				this.profile.matchScore = MatchService.calculateMatchScore(
+				                              this.profile);
+
+				this.profile.recommendation = MatchService.getRecommendation(
+				                                  this.profile.matchScore);
+
+				this.loading = false;
+
+				// Restore any cached data if you viewed this profile last time.
+				if (LocalDataService.cachedUserDataFound(this.profile.okcUsername)) {
+					this.profile.matchData.customized = true; 
+					this.customMessage = LocalDataService.getSavedMessage();
+					this.saveCustomized = true;
 				}
-
-				ScraperService.getProfile().then(angular.bind(this, function(data) {
-					var htmlDataObj = ScraperService.turnIntoJquery(data.html);
-
-					// Object exposed to the front end.  
-					this.profile = TextProcessorService.convertHtmlDataToProfile(
-							htmlDataObj, this.keywords);
-
-					this.profile.matchScore = MatchService.calculateMatchScore(
-					                              this.profile);
-
-					this.profile.recommendation = MatchService.getRecommendation(
-					                                  this.profile.matchScore);
-
-					this.loading = false;
-
-					// Restore any locally stored data if you viewed this profile last time.
-					if (LocalDataService.cachedProfileDataFound(this.profile.okcUsername)) {
-						this.profile.matchData.customized = true; //Adds customized flag to the model
-						this.customMessage = LocalDataService.getSavedMessage();
-						this.saveCustomized = true;
-					}
-
-				}), 
-				angular.bind(this, function errorHandler(e) {
-					console.log(e);
-					this.loading = false;
-				})
-			); // End inner async call.
-		})); // End outer async call.
+			}), 
+			angular.bind(this, function errorHandler(e) {
+				console.log(e);
+				this.loading = false;
+			}));  // End inner async call.
+		}));  // End outer async call.
 	};
 
-	this.initialize();  // Initalizes the app.
+	// Script starts here.
+	this.initialize();
 
 	// Expose generic message text for those lacking data to work with.
 	this.genericQuestion = TextProcessorService.getGenericQuestion();
 
-	// When the profiles model is updated by adjusting keyword choices, 
-	// customized becomes false again and we keep the message model in sync.
+	/**
+	 * Event handler for adjusting your selected keywords. When this happens
+	 * we remove any customizations to keep the model in sync.
+	 */
 	this.keywordClick = function() {
-		//Reset the customized message flags
+		
+		// Remove customized data.
 		this.profile.matchData.customized = false;
 		this.saveCustomized = false;
-
 		LocalDataService.clearCustomMessageData();
 
-		//Update the textarea message model
+		// TODO(jon): Either abstract into a directive, or find a non-DOM approach.
 		this.customMessage = TextProcessorService.processLineBreaks(
-				$('.finalmessage').html());
+				TextProcessorService.getMessageHtml());
 	};
 
-	// TODO(jon): Merge the two functions below
-	this.raiseKeywordPosition = function(clickedMatch, matchesArr) {
-		//This function moves a particular keyword one slot higher for arranging your message. 
-		var thisPosition, thisObject, prevObject;
-		thisPosition = matchesArr.indexOf(clickedMatch);
-		thisObject = clickedMatch;
-		prevObject = matchesArr[thisPosition-1];
+	/**
+	 * Moves a particular keyword in the message order, either up or down.
+	 * 
+	 * @param {number} keywordIndex Position in the keywords array.
+	 * @param {string} direction Which way to adjust the keyword
+	 */
+	this.adjustKeywordPosition = function(keywordIndex, direction) {
 
-		matchesArr[thisPosition] = prevObject;
-		matchesArr[thisPosition-1] = thisObject;	
-
-		this.keywordClick(); // This is essentially a keyword "click".		
-	};
-
-	this.lowerKeywordPosition = function(clickedMatch, matchesArr) {
-		// This function moves a particular keyword one slot higher for arranging 
-		// your message. 
-		var thisPosition, thisObject, nextObject;
+		console.log(arguments);
+		console.log(this.profile.matchData.matched);
 		
-		thisPosition = matchesArr.indexOf(clickedMatch);
-		thisObject = clickedMatch;
-		nextObject = matchesArr[thisPosition+1];
+		var keywordArray = this.profile.matchData.matched,
+				clickedKeyword = keywordArray[keywordIndex],
+				newIndex = (direction === 'up' ? keywordIndex-1 : keywordIndex+1),
+				keywordToSwitchWith;
 
-		// If we want to move to bottom, execute differently vs. moving down one 
-		// position.
-		matchesArr[thisPosition] = nextObject;
-		matchesArr[thisPosition+1] = thisObject;
+		keywordToSwitchWith = keywordArray[newIndex];
+		keywordArray[keywordIndex] = keywordToSwitchWith;
+		keywordArray[newIndex] = clickedKeyword;	
 
-		this.keywordClick(); // This is essentially a keyword "click".
+		// Since adjusting order is a click event on keywords, we trigger this.
+		this.keywordClick(); 
 	};
 
+	/**
+	 * Sends your message through the Chrome framework to inject onto the page.
+	 * 
+	 * @param {Object} profile The profile data, including your message.
+	 */
 	this.sendToTab = function(profile){
-		var message, interactionData, portObj;
+		var message, interactionData, msgData;
 		
 		// If customized, this.customMessage from textarea is what's sent. 
 		// Else, the standard .finalmessage div's contents are used
 		message = this.saveCustomized 
 									? this.customMessage 
 									: TextProcessorService.processLineBreaks(
-												$('.finalmessage').html());
+												TextProcessorService.getMessageHtml());
 
-		portObj = {
+		msgData = {
 		  message: message,
 		  userId: ScraperService.userId
 		};
 
-		// Send the message to the background script & record the interaction
-		// TODO(jon): Update the object key to be more descriptive of contents.
-		chrome.runtime.sendMessage({portover3: portObj}, function(response) {
+		// Send the message to the background script & record the interaction.
+		chrome.runtime.sendMessage({datebotMessage: msgData}, function(response) {
 			if (response.status === 'message_sent' && !this.noTracking) {
 				console.log('Recording interaction!', this.profile);
 				LocalDataService.recordInteraction(this.profile);
@@ -124,24 +123,28 @@ angular.module('datebot').controller('ProfileController',
 		}.bind(this));
 	};
 	
-  // This function is used for debugging purposes
-  // In particular, to see how message will render after all HTML processing occurs. 
+  /**
+   * A debugging function to preview messaging rendering post-processing.  
+   */ 
   this.testMessage = function() {
-  	// Either return customized message with linebreaks turned into <br> tags, if customization had been used
-  	// or process the keyword generated message and replace linebreaks similarly
     return this.saveCustomized ? 
     		this.customMessage.replace(/\n/g, '<br />') : 
     		TextProcessorService.processLineBreaks(
-						$('.finalmessage').html()).replace(/\n/g, '<br />');
+						TextProcessorService.getMessageHtml()).replace(/\n/g, '<br />');
   };
 
+  /**
+   * Enables the custom message editor in the view.
+   * 
+   * @param {Object} profile
+   */
 	this.showCustomEditor = function(profile) {
-		//If there is no customized message already, grab the keyword-driven message and convert
-		//If we've already customized, this just pulls it as it is without overwriting
+		// Start fresh if no previous custom message.
 		if (!this.saveCustomized) {
-			this.customMessage = TextProcessorService.processLineBreaks($('.finalmessage').html()); 	
+			this.customMessage = TextProcessorService.processLineBreaks(
+					TextProcessorService.getMessageHtml()); 	
 		}
-		profile.customEditorActive = true; //adds custom editor property to the profile model
+		profile.customEditorActive = true; 
 	};
 
 	//Function that runs as soon as the custom message textarea is edited
@@ -149,6 +152,11 @@ angular.module('datebot').controller('ProfileController',
 		this.profile.matchData.customized = true; //Adds customized flag to the model
 	};
 
+	/**
+	 * Saves any custom edits you've made to th emessage.
+	 *
+	 * @param {Object} profile
+	 */
 	this.saveCustomEdit = function(profile) {			
 		
 		profile.customEditorActive = false; 
@@ -165,12 +173,11 @@ angular.module('datebot').controller('ProfileController',
 		} 
 	};
 
+	/**
+	 * Exposes the options page from within the view.
+	 */
 	this.goToOptions = function() {
-		var extId = chrome.i18n.getMessage("@@extension_id"); //Gets the extension ID for opening the options page. Not required for creating the tab, but required for checking to see if the URL is open
-		chrome.tabs.create({ 
-		    url: "chrome-extension://" + extId + "/components/options/interests.html",
-		    active: true
-		});
+		LocalDataService.openChromeExtensionOptions();
 	};
 
 	}
