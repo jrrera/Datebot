@@ -135,7 +135,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       // Run the interactions object through updateInteractionRecords, which updates the response
       // attribute on each interaction and returns the updated objected, stringified
       localStorage["dbotInteractions"] = updateInteractionRecords(dbotInteractions, msg.messages);
-      return true;
+      return true; //Required by Chrome framework to keep async requests alive.
     }
   }
 
@@ -149,7 +149,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       var okcTab = tabs[0].url;
       sendResponse(okcTab);
     }); 
-    return true;   
+    return true;   //Required by Chrome framework to keep async requests alive.
   }
 
   //Listener for porting the message from the extention into OKCupid's message box
@@ -164,5 +164,5 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       });
     }); 
   }
-  return true; //Required by Chrome framework after acting on a listener response
+  return true;  //Required by Chrome framework to keep async requests alive.
 });

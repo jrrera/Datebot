@@ -147,9 +147,9 @@ angular.module('datebot').controller('ProfileController',
 		profile.customEditorActive = true; 
 	};
 
-	//Function that runs as soon as the custom message textarea is edited
+	//Function that runs as soon as the custom message textarea is edited.
 	this.markAsCustomized = function() {
-		this.profile.matchData.customized = true; //Adds customized flag to the model
+		this.profile.matchData.customized = true; 
 	};
 
 	/**
@@ -162,12 +162,10 @@ angular.module('datebot').controller('ProfileController',
 		profile.customEditorActive = false; 
 		
 		if (profile.matchData.customized) {
-			// This determines which div gets grabbed for sending the 
-			// final message to the recipient.
+			// This determines which div gets grabbed for sending the final message.
 			this.saveCustomized = true; 
 
-			// Next, we save locally, so if you leave the app temporarily, and 
-			// view the same profile shortly after, your work will be saved.
+			// Save your custom work locally.
 			LocalDataService.saveCustomMessageData(
 					profile.okcUsername, this.customMessage);
 		} 
