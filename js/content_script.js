@@ -15,7 +15,7 @@
       scriptNode = document.createElement('script');
 
       // Open the composer window for main composer and action composer
-      scriptNode.textContent = "jQuery('#actions a').trigger('click');";
+      scriptNode.textContent = "jQuery('#actions > a').trigger('click');";
       document.body.appendChild(scriptNode);
 
     } else if (action === "sendMessage") {

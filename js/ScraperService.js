@@ -78,7 +78,7 @@ ScraperService.prototype.parseRawHtml = function(html) {
   // jQuery was having errors trying to parse the full page. So we 
   // extract the core part of the document, where the ID starts using
   // "page" as a prefix. We close it off at the final div.
-  var coreDocumentArr = /<div id="page"(.|\n)*<\/div>/gi.exec(html);
+  var coreDocumentArr = /<main id="page"(.|\n)*<\/main>/gi.exec(html);
 	var htmlObj = $(coreDocumentArr[0]);
 
 	var okcText = htmlObj.find("#main_column").text().toLowerCase();
