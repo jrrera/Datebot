@@ -240,6 +240,7 @@ TextProcessorService.prototype.extractContext = function(profile, keywords, essa
       regExString,
       keywordRegEx, 
       essayTitle, 
+      essayContext,
       contextGrabber,
       essayTitleWithContext;
   
