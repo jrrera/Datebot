@@ -6,7 +6,8 @@
     "tabs",
     "background",
     "contextMenus",
-    "storage"
+    "storage",
+    "clipboardWrite"
   ],
   "icons": {
     "16":"img/Thomas-Hello16.png",

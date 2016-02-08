@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('datebot').controller('ProfileController',
-	function ProfileController(ScraperService, TextProcessorService) {
+	function ProfileController($scope, ScraperService, TextProcessorService) {
+		var self = this;
 
 		//Private variables
 		var dayOfWeek = new Date().getDay(),
@@ -44,6 +45,7 @@ angular.module('datebot').controller('ProfileController',
 
 		//Begin cascade of async calls for username, keywords, and profile
 		this.initialize = function() {
+
 			ScraperService.getKeywords().then(angular.bind(this, function(data) {
 
 				this.keywords = data;
@@ -195,40 +197,17 @@ angular.module('datebot').controller('ProfileController',
 			}
 		};
 
-		this.sendToTab = function(profile){
-			var message, interactionData;
-
-			//If customized, this.customMessage from textarea is what's sent.
-			// Else, the standard .finalmessage div's contents are used
-			message = this.saveCustomized
-										? this.customMessage
-										: TextProcessorService.processLineBreaks(
-													$('.finalmessage').html());
-
-			console.log(ScraperService.userId);
-			var portObj = {
-			  message: message,
-			  userId: ScraperService.userId
-			};
-
-			//Send the message to the background script & record the interaction
-			chrome.runtime.sendMessage({portover3: portObj}, function(response) {
-				if (response.status === 'message_sent' && !this.noTracking) {
-					console.log('Recording interaction!');
-					recordInteraction();
-				}
-			});
-
-
+		this.copyToClipboard = function(profile){
+			document.execCommand('copy'); // Copy to clipboard.
 		};
 
-        // This function is used for debugging purposes
-        // In particular, to see how message will render after all HTML processing occurs.
-        this.testMessage = function() {
-        	// Either return customized message with linebreaks turned into <br> tags, if customization had been used
-        	// or process the keyword generated message and replace linebreaks similarly
-            return this.saveCustomized ? this.customMessage.replace(/\n/g, '<br />') : TextProcessorService.processLineBreaks($('.finalmessage').html()).replace(/\n/g, '<br />');
-        }
+    // This function is used for debugging purposes
+    // In particular, to see how message will render after all HTML processing occurs.
+    this.testMessage = function() {
+    	// Either return customized message with linebreaks turned into <br> tags, if customization had been used
+    	// or process the keyword generated message and replace linebreaks similarly
+        return this.saveCustomized ? this.customMessage.replace(/\n/g, '<br />') : TextProcessorService.processLineBreaks($('.finalmessage').html()).replace(/\n/g, '<br />');
+    }
 
 		this.showCustomEditor = function(profile) {
 			//If there is no customized message already, grab the keyword-driven message and convert
@@ -264,6 +243,16 @@ angular.module('datebot').controller('ProfileController',
 			    url: "chrome-extension://" + extId + "/components/options/interests.html",
 			    active: true
 			});
+		};
+
+
+		this.confirmCopied = function() {
+			self.copied = true;
+
+			setTimeout(function() {
+				self.copied = false;
+				$scope.$evalAsync();
+			}, 3000);
 		};
 
 		// This function on the controller updates the profileObj in place withour returning a new object

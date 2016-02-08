@@ -40,12 +40,10 @@ ScraperService.prototype.getProfile = function() {
 };
 
 
-ScraperService.prototype.extraBasicData = function(html) {
+ScraperService.prototype.extraBasicData = function(htmlStr) {
 
-  // jQuery was having errors trying to parse the full page. So we
-  // extract the core part of the document, where the ID starts using
-  // page as a prefix. We close it off at the final div.
-  var coreDocumentArr = /<div id="main_content"(.|\n)*<\/div>/gi.exec(html);
+  // Extract the core part of the document.
+  var coreDocumentArr = /<div id="main_content"(.|\n)*<\/div>/gi.exec(htmlStr);
 	var htmlObj = $(coreDocumentArr[0]);
 
 	var okcText = htmlObj.find(".profile2015-content-main").text().toLowerCase().trim();
@@ -57,9 +55,7 @@ ScraperService.prototype.extraBasicData = function(html) {
     username: okcUserName,
     imgUrl: okcPicture,
     $html: htmlObj
-
-  }
-	// return [okcText, okcUserName, okcPicture, htmlObj];
+  };
 
 };
 
