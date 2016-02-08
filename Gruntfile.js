@@ -12,14 +12,14 @@ module.exports = function(grunt) {
         files: {
           'build/css/popup.css': 'stylesheets/popup.scss',
           'build/css/style.css': 'stylesheets/style.scss',
-        } 
+        }
       },
       debug: {
         files: {
           'temp/popup.css': 'stylesheets/popup.scss',
           'temp/style.css': 'stylesheets/style.scss',
           'temp/options.css': 'components/options/css/options.scss',
-        } 
+        }
       }
     },
 
@@ -69,12 +69,12 @@ module.exports = function(grunt) {
       }
     },
 
-    imagemin: {                          
-      imgdir: {                         
+    imagemin: {
+      imgdir: {
         files: [{
-          expand: true,                 
-          src: ['img/*.{png,jpg,gif}'],   
-          dest: 'build/'                  
+          expand: true,
+          src: ['img/*.{png,jpg,gif}'],
+          dest: 'build/'
         }]
       }
     },
@@ -114,7 +114,7 @@ module.exports = function(grunt) {
           type: 'html'
         }
       }
-    },    
+    },
 
     usemin: {
       popup: {
