@@ -3,9 +3,6 @@
  * @ngInject
  */
 function ScraperService($q, TextProcessorService) {
-    /**
-     * @type {angular.$q}
-     */
   this.q_ = $q;
 
   this.textProcessorService = TextProcessorService;
@@ -43,7 +40,7 @@ ScraperService.prototype.getProfile = function() {
 };
 
 
-ScraperService.prototype.turnIntoJquery = function(html) {
+ScraperService.prototype.extraBasicData = function(html) {
 
   // jQuery was having errors trying to parse the full page. So we
   // extract the core part of the document, where the ID starts using
@@ -55,11 +52,14 @@ ScraperService.prototype.turnIntoJquery = function(html) {
 	var okcUserName = htmlObj.find('.userinfo2015-basics-username').text().trim();
 	var okcPicture = htmlObj.find('img.active').attr('src');
 
-  // Get user ID and store on service to use for opening chat
-  // panel automatically
-  // this.userId = htmlObj.find('#action_bar').data('userid');
-  console.log([okcText, okcUserName, okcPicture, htmlObj]);
-	return [okcText, okcUserName, okcPicture, htmlObj];
+  return {
+    profile: okcText,
+    username: okcUserName,
+    imgUrl: okcPicture,
+    $html: htmlObj
+
+  }
+	// return [okcText, okcUserName, okcPicture, htmlObj];
 
 };
 

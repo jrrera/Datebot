@@ -54,32 +54,33 @@ angular.module('datebot').controller('ProfileController',
 
 				//Now that keywords have been returned, time to get the profile
 				ScraperService.getProfile().then(angular.bind(this, function(data){
-					var jqueryArr, okcContext, profileObj;
+					var basicData, okcContext, profileObj;
 
-					// Returns an array of - in order - okcText, 
+					// Returns an array of - in order - okcText,
 					// okcContext (for matched interests), the picture URL,
 					// and the jquery object
-					jqueryArr = ScraperService.turnIntoJquery(data.html);
+					basicData = ScraperService.extraBasicData(data.html);
 
 					// Now, we test to see if the OKCText and username were found in the HTML.
 					// If not, we're not on a profile page. If yes, continue on
-					if (jqueryArr[0] && jqueryArr[1]) {
+					if (basicData.profile && basicData.username) {
 						//Returns an array of objects (the essays scraped from the profile)
-						okcContext = TextProcessorService.processContext(jqueryArr[3]);
+						okcContext = TextProcessorService.processContext(basicData.$html);
 
 						//Processes the profile text with find-and-replace
-						jqueryArr[0] = TextProcessorService.processProfileText(jqueryArr[0]);
+						basicData.profile = TextProcessorService.processProfileText(basicData.profile);
 
-						//Adds the okcContext as the fifth item in the jqueryArr array
-						jqueryArr.push(okcContext);
+						//Adds the okcContext as the fifth item in the basicData array
+						basicData.context = okcContext;
 
 						//Create the final profile object to send to the front-end if the profile processed successfully
 						profileObj = {
-							okcText: jqueryArr[0],
-							okcUsername: jqueryArr[1],
-							okcPicture: jqueryArr[2],
-							okcContext: jqueryArr[4],
-							matches: ScraperService.findSimilarities(jqueryArr[0], this.keywords, jqueryArr[4]) //Generates the object that the Chrome extension front end looks for
+							okcText: basicData.profile,
+							okcUsername: basicData.username,
+							okcPicture: basicData.imgUrl,
+							okcContext: basicData.context,
+							matches: ScraperService.findSimilarities(
+									basicData.profile, this.keywords, basicData.context) //Generates the object that the Chrome extension front end looks for
 						}
 
 						this.profiles.push(profileObj);
