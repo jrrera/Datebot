@@ -1,11 +1,11 @@
 /**
  * @constructor
  * @ngInject
- */ 
+ */
 function ScraperService($q, TextProcessorService) {
     /**
      * @type {angular.$q}
-     */ 
+     */
   this.q_ = $q;
 
   this.textProcessorService = TextProcessorService;
@@ -14,51 +14,53 @@ function ScraperService($q, TextProcessorService) {
   this.userId = null;
 }
 
-angular.module('datebot').service('ScraperService', ScraperService);  
+angular.module('datebot').service('ScraperService', ScraperService);
 
 ScraperService.prototype.getProfile = function() {
 	console.log('Initalizing profile grab...');
 
 	var deferred = this.q_.defer(); //$q service uses async promises so you're not nesting callbacks on callbacks on callbacks
 
-    //First, we send a runtime message to the background script. Then, we add a listener for the result back the content and background scripts. 
+    //First, we send a runtime message to the background script. Then, we add a listener for the result back the content and background scripts.
     window.chrome.runtime.sendMessage({method:"triggerScript"},function(response){});
-    
+
     //Then, we listen for a response. If the msg object has an HTML property, we're in businesss
-    window.chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {		        
+    window.chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       if (msg.html) {
       	if (!msg.html.length) {
     			deferred.reject('Error! There was nothing returned in msg.html!');
       	} else {
-      		console.log('The scraped HTML has arrived! :D');
+      		console.log('The scraped HTML has arrived! :D', msg.html);
     			deferred.resolve({html:msg.html});
-        } 
+        }
       } else {
         deferred.reject('Error! Returned msg object did not contain an HTML property');
       }
-    
-    });  
 
-	return deferred.promise;			
+    });
+
+	return deferred.promise;
 };
 
 
 ScraperService.prototype.turnIntoJquery = function(html) {
 
-  // jQuery was having errors trying to parse the full page. So we 
+  // jQuery was having errors trying to parse the full page. So we
   // extract the core part of the document, where the ID starts using
   // page as a prefix. We close it off at the final div.
-  var coreDocumentArr = /<div id="page"(.|\n)*<\/div>/gi.exec(html);
+  var coreDocumentArr = /<div id="main_content"(.|\n)*<\/div>/gi.exec(html);
 	var htmlObj = $(coreDocumentArr[0]);
 
-	var okcText = htmlObj.find("#main_column").text().toLowerCase();
-	var okcUserName = htmlObj.find('#basic_info_sn').text();
-	var okcPicture = htmlObj.find('#thumb0 img').attr('src');
+	var okcText = htmlObj.find(".profile2015-content-main").text().toLowerCase().trim();
+	var okcUserName = htmlObj.find('.userinfo2015-basics-username').text().trim();
+	var okcPicture = htmlObj.find('img.active').attr('src');
 
   // Get user ID and store on service to use for opening chat
   // panel automatically
-  this.userId = htmlObj.find('#action_bar').data('userid'); 
+  // this.userId = htmlObj.find('#action_bar').data('userid');
+  console.log([okcText, okcUserName, okcPicture, htmlObj]);
 	return [okcText, okcUserName, okcPicture, htmlObj];
+
 };
 
 
@@ -74,10 +76,10 @@ ScraperService.prototype.getKeywords = function() {
 		} else {
   		console.log('no keywords found. giving defaults');
   		var defaultKeywords = {
-  			"opener":"Hey, how's it going?\n\n", 
+  			"opener":"Hey, how's it going?\n\n",
   			"closer":"Cheers,\n{Name}",
   			"first_transition" : "Also,",
-  			"second_transition" : "Oh, and", 
+  			"second_transition" : "Oh, and",
   			"pairs": [
   				{
   					"keyword": "cooking",
@@ -115,7 +117,7 @@ ScraperService.prototype.getKeywords = function() {
   		deferred.resolve(angular.fromJson(defaultKeywords))
 		}
 	}));
-		
+
 	return deferred.promise;
 };
 
@@ -123,10 +125,10 @@ ScraperService.prototype.getKeywords = function() {
 ScraperService.prototype.findSimilarities = function(profile, keywords, context) {
 
 	//Begin processing the data by sorting in the appropriate array
-	var desiredKeywords = [], 
-        desiredMessage = [], 
-        desiredPriority =[], 
-        finalKeywordPriority = [], 
+	var desiredKeywords = [],
+        desiredMessage = [],
+        desiredPriority =[],
+        finalKeywordPriority = [],
         finalMessage = [];
 
 	//Put the desiredKeywords in one array, and the related message in another array.
@@ -145,7 +147,7 @@ ScraperService.prototype.findSimilarities = function(profile, keywords, context)
 	for (var i = 0; i < finalKeywords.length; i++) {
 	  if (desiredKeywords.indexOf(finalKeywords[i]) != -1) {
 	    var index = desiredKeywords.indexOf(finalKeywords[i]);
-	    finalMessage.push(desiredMessage[index]);  
+	    finalMessage.push(desiredMessage[index]);
 	  }
 	}
 
@@ -165,21 +167,17 @@ ScraperService.prototype.findSimilarities = function(profile, keywords, context)
 
     // highlightMatches will turn the matched keyword blue
 		oneMatchObj.context = this.textProcessorService.highlightMatches(
-        finalKeywords[i], finalContext[i]); 
+        finalKeywords[i], finalContext[i]);
 		oneMatchObj.message = finalMessage[i];
 		oneMatchObj.priority = finalKeywordPriority[i];
 
 	  finalResult.matched.push(oneMatchObj);
 	}
-	
+
 	console.log('finalResult', finalResult);
 
-	// Before returning, we run the finalResult through a function that checks the highest priority 
+	// Before returning, we run the finalResult through a function that checks the highest priority
 	// keywords and flips on the checked attribute flag if it's a high priority keyword
-	this.textProcessorService.determineTopKeywords(finalResult); 
+	this.textProcessorService.determineTopKeywords(finalResult);
 	return finalResult;
 };
-
-
-
-
