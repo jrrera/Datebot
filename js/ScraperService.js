@@ -16,27 +16,21 @@ angular.module('datebot').service('ScraperService', ScraperService);
 ScraperService.prototype.getProfile = function() {
 	console.log('Initalizing profile grab...');
 
-	var deferred = this.q_.defer(); //$q service uses async promises so you're not nesting callbacks on callbacks on callbacks
-
-    //First, we send a runtime message to the background script. Then, we add a listener for the result back the content and background scripts.
-    window.chrome.runtime.sendMessage({method:"triggerScript"},function(response){});
+  return this.q_(function(resolve, reject) {
+    // Pass angular.noop as callback, since we add a listener coming back
+    // upstream. Can merge this two calls together in the future.
+    window.chrome.runtime.sendMessage({method:"triggerScript"}, angular.noop);
 
     //Then, we listen for a response. If the msg object has an HTML property, we're in businesss
     window.chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       if (msg.html) {
-      	if (!msg.html.length) {
-    			deferred.reject('Error! There was nothing returned in msg.html!');
-      	} else {
-      		console.log('The scraped HTML has arrived! :D', msg.html);
-    			deferred.resolve({html:msg.html});
-        }
+  			resolve({html:msg.html});
       } else {
-        deferred.reject('Error! Returned msg object did not contain an HTML property');
+        reject('Error! Returned msg object did not contain HTML');
       }
-
     });
 
-	return deferred.promise;
+  });
 };
 
 

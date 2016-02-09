@@ -55,8 +55,11 @@ TextProcessorService.prototype.findEssayTitle = function(keyword, essays) {
 /**
 * Removes a series of profile filler text snippets we don't want to analyze.
 */
-TextProcessorService.prototype.processProfileText = function(profile) {
-  //This function removes the built-in OKC text headers, changes problematic double quotation marks to singles, and removes unnecessary spacing.
+TextProcessorService.prototype.removeEssayHeaders = function(profile) {
+  // TODO: Refactor to extract essay titles dynamically like processContext does.
+  // This function removes the built-in OKC text headers,
+  // changes problematic double quotation marks to singles,
+  // and removes unnecessary spacing.
   var replace1 = "my self-summary";
   var replace2 = "what i\u2019m doing with my life";
   var replace3 = "the first things people usually notice about me";
@@ -66,40 +69,27 @@ TextProcessorService.prototype.processProfileText = function(profile) {
   var replace7 = "on a typical friday night i am";
   var replace8 = "the most private thing i\u2019m willing to admit";
   var replace9 = "i\u2019m looking for";
-  var replace10 = new RegExp('"', "g");
-  var replace11 = "            ";
 
-  var findreplace = [replace1,replace2,replace3,replace4,replace5,replace6,replace7,replace8,replace9,replace11];
+  var findreplace = [replace1,replace2,replace3,replace4,replace5,replace6,replace7,replace8,replace9];
 
   var textUpdate = profile;
   for (var i = 0; i < findreplace.length; i++) {
     textUpdate = textUpdate.replace(findreplace[i],"");
   }
-    textUpdate = textUpdate.replace(replace10, "'");
-    textUpdate = textUpdate.replace(/(\r\n|\n|\r)/gm," ");
-    textUpdate = textUpdate.replace(/\s+/gm, " ");
+
   return textUpdate;
 };
 
 
-TextProcessorService.prototype.processContext = function(htmlObj){
+/**
+ * Takes HTML wrapped in jQuery and extracts each essay of the profile.
+ *
+ * @param  {jQuery} htmlObj HTML page as jQuery.
+ * @return {Array<Object>} An array of essay objects.
+ */
+TextProcessorService.prototype.processContext = function($html){
   var contextArr = [];
-
-  // for (var i = 0; i < 9; i++) {
-  //   var contextObj = {};
-  //
-  //   name = htmlObj.find('#essay_'+i+'> a').text();
-  //   essay = htmlObj.find('#essay_text_'+i).text();
-  //
-  //   finalEssay = essay.replace(/\n/gi," ");
-  //
-  //   contextObj.name = name;
-  //   contextObj.essay = finalEssay;
-  //
-  //   contextArr.push(contextObj);
-  // }
-  //
-  var essays = htmlObj.find('.essays2015-essay');
+  var essays = $html.find('.essays2015-essay');
 
   essays.each(function(i) {
     var essay = {};

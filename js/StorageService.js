@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('datebot').factory(function() {
+angular.module('datebot').factory('StorageService', function() {
   function recordInteraction(interactionObj) {
     var records = localStorage["dbotInteractions"], //storage object containing username as key and interaction as value
         user = interactionObj.username;
