@@ -1,6 +1,6 @@
 'use strict';
 
-keywordsApp.controller('KeywordController', 
+keywordsApp.controller('KeywordController',
 	function KeywordController($scope, $timeout, $filter, keywordData) {
 		console.log('keyword controller initiated');
 		$scope.interestsPage = true;
@@ -10,9 +10,10 @@ keywordsApp.controller('KeywordController',
 		$scope.sortorder = '';
 		$scope.exportTurnOn = false; //Disables export button until file is ready
 
-		keywordData.getKeywords($scope).then(function(data) {
+		keywordData.getKeywords().then(function(data) {
 			console.log('initiating keyword grab');
-			$scope.keyword = angular.fromJson(data);
+			$scope.keyword = data.keywords;
+			$scope.isNewUser = !data.fromStorage; // Nothing in storage? New user.
 			$scope.loading = false; //Turns off loading notifications
 			$scope.completed = true; //Turns on successful load notif
 			$scope.keywordLength = $scope.keyword.pairs.length;
@@ -26,8 +27,8 @@ keywordsApp.controller('KeywordController',
 			$timeout(function(){
 				$scope.completed = false;	//Turns off loading notification 5 seconds later
 			}, 5000);
-				
-			//Logic for handling keywords passing via context menu across tabs		
+
+			//Logic for handling keywords passing via context menu across tabs
 			if ($scope.added) {
 			  console.log('A keyword is waiting!');
 		      if (keywordData.checkForExistingKeywords($scope.newKeyword, $scope.keyword.pairs) === false) {
@@ -58,7 +59,7 @@ keywordsApp.controller('KeywordController',
 		$scope.submitImport = function() {
 			var keywords;
 			console.log('data to replace current keywords', $scope.importedData);
-			
+
 			$scope.importOn = false;
 
 			if (typeof $scope.importedData === 'object') {
@@ -83,12 +84,13 @@ keywordsApp.controller('KeywordController',
 			keywordData.saveKeywords($scope.keyword); //Saves keywords to local storage
 			keywordData.generateExport($scope.keyword); //Updates the export file
 			$scope.saved = true;
-			
+			$scope.keywordLength = $scope.keyword.pairs.length;
+
 			$timeout(function(){
-				$scope.saved = false;	
+				$scope.saved = false;
 			}, 5000);
 		};
-		
+
 		$scope.cancelEdit = function(){
 			window.location = 'interests.html';
 		};
@@ -101,7 +103,7 @@ keywordsApp.controller('KeywordController',
 		$scope.deleteRow = function(index){
 			$scope.keyword.pairs.splice(index, 1);
 		};
-		
+
 		$scope.recommendation = function(text) {
 			//Coming soon
 		};
@@ -112,34 +114,34 @@ keywordsApp.controller('KeywordController',
 		    console.log("contextMenus listener was triggered. We received this keyword:", msg.newKeyword);
 
 		    var newKeyword = keywordData.trimKeyword(msg.newKeyword).toLowerCase();
-		   
+
 		    if (newKeyword.length > 0) {
 		    	if (!$scope.loading) { //Checks to see if the AJAX call has completed for the keywords yet. If loading = false, the process is complete, so we move forward as planned
-			      
+
 			      if (keywordData.checkForExistingKeywords(newKeyword, $scope.keyword.pairs) === false){ //If no matching keywords were found, create it.
-					
+
 					//Run $scope.$apply because this data change happens in the chrome API callback
 					$scope.$apply(function(){
 						$scope.keyword.pairs.unshift({'keyword':newKeyword, 'message':'[[Requires a related message]]'}); //Add to top of keywords list
-						$scope.save(); //Save the data	
+						$scope.save(); //Save the data
 					});
-			      }		    		
-		    	
-		    	} else {	    		
+			      }
+
+		    	} else {
 			    	console.log('Keywords not loaded yet. Making $scope.added true!');
 
 			    	//Run $scope.$apply because this data change happens in the chrome API callback
 			    	$scope.$apply(function(){
 						$scope.added = true; //Queues up this keyword to get added along with AJAX call still in progress
-						$scope.newKeyword = newKeyword; //This is where the new keyword is held until the AJAX call finishes (See code above for how this gets handled)			    		
+						$scope.newKeyword = newKeyword; //This is where the new keyword is held until the AJAX call finishes (See code above for how this gets handled)
 			    	});
-			    	
+
 		    	}
 		    }
 		    sendResponse('Received!');
 		  }
-		});	
-		
+		});
+
 		//Event listener for import feature
 		document.getElementById('files').addEventListener('change', $scope.handleFileSelect, false);
 	}

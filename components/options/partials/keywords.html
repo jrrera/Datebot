@@ -1,7 +1,7 @@
 <ul class="nav nav-pills">
 	<a class="navbar-brand">Datebot</a>
   <li class="active"><a href="#/">Interests</a></li>
-	<li><a href="#/analytics">Analytics</a></li>
+	<!-- <li><a href="#/analytics">Analytics</a></li> -->
 
 </ul>
 
@@ -10,24 +10,43 @@
 </div>
 <div style="padding-left: 20px; padding-right: 20px;">
 <div class="row">
+	<div class="alert alert-info" ng-show="isNewUser">
+  		Welcome to Datebot! My goal is to make sure that you find better matches more quickly
+			on OKCupid.
+			<br /><br />
+			Before you can use Datebot, scroll down to the example keywords below.
+			These keywords are what we use to match you more accurately than OKCupid currently does.
+			And the best part is, if you also include a small message with your interest of choice,
+			Datebot will write the message for you!
+			<br /><br />
+			Okay, so scroll down, add/delete/modify some interests, and then click save.
+			Once you click save, you're good to go! (Don't forget to save!)
+			<br /><br />
+			I'd also highly recommend reading the
+			<a href="https://docs.google.com/document/d/1EQIzJzchrmPx05tBrfrFsu3J58TQyW5z7I-imuz7XFc/edit?usp=sharing"
+			target="_blank">Datebot guide</a> when you have a chance. This
+			tool is powerful, and I want to make sure you know how to take full advantage of it.
+			<br /><br/>
+			Enjoy!
+	</div>
 	<div class="alert alert-info" ng-show="loading">
   		Loading your account data...
-	</div>		
+	</div>
 	<div class="alert alert-success" ng-show="completed">
   		Settings loaded successfully!
 	</div>
 	<div class="alert alert-success" ng-show="saved">
   		<p>Everything was saved successfully!</p>
   		<p><strong>Remember</strong>: Your data is stored locally, so don't forget to download your keyword data every so often with the 'Export' button! :)
-	</div>		
-</div>	
+	</div>
+</div>
 <br />
-<h3>Message Templating</h3>
+<h2>Message Templating</h2>
 <h5>This is where you set up the template for your messages. This allows Datebot to suggest messages for you.</h5>
 <br />
 <button class="btn btn-primary" ng-click="save()">Save</button>
 <button class="btn" ng-click="cancelEdit()">Undo</button>
-<br /><br />		
+<br /><br />
 
 <div class="row">
 	<div class="col-md-5">
@@ -51,10 +70,10 @@
 		<strong>Second Transition:</strong> <br />
 		<textarea class="transition" placeholder="Write your second transition here. (ex: 'Oh, and')" ng-model="keyword.second_transition"></textarea>
 	</div>
-</div>		
+</div>
 
 <hr />
-<h3>Data Import / Export</h3>
+<h2>Data Import / Export</h2>
 <h5>Here, you can download a history of past interactions for analysis, and export/import your interests and associated messages.</h5>
 <br />
 <div class="row">
@@ -64,7 +83,7 @@
 	<div class="col-md-2">
 		<a style="color:white;" href="{{exportUrl}}" download="dbot_export"><button ng-disabled="!exportTurnOn" id="exporter" class="btn btn-primary">Export Interests</button></a>
 	</div>
-	<div class="col-md-2">	
+	<div class="col-md-2">
 		<button class="btn" ng-click="importOn = !importOn">Import Interests</button>
 	</div>
 </div>
@@ -85,20 +104,27 @@
 <!-- End import options-->
 
 <hr />
-<h3>Interests and Talking Points</h3>
+<h2>Interests and Talking Points</h2>
 
-<h5>You have {{ keywordLength }} interests in the database. Only {{100 - keywordLength}} to go before you hit the goal of 100!</h5>
-<div class="progress progress-striped active">
+<p class="lead">You have {{ keywordLength }} interests in the database. Only {{25 - keywordLength}} to go before you hit the recommended goal of 25.</p>
+	<p>(This is when Datebot becomes immensely helpful, since we often have a dozen or more interests we care about.)</p>
+<!-- <div class="progress progress-striped active">
 	<div class="bar" style="width: {{ keywordLength }}%">{{ keywordLength }}%</div>
+</div> -->
+<div class="progress">
+  <div class="progress-bar progress-bar-striped active" role="progressbar"
+			 aria-valuenow="{{ keywordLength }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ keywordLength }}%">
+    <span>{{ keywordLength }}%</span>
+  </div>
 </div>
 <div class="row">
-	<div class="col-md-1">	
+	<div class="col-md-1">
 		<button class="btn btn-primary" ng-click="save()">Save</button>
-	</div>	
+	</div>
 	<div class="col-md-1">
 		<button class="btn" ng-click="addRow()"> Add </button>
 	</div>
-	<div class="col-md-1">	
+	<div class="col-md-1">
 		<button class="btn" ng-click="cancelEdit()">Undo</button>
 	</div>
 
@@ -112,12 +138,14 @@
 		<div class="row">
 			<div class="col-md-3">
 				<!-- <i class="icon-exclamation-sign" ng-show="recommendation()"></i> -->
-				<input type="text" class="form-control" name="{{pair.keyword}}" ng-model="pair.keyword" placeholder="Interest/keyword goes here" required />
+				<input type="text" class="form-control" name="{{pair.keyword}}" ng-model="pair.keyword" placeholder="Interest/keyword (e.g. vegan)" required />
 				<span>Priority <small>(1 is highest, 3 lowest)</small>:</span> <input class="keyword_priority" ng-model="pair.priority" placeholder="?" />
 
 			</div>
 			<div class="col-md-7">
-				<textarea class="message form-control" ng-model="pair.message" placeholder="Message goes here" required></textarea>
+				<textarea class="message form-control" ng-model="pair.message"
+									placeholder="Your message based on this interest. Example: I've been a vegan for five years. Do you have a favorite vegan restaurant in the city?"
+									required></textarea>
 			</div>
 			<div class="deletekeyword">
 				<button class="btn btn-small" ng-click="deleteRow($index)">Delete</button>

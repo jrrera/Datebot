@@ -8,7 +8,7 @@
     <!-- endbuild -->
   </head>
   <body>
-  <div ng-controller="ProfileController as profileCtrl">
+  <div ng-controller="ProfileController as profileCtrl" class="container">
     <p class="lead title">Datebot - Online Dating Assistant</p>
     <div class="alert alert-success" role="alert" ng-show="profileCtrl.copied">
       Copied to clipboard. Now go send that message!
@@ -19,9 +19,9 @@
       <div style="float: right;">
         <img src="img/Thomas-Hello128.png" alt="Welcome!" /></div><br />
         <p class="lead">Welcome to Datebot, the online dating assistant. Seems
-         like you're a new user.<br />To get started, visit the Options page or
-         read the <a href="https://docs.google.com/document/d/1EQIzJzchrmPx05tB
-         rfrFsu3J58TQyW5z7I-imuz7XFc" target="_blank">Datebot Guide</a><br />
+         like you're a new user.<br /><br />To get started, visit the Options page or
+         read the <a href="https://docs.google.com/document/d/1EQIzJzchrmPx05tBrfrFsu3J58TQyW5z7I-imuz7XFc/edit?usp=sharing"
+                    target="_blank">Datebot Guide</a><br />
 
          <button class="btn btn-primary" ng-click="profileCtrl.goToOptions()">
           Go to the Options Page</button>
@@ -67,10 +67,10 @@
            type="checkbox"
            ng-model="profileCtrl.debug" />
     <small class="toggle_label">Debug mode?</small>
-    <input style="margin-bottom: 4px;"
+    <!-- <input style="margin-bottom: 4px;"
            type="checkbox"
            ng-model="profileCtrl.noTracking" />
-    <small class="toggle_label">Don't record messages?</small>
+    <small class="toggle_label">Don't record messages?</small> -->
   </div>
 
    <!--This contains match info (where most of the workflow takes place)-->
@@ -88,7 +88,7 @@
       <td ng-hide="profileCtrl.hidePicture" id="matchinfo">
         <a href="http://www.okcupid.com/profile/{{profile.okcUsername}}"
            target="_blank">{{profile.okcUsername}}</a>
-        <img src="{{profile.okcPicture}}" /><br />
+        <img src="{{profile.okcPicture}}" class="profile-image" /><br />
         <p class="score lead">
           Score:<br />
           <strong>{{profileCtrl.calculateScore(profile)}}</strong>
@@ -115,11 +115,11 @@
                                 match, profile.matches.matched, 'last')"
                   ng-hide="$last"></span>
 
-            <span class="moveit glyphicon glyphicon-arrow-up"
+            <!-- <span class="moveit glyphicon glyphicon-arrow-up"
                   ng-click="profileCtrl.raiseKeywordPosition(
                                 match, profile.matches.matched)"
                   ng-hide="$first">
-                  <small>1</small></span>
+                  <small>1</small></span> -->
             <!-- <span class="moveit"
                       ng-click="lowerKeywordPosition(
                           match, profile.matches.matched)"
@@ -180,12 +180,21 @@
           <p ng-bind-html="profile.matches.closer | unsafe"></p>
         </div>
 
-
-        <!--Custom Editor functionality-->
+        <!-- Custom message result goes here -->
         <div class="customized_finalmessage"
              ng-show="profileCtrl.saveCustomized && !profile.customEditorActive"
              ng-bind-html="profileCtrl.customMessage | replaceLineBreaks | unsafe">
         </div>
+
+        <button id="{{profile.okcUsername}}"
+                class="btn btn-primary sendmessage"
+                ng-hide="profile.customEditorActive"
+                ng-click="profileCtrl.copyToClipboard(profile)">
+                Copy to Clipboard
+        </button>
+
+
+        <!--Custom Editor functionality-->
         <textarea class="custom_editor"
                   ng-model="profileCtrl.customMessage"
                   ng-show="profile.customEditorActive"
@@ -200,21 +209,13 @@
                 class="btn" ng-show="profile.customEditorActive"
                 ng-click="profileCtrl.saveCustomEdit(profile)">Save</button>
 
-        <div id="{{profile.okcUsername}}_customized_alert"
-             class="alert"
+        <hr />
+        <div class="alert alert-info"
              ng-show="profileCtrl.saveCustomized">
              Note: This is a customized message. Adjusting your keyword choices
               will reset the message to your defaults!
         </div>
         <!--End Custom Edtior functionality-->
-
-        <button id="{{profile.okcUsername}}"
-                class="btn btn-primary sendmessage"
-                ng-hide="profile.customEditorActive"
-                ng-click="profileCtrl.copyToClipboard(profile)">
-                Copy to Clipboard
-        </button>
-
         <hr />
 
         <button class="btn btn-small" ng-click="profileCtrl.goToOptions()">

@@ -268,7 +268,7 @@ ProfileController.prototype.confirmCopied = function() {
 
 	setTimeout(function() {
 		self.copied = false;
-		this.scope_.$evalAsync();
+		self.scope_.$evalAsync();
 	}, 3000);
 };
 

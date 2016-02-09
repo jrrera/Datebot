@@ -1,63 +1,63 @@
 keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
-
+	var defaultKeywords = {
+		"opener":"Hey, how's it going?\n\n",
+		"closer":"Cheers,\n{Name}",
+		"first_transition" : "Also,",
+		"second_transition" : "Oh, and",
+		"pairs": [
+			{
+				"keyword": "cooking",
+				"message": "I'm really into cooking too. Do you have a specialty dish? Mine's {{INSERT DISH NAME HERE}}.",
+				"priority": 2
+			},
+			{
+				"keyword": "travel",
+				"message": "How was traveling in {{COUNTRY/STATE/PLACE}}? I've been to {{COUNTRY/STATE/PLACE}} and had an amazing time.",
+				"priority": 2
+			},
+			{
+				"keyword": "foodie",
+				"message": "I'm a total foodie too. Have you ever been to {{PLACE}} in {{NEIGHBORHOOD}}? It's unbelievable.",
+				"priority": 2
+			},
+			{
+				"keyword": "thai",
+				"message": "Thai food is my absolutely favorite right now. Have you been to {{PLACE}} in {{NEIGHBORHOOD}}? It's fantastic.",
+				"priority": 2
+			},
+			{
+				"keyword": "barhopping",
+				"message": "Since moving here, I've been loving the bar scene. What's your favorite bar? I'm pretty fond of {{BAR}}.",
+				"priority": 2
+			},
+			{
+				"keyword": "game of thrones",
+				"message": "I definitely share your love for Game of Thrones. Who's your favorite character? I'd have to give it to Jon Snow on that one.",
+				"priority": 2
+			}
+		]
+	};
 	return {
-        getKeywords: function($scope) {
-        	var deferred = $q.defer();
+    getKeywords: function() {
+    	var deferred = $q.defer();
 
 			chrome.storage.local.get('dbotKeywords', function(result) {
 				if (result.dbotKeywords) {
-					$scope.$apply(function(){
-						deferred.resolve(angular.fromJson(result.dbotKeywords))
-					});							
+					deferred.resolve({
+						fromStorage: true,
+						keywords: angular.fromJson(result.dbotKeywords)
+					});
 				} else {
-	        		console.log('no keywords found. giving defaults');
-	        		var defaultKeywords = {
-	        			"opener":"Hey, how's it going?\n\n", 
-	        			"closer":"Cheers,\n{Name}", 
-	        			"first_transition" : "Also,",
-	        			"second_transition" : "Oh, and",
-	        			"pairs": [
-	        				{
-	        					"keyword": "cooking",
-	        					"message": "I'm really into cooking too. Do you have a specialty dish? Mine's {{INSERT DISH NAME HERE}}.",
-	        					"priority": 2
-	        				},
-	        				{
-	        					"keyword": "travel",
-	        					"message": "How was traveling in {{COUNTRY/STATE/PLACE}}? I've been to {{COUNTRY/STATE/PLACE}} and had an amazing time.",
-	        					"priority": 2
-	        				},
-	        				{
-	        					"keyword": "foodie",
-	        					"message": "I'm a total foodie too. Have you ever been to {{PLACE}} in {{NEIGHBORHOOD}}? It's unbelievable.",
-	        					"priority": 2
-	        				},
-	        				{
-	        					"keyword": "thai",
-	        					"message": "Thai food is my absolutely favorite right now. Have you been to {{PLACE}} in {{NEIGHBORHOOD}}? It's fantastic.",
-	        					"priority": 2
-	        				},
-	        				{
-	        					"keyword": "barhopping",
-	        					"message": "Since moving here, I've been loving the bar scene. What's your favorite bar? I'm pretty fond of {{BAR}}.",
-	        					"priority": 2
-	        				},
-	        				{
-	        					"keyword": "game of thrones",
-	        					"message": "I definitely share your love for Game of Thrones. Who's your favorite character? I'd have to give it to Jon Snow on that one.",
-	        					"priority": 2
-	        				}
-	        			]
-	        		};
-	        		$scope.$apply(function(){
-	        			deferred.resolve(defaultKeywords);
-	        		});
+      		console.log('no keywords found. giving defaults');
+    			deferred.resolve({
+						fromStorage: false,
+						keywords: defaultKeywords
+					});
 				}
 			});
-				
-			return deferred.promise;
-        },
 
+			return deferred.promise;
+    },
 
 		saveKeywords: function(keywordObj) {
 			var keywordJson;
@@ -67,7 +67,7 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 			}
 
 			keywordJson = JSON.stringify(keywordObj);
-			
+
 			chrome.storage.local.set({'dbotKeywords': keywordJson}, function(){});
 
 			//this.generateExport(keywordObj); //Updates the export file
@@ -81,7 +81,7 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 			var json = JSON.stringify(keywordObj);
 			var blob = new Blob([json], {type: "application/json"});
 			var url  = URL.createObjectURL(blob);
-			return url;	
+			return url;
 		},
 
 		generateInteractionExport: function() {
@@ -95,7 +95,7 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 		checkForExistingKeywords: function(keyword, pairs) {
 		  var pattern = new RegExp("^" + keyword + "$", "i"),
 		  match = false;
-		
+
 		  for (var i = 0; i < pairs.length; i++) {
 		    if (pattern.test(pairs[i].keyword) === true) {
 		      match = true;
@@ -126,7 +126,7 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 		// 			$log.warn(status, headers);
 		// 		});
 
-		// 	return deferred.promise;			
+		// 	return deferred.promise;
 		// },
 		// getUsername: function() {
 		// 	try {
@@ -146,7 +146,7 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 		//Outdated code on posting to AppEngine:
 		//			// if (username === 'jrrera' || username ==='jrrera@gmail.com') { //Only works for my username so far
 			// 	$http({
-			// 		method: 'POST', 
+			// 		method: 'POST',
 			// 		url:'http://dbotapp.appspot.com/keywords',
 			// 		//url:'http://localhost:8080/keywords', //for testing
 			// 		dataType: 'json',
@@ -163,7 +163,7 @@ keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 			// 		}).
 			// 		error(function (data, status, headers, config) {
 			// 			$log.warn(status, headers);
-			// 		});	
+			// 		});
 			// }
 	};
 });

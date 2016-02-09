@@ -1,13 +1,17 @@
   body {
     min-width:800px;
-    min-height:350px; 
+    min-height:350px;
+  }
+
+  .profile-image {
+    width: 150px;
   }
 
   #robot {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    padding: 5px; 
+    padding: 5px;
   }
 
   .bluekeywords {
@@ -96,16 +100,16 @@
     display:none;
     position:absolute;
     left: 85%;
-    top: 20%;        
+    top: 20%;
   }
 
   #rescan {
     display:none;
     position:absolute;
     left: 72%;
-    top: 20%;        
+    top: 20%;
   }
-  
+
   .custom_editor {
     width: 350px;
     height: 300px;
@@ -125,7 +129,7 @@
   img.centered {
     display: block;
     margin-left: auto;
-    margin-right: auto 
+    margin-right: auto
   }
 
   .score {
@@ -140,7 +144,7 @@
   }
 
   .title {
-    display:inline; 
+    display:inline;
     font-weight: bold;
     margin: 5px;
   }
