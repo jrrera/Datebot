@@ -143,15 +143,14 @@
 
       <!--Holds the processed message and in-place editing functionality-->
       <td id="the_message" style="min-width: 225px;">
-        <div class="alert" ng-hide="profile.matches.matched.length">
-          Bummer, couldn't find anything in common here. Want to send a
-          generic message?
+        <div class="alert alert-warning" ng-hide="profile.matches.matched.length || profileCtrl.saveCustomized">
+          Bummer, couldn't find anything in common here. Add more keywords or try another profile.
         </div>
 
         <div class="finalmessage"
              copy-to-clipboard on-copy="profileCtrl.confirmCopied()"
              custom-override="profileCtrl.saveCustomized && profileCtrl.customMessage"
-             ng-hide="profile.customEditorActive || profileCtrl.saveCustomized">
+             ng-hide="profile.customEditorActive || profileCtrl.saveCustomized || !profile.matches.matched.length">
 
           <!--Open the message with the chosen opener-->
           <p ng-bind-html="profile.matches.opener | unsafe"></p>
@@ -188,7 +187,7 @@
 
         <button id="{{profile.okcUsername}}"
                 class="btn btn-primary sendmessage"
-                ng-hide="profile.customEditorActive"
+                ng-hide="profile.customEditorActive || (!profile.matches.matched.length && !profileCtrl.saveCustomized)"
                 ng-click="profileCtrl.copyToClipboard(profile)">
                 Copy to Clipboard
         </button>
