@@ -276,30 +276,30 @@ ProfileController.prototype.confirmCopied = function() {
 // This function on the controller updates the profileObj in place withour returning a new object
 // profileObj is a private var in the controller, to allow it to maintain state between function calls
 // By updating the object in place, we avoid infinite digest loops by returning new object in each call
-ProfileController.prototype.updateDatabaseObj = function(profileObj, customizedBool, username, matchScore) {
-	function produceKeywordArr(matchArr) {
-		//Takes in the 'matched' array and returns an array of keywords used, in the order of their use
-		var keywordArr = [];
-		if (matchArr.length) {
-			angular.forEach(matchArr, function(match){
-				if (match.checked) keywordArr.push(match.keyword);
-			});
-		} else {
-			keywordArr.push('genericQuestion'); //If no matches found in the matchArr, record a generic message
-		}
-
-		if (!keywordArr.length) keywordArr.push('genericQuestion'); //If matchArr has interests, but none were checked when messsage was sent, record as generic message
-		return keywordArr;
-	}
-
-	profileObj.keywords = produceKeywordArr(profileObj.matched);
-	profileObj.username = username;
-	profileObj.date_messaged = new Date;
-	profileObj.customized = customizedBool;
-	profileObj.response = false;
-	profileObj.opener = profileObj.opener.replace(/(?:\n|<br\s?\/?>)/gi, ""); //Removes line breaks and br tags from record
-	profileObj.closer = profileObj.closer.replace(/(<br\s?\/?>)/gi, "\n");
-	profileObj.matchScore = matchScore;
-
-	return profileObj;
-};
+// ProfileController.prototype.updateDatabaseObj = function(profileObj, customizedBool, username, matchScore) {
+// 	function produceKeywordArr(matchArr) {
+// 		//Takes in the 'matched' array and returns an array of keywords used, in the order of their use
+// 		var keywordArr = [];
+// 		if (matchArr.length) {
+// 			angular.forEach(matchArr, function(match){
+// 				if (match.checked) keywordArr.push(match.keyword);
+// 			});
+// 		} else {
+// 			keywordArr.push('genericQuestion'); //If no matches found in the matchArr, record a generic message
+// 		}
+//
+// 		if (!keywordArr.length) keywordArr.push('genericQuestion'); //If matchArr has interests, but none were checked when messsage was sent, record as generic message
+// 		return keywordArr;
+// 	}
+//
+// 	profileObj.keywords = produceKeywordArr(profileObj.matched);
+// 	profileObj.username = username;
+// 	profileObj.date_messaged = new Date;
+// 	profileObj.customized = customizedBool;
+// 	profileObj.response = false;
+// 	profileObj.opener = profileObj.opener.replace(/(?:\n|<br\s?\/?>)/gi, ""); //Removes line breaks and br tags from record
+// 	profileObj.closer = profileObj.closer.replace(/(<br\s?\/?>)/gi, "\n");
+// 	profileObj.matchScore = matchScore;
+//
+// 	return profileObj;
+// };

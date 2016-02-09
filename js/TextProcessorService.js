@@ -27,7 +27,7 @@ TextProcessorService.prototype.processLineBreaks = function(text) {
 
   //Adds two lines breaks for any closing p tags
   final = final.replace(/\s*<\/p>\s*/gi,"\n\n");
-  return final;
+  return final.trim();
 };
 
 /**

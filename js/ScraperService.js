@@ -66,7 +66,7 @@ ScraperService.prototype.getKeywords = function() {
 		} else {
   		console.log('no keywords found. giving defaults');
   		var defaultKeywords = {
-  			"opener":"Hey, how's it going?\n\n",
+  			"opener":"Hey, how's it going?",
   			"closer":"Cheers,\n{Name}",
   			"first_transition" : "Also,",
   			"second_transition" : "Oh, and",
@@ -142,8 +142,8 @@ ScraperService.prototype.findSimilarities = function(profile, keywords, context)
 	}
 
 	var finalResult = {
-		opener: keywords.opener.replace("\n", "<br />"),
-		closer: keywords.closer.replace("\n", "<br />"),
+		opener: keywords.opener.replace(/(?:\r\n|\r|\n)/g, "<br />"),
+		closer: keywords.closer.replace(/(?:\r\n|\r|\n)/g, "<br />"),
 		first_transition: keywords.first_transition,
 		second_transition: keywords.second_transition
 	};

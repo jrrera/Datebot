@@ -1,6 +1,6 @@
 keywordsApp.factory('keywordData', function($http, $log, $q, $rootScope){
 	var defaultKeywords = {
-		"opener":"Hey, how's it going?\n\n",
+		"opener":"Hey, how's it going?",
 		"closer":"Cheers,\n{Name}",
 		"first_transition" : "Also,",
 		"second_transition" : "Oh, and",

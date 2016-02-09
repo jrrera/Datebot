@@ -63,10 +63,10 @@
            ng-model="profileCtrl.hideContext" />
     <small class="toggle_label">Hide Context?</small>
 
-    <input style="margin-bottom: 4px;"
+    <!-- <input style="margin-bottom: 4px;"
            type="checkbox"
            ng-model="profileCtrl.debug" />
-    <small class="toggle_label">Debug mode?</small>
+    <small class="toggle_label">Debug mode?</small> -->
     <!-- <input style="margin-bottom: 4px;"
            type="checkbox"
            ng-model="profileCtrl.noTracking" />
@@ -153,7 +153,7 @@
              ng-hide="profile.customEditorActive || profileCtrl.saveCustomized || !profile.matches.matched.length">
 
           <!--Open the message with the chosen opener-->
-          <p ng-bind-html="profile.matches.opener | unsafe"></p>
+          <p ng-bind-html="profile.matches.opener"></p>
 
           <!--Loop through the profile.matches.matched array to display the
               message associated with the keywords-->
@@ -176,7 +176,7 @@
           </p>
 
           <!--Close the message with the closing text-->
-          <p ng-bind-html="profile.matches.closer | unsafe"></p>
+          <p ng-bind-html="profile.matches.closer"></p>
         </div>
 
         <!-- Custom message result goes here -->
@@ -224,12 +224,12 @@
 
         <!--This div preps the data for the database if we choose to send the
             msg, and is viewable in debug mode-->
-        <div id="{{profile.okcUsername}}_data" ng-show="profileCtrl.debug">
+        <!-- <div id="{{profile.okcUsername}}_data" ng-show="profileCtrl.debug">
           <hr />
           <strong>Database Object:</strong><br />
           {{ profileCtrl.updateDatabaseObj(profile.matches, saveCustomized, profile.okcUsername, profile.matchScore) }}
           <br /><hr />
-        </div>
+        </div> -->
 
         <!--Debug feature for previewing the plain text message to ensure no
             HTML stuck around after processing-->
