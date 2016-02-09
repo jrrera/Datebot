@@ -52,6 +52,12 @@ module.exports = function(grunt) {
         src: 'popup.html',
         dest: 'build/',
       },
+      fonts: {
+        src: ['bower_components/bootstrap/fonts/*'],
+        expand: true,
+        flatten: true,
+        dest: 'build/fonts/'
+      },
       components: {
         expand: true,
         src: ['components/**/*.html'],

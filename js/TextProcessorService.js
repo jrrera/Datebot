@@ -19,7 +19,7 @@ TextProcessorService.prototype.processLineBreaks = function(text) {
   final = final.replace(/<\/?span[^>]*?"?>/gi,""); //Filters out all span tags
 
   //Removes commented out HTML and arbitrary spacing in a nongreedy fashion
-  final = final.replace(/\n*(?:\s{2,})?<!--(.|\n)*?-->\s*\n*/gi, "");
+  final = final.replace(/\n*(?:\s{2,})?<!--(.|\n)*?-->\s*\n*/gi, " ");
 
   //Puts a line break for any <br> tag
   final = final.replace(/\s*<br\s?\/?>\s*\n*<\/p>\n*\s*/gi, "\n\n");

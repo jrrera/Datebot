@@ -88,7 +88,7 @@
       <td ng-hide="profileCtrl.hidePicture" id="matchinfo">
         <a href="http://www.okcupid.com/profile/{{profile.okcUsername}}"
            target="_blank">{{profile.okcUsername}}</a>
-        <img src="{{profile.okcPicture}}" class="profile-image" /><br />
+        <img ng-src="{{profile.okcPicture}}" class="profile-image" /><br />
         <p class="score lead">
           Score:<br />
           <strong>{{profileCtrl.calculateScore(profile)}}</strong>
