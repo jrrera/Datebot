@@ -1,33 +1,12 @@
 'use strict';
 
 angular.module('datebot').controller('ProfileController',
-	function ProfileController($scope, ScraperService, TextProcessorService) {
+	function ProfileController($scope, ScraperService, TextProcessorService, StorageService) {
 		var self = this;
 
 		//Private variables
 		var dayOfWeek = new Date().getDay(),
-			profileObj = profileObj || {};
-
-		function recordInteraction() {
-			var records = localStorage["dbotInteractions"], //storage object containing username as key and interaction as value
-			interactionObj = profileObj, //grabs the variable off the controller
-			user = interactionObj.username;
-
-			if (records) {
-				//Parse JSON string and store this data if this user hasn't been recorded yet
-				console.log('Found records. Parsing...');
-				records = JSON.parse(records);
-				if (!records[user]) records[user] = interactionObj;
-				localStorage["dbotInteractions"] = JSON.stringify(records);
-			} else {
-				//If no records object found, intialize object, store data, and stringify
-				console.log('No interaction record found, adding...');
-				records = {};
-				records[user] = interactionObj;
-				localStorage["dbotInteractions"] = JSON.stringify(records);
-			}
-			//console.log(JSON.stringify(records, null, 4));
-		}
+				profileObj = profileObj || {};
 
 		//Begin properties and methods available on controller
     this.loading = true; //Shows the AJAX loader graphic, and hides the results table. Will flip after AJAX call comes back
