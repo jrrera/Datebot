@@ -32,7 +32,7 @@ keywordsApp.controller('KeywordController',
 			if ($scope.added) {
 			  console.log('A keyword is waiting!');
 		      if (keywordData.checkForExistingKeywords($scope.newKeyword, $scope.keyword.pairs) === false) {
-				$scope.keyword.pairs.unshift({'keyword':$scope.newKeyword, 'message':'[[Requires a related message]]'}); //Add to top of keywords list
+				$scope.keyword.pairs.unshift({'keyword':$scope.newKeyword, 'message':''}); //Add to top of keywords list
 				keywordData.saveKeywords($scope.keyword); //Save the data
 		      }
 			}
@@ -122,7 +122,7 @@ keywordsApp.controller('KeywordController',
 
 					//Run $scope.$apply because this data change happens in the chrome API callback
 					$scope.$apply(function(){
-						$scope.keyword.pairs.unshift({'keyword':newKeyword, 'message':'[[Requires a related message]]'}); //Add to top of keywords list
+						$scope.keyword.pairs.unshift({'keyword':newKeyword, 'message':''}); //Add to top of keywords list
 						$scope.save(); //Save the data
 					});
 			      }
