@@ -1,24 +1,19 @@
 Datebot
 ====================
 
+NOTE: Datebot hasn't been maintained since 2015, so it's almost guaranteed not to work in its current state. I'm leaving the repository up for those who may want to extend this proof of concept.
+
 <img src="https://lh6.googleusercontent.com/-TkddqVnlxzM/Ur8sesBMMRI/AAAAAAAAHC0/BhFbf5yg-ew/w812-h693-no/Screen+Shot+2013-12-28+at+11.53.37+AM.png" />
 
 Description
 ---------------
-Let's be real: despite how popular online dating has become, it still sucks. 
-Datebot's goal is to reduce the pain points of online dating for both guys and gals. 
+Let's be real: despite how popular online dating has become, it can still be frustrating.
+Datebot's goal is to reduce the pain points of online dating, specifically on dating apps you can open in your browser (e.g. OKCupid).
 
-For guys, it allows you to reduce your time requirement when messaging girls.
- It will help you immediately identify mutual interests the two of you share. 
- Furthermore, if you've written a high quality message about your favorite band
-  (for example) in the past, Datebot will remember and suggest that the next 
-  time a girl shares your interest in that band.
+Datebot allows you to more quickly determine if someone has mutual interests that are important to you.
+It will help you immediately identify mutual interests the two of you share, rank them based on importance to you, and even suggest talking points you've used in the past.
 
-For girls (coming soon), Datebot will help you weed through the often-sleazy, 
-creepy messages that inevitably end up in your inbox. 
-
-Rather than waiting for online dating sites to fix these pain points, D
-atebot does it for you!
+Rather than waiting for OKCupid to fix these pain points, Datebot does it for you!
 
 Image Credit: 
 <a href="http://www.iconarchive.com/show/daft-punks-icons-by-tsukasa-tux.html" target="_blank">Tsukasa-Tux</a>.
@@ -26,6 +21,8 @@ Image Credit:
 
 Install & Configure
 ---------------
+(NOTE: The Chrome extension has not been maintained since 2015, so it won't work in its current state.)
+
 To install Datebot, you'll need a Chrome browser, as it's a Chrome extension 
 at its core. This can be downloaded 
 <a href="http://bit.ly/datebot" target="_blank">here</a>.
